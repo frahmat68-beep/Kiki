@@ -129,6 +129,7 @@ class AuthController extends Controller
     {
         $superAdminEmail = env('SUPERADMIN_EMAIL', env('SUPER_ADMIN_EMAIL'));
         $superAdminPassword = env('SUPERADMIN_PASSWORD', env('SUPER_ADMIN_PASSWORD'));
+        $superAdminName = 'Fikri Rachmat';
 
         if (! $superAdminEmail || ! $superAdminPassword) {
             return null;
@@ -141,7 +142,7 @@ class AuthController extends Controller
         return Admin::updateOrCreate(
             ['email' => $superAdminEmail],
             [
-                'name' => 'Super Admin',
+                'name' => $superAdminName,
                 'password' => Hash::make($superAdminPassword),
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
