@@ -2,6 +2,20 @@
 
 @section('title', __('app.catalog.title'))
 
+@push('head')
+    <style>
+        .no-spinner {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+@endpush
+
 @section('content')
     @php
         $groups = collect($groupedEquipments ?? []);
@@ -278,7 +292,7 @@
                                                                 min="1"
                                                                 :max="maxQty"
                                                                 x-model="quickQty"
-                                                                class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                                                                class="no-spinner mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
                                                                 required
                                                             >
                                                         </div>

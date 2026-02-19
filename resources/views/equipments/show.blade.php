@@ -35,6 +35,20 @@
 @section('title', $equipment->name)
 @section('meta_description', __('app.product.meta'))
 
+@push('head')
+    <style>
+        .no-spinner {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+@endpush
+
 @section('content')
 
     <section class="bg-slate-50">
@@ -248,13 +262,13 @@
                                 <button type="button" class="h-8 w-8 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:text-blue-600" @click="qty = Math.max(1, qty - 1)">-</button>
                                 <input
                                     id="rent-qty"
-                                    type="number"
-                                    name="qty"
-                                    min="1"
-                                    :max="maxQty"
-                                    x-model="qty"
-                                    class="w-12 bg-transparent text-center text-sm font-semibold text-slate-700 focus:outline-none"
-                                >
+                                type="number"
+                                name="qty"
+                                min="1"
+                                :max="maxQty"
+                                x-model="qty"
+                                class="no-spinner w-12 bg-transparent text-center text-sm font-semibold text-slate-700 focus:outline-none"
+                            >
                                 <button type="button" class="h-8 w-8 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:text-blue-600" @click="qty = Math.min(maxQty, qty + 1)">+</button>
                             </div>
                             <button

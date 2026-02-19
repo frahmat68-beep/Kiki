@@ -5,16 +5,20 @@
             <p class="mt-3 text-sm leading-relaxed text-blue-100/90">
                 {{ setting('footer.about', setting('footer_description', site_content('footer.about', __('app.footer.about_body')))) }}
             </p>
-            <div class="mt-4 rounded-xl border border-blue-300/35 bg-gradient-to-br from-blue-900/80 to-slate-900/85 p-3 shadow-inner">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-100">{{ setting('footer.rules_title', __('app.footer.rules_title')) }}</p>
+            <div
+                class="mt-4 rounded-xl border p-3 shadow-inner"
+                style="background: linear-gradient(145deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 58, 138, 0.9) 100%); border-color: rgba(147, 197, 253, 0.45); color: #eff6ff;"
+            >
+                <p class="text-xs font-semibold uppercase tracking-[0.14em]" style="color: #bfdbfe;">{{ setting('footer.rules_title', __('app.footer.rules_title')) }}</p>
                 <a
                     href="{{ route('rental.rules') }}"
-                    class="mt-2 inline-flex items-center gap-1 text-sm font-semibold italic text-white transition hover:text-blue-200"
+                    class="mt-2 inline-flex items-center gap-1 text-sm font-semibold italic transition hover:opacity-90"
+                    style="color: #ffffff;"
                 >
                     {{ setting('footer.rules_link', __('app.footer.rules_link')) }}
                     <span aria-hidden="true">→</span>
                 </a>
-                <p class="mt-2 text-xs leading-relaxed text-blue-100/85">{{ setting('footer.rules_note', __('app.footer.rules_note')) }}</p>
+                <p class="mt-2 text-xs leading-relaxed" style="color: #dbeafe;">{{ setting('footer.rules_note', __('app.footer.rules_note')) }}</p>
             </div>
         </div>
 
