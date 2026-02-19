@@ -332,12 +332,9 @@ class CartController extends Controller
                 ->values();
 
             if ($conflictDates->isNotEmpty()) {
-                $list = $conflictDates->take(4)->implode(', ');
-                if ($conflictDates->count() > 4) {
-                    $list .= ', ...';
-                }
-
-                return "{$equipment->name} sedang disewa pada tanggal: {$list}. Silakan turunkan jumlah atau pilih tanggal lain.";
+                return "{$equipment->name} tidak tersedia untuk jumlah ini.\n"
+                    . 'Tanggal bentrok: ' . $this->formatConflictDateList($conflictDates) . ".\n"
+                    . 'Silakan kurangi jumlah atau pilih tanggal lain.';
             }
         }
 
@@ -393,5 +390,18 @@ class CartController extends Controller
         }
 
         return 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=600&q=80';
+    }
+
+    private function formatConflictDateList(\Illuminate\Support\Collection $dates, int $limit = 4): string
+    {
+        $visibleDates = $dates->take($limit);
+        $remainingCount = max($dates->count() - $visibleDates->count(), 0);
+
+        $result = $visibleDates->implode(', ');
+        if ($remainingCount > 0) {
+            $result .= ", dan {$remainingCount} tanggal lain";
+        }
+
+        return $result;
     }
 }

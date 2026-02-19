@@ -318,7 +318,7 @@
                     error: 'border-rose-200 bg-rose-50 text-rose-700',
                 };
 
-                availabilityFeedback.className = `rounded-xl border px-4 py-3 text-xs ${classes[tone] || classes.info}`;
+                availabilityFeedback.className = `rounded-xl border px-4 py-3 text-xs leading-relaxed whitespace-pre-line ${classes[tone] || classes.info}`;
                 availabilityFeedback.textContent = message;
                 availabilityFeedback.classList.remove('hidden');
             };
@@ -397,13 +397,14 @@
                         ? payload.suggestions.map((item) => `${formatDate(item.start_date)} - ${formatDate(item.end_date)}`)
                         : [];
 
-                    let detail = payload.message || @json(__('ui.availability.not_available'));
+                    const lines = [payload.message || @json(__('ui.availability.not_available'))];
                     if (conflicts.length > 0) {
-                        detail += ` {{ __('app.product.availability_conflict_label') }} ${conflicts.slice(0, 4).join(', ')}`;
+                        lines.push(`{{ __('app.product.availability_conflict_label') }} ${conflicts.slice(0, 4).join(', ')}`);
                     }
                     if (suggestions.length > 0) {
-                        detail += ` {{ __('app.product.availability_suggestions_label') }} ${suggestions.join(' | ')}`;
+                        lines.push(`{{ __('app.product.availability_suggestions_label') }} ${suggestions.join(' | ')}`);
                     }
+                    const detail = lines.join('\n');
 
                     setAddToCartState(false);
                     setAvailabilityMessage(detail, availabilityState === 'partially_available' ? 'warning' : 'error');

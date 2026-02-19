@@ -140,7 +140,7 @@ class CartQuantityValidationTest extends TestCase
         $response->assertSessionHas('error', function ($message) use ($equipment) {
             $text = (string) $message;
 
-            return str_contains($text, $equipment->name) && str_contains($text, 'sedang disewa pada tanggal');
+            return str_contains($text, $equipment->name) && str_contains($text, 'Tanggal bentrok:');
         });
         $this->assertSame([], session()->get('cart.items', []));
     }
