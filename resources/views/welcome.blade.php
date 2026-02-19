@@ -131,11 +131,7 @@
                         </div>
                     @elseif ($userOverview)
                         <div class="mt-5">
-                            <div class="grid grid-cols-1 gap-2.5 min-[390px]:grid-cols-2 sm:grid-cols-4 sm:gap-3">
-                                <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Total Order</p>
-                                    <p class="mt-1 text-lg font-semibold text-slate-900">{{ (int) ($userOverview['total_orders'] ?? 0) }}</p>
-                                </article>
+                            <div class="grid grid-cols-1 gap-2.5 min-[390px]:grid-cols-2 sm:grid-cols-3 sm:gap-3">
                                 <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
                                     <p class="text-[10px] font-semibold tracking-wide text-slate-500">Pending Bayar</p>
                                     <p class="mt-1 text-lg font-semibold text-amber-600">{{ (int) ($userOverview['pending_payment'] ?? 0) }}</p>

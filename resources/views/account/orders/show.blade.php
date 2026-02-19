@@ -79,6 +79,15 @@
     ];
     $canReschedule = in_array($orderStatus, ['menunggu_pembayaran', 'diproses', 'lunas'], true);
     $hasPickedUp = in_array($orderStatus, ['barang_diambil', 'barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda', 'selesai'], true);
+    $rescheduleStartDate = $order->rental_start_date;
+    $rescheduleEndDate = $order->rental_end_date;
+    $rescheduleDurationDays = 1;
+    if ($rescheduleStartDate && $rescheduleEndDate && $rescheduleEndDate->gte($rescheduleStartDate)) {
+        $rescheduleDurationDays = $rescheduleStartDate->diffInDays($rescheduleEndDate) + 1;
+    }
+    $rescheduleConflictPopupMessage = (session('error') && (old('rental_start_date') || old('rental_end_date')))
+        ? session('error')
+        : null;
 @endphp
 
 @section('content')
@@ -107,6 +116,39 @@
             @if (session('success'))
                 <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($rescheduleConflictPopupMessage)
+                <div id="reschedule-conflict-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 px-4">
+                    <div class="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-5 shadow-2xl">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">Jadwal Tidak Tersedia</p>
+                                <p class="mt-2 text-sm font-semibold text-slate-900">Reschedule perlu tanggal lain.</p>
+                            </div>
+                            <button
+                                type="button"
+                                data-close-reschedule-popup
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-rose-200 hover:text-rose-600"
+                                aria-label="Tutup popup"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <p class="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                            {{ $rescheduleConflictPopupMessage }}
+                        </p>
+                        <div class="mt-4 flex justify-end">
+                            <button
+                                type="button"
+                                data-close-reschedule-popup
+                                class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
                 </div>
             @endif
 
@@ -296,7 +338,7 @@
                     @if ($canReschedule)
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
                             <h3 class="text-sm font-semibold text-slate-900">Butuh Reschedule?</h3>
-                            <p class="mt-1 text-xs text-slate-600">Jadwal masih bisa diubah selama barang belum diambil. Durasi sewa harus tetap sama.</p>
+                            <p class="mt-1 text-xs text-slate-600">Jadwal masih bisa diubah selama barang belum diambil. Durasi tetap {{ $rescheduleDurationDays }} hari, jumlah barang tetap sama, dan ada buffer 1 hari sebelum/sesudah sewa.</p>
                             <form method="POST" action="{{ route('account.orders.reschedule', $order) }}" class="mt-3 space-y-2">
                                 @csrf
                                 @method('PATCH')
@@ -305,6 +347,7 @@
                                     <input
                                         type="date"
                                         name="rental_start_date"
+                                        data-reschedule-start
                                         min="{{ now()->toDateString() }}"
                                         value="{{ old('rental_start_date', optional($order->rental_start_date)->format('Y-m-d')) }}"
                                         required
@@ -316,11 +359,15 @@
                                     <input
                                         type="date"
                                         name="rental_end_date"
+                                        data-reschedule-end
+                                        data-duration-days="{{ $rescheduleDurationDays }}"
                                         min="{{ now()->toDateString() }}"
                                         value="{{ old('rental_end_date', optional($order->rental_end_date)->format('Y-m-d')) }}"
+                                        readonly
                                         required
-                                        class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                        class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                                     >
+                                    <p class="mt-1 text-[11px] text-slate-500">Tanggal kembali otomatis mengikuti durasi {{ $rescheduleDurationDays }} hari.</p>
                                 </div>
                                 <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50">
                                     Simpan Reschedule
@@ -395,6 +442,64 @@
                     setTimeout(() => {
                         copyButton.textContent = 'Copy Resi';
                     }, 1500);
+                }
+            });
+        })();
+
+        (function () {
+            const startInput = document.querySelector('[data-reschedule-start]');
+            const endInput = document.querySelector('[data-reschedule-end]');
+
+            if (!startInput || !endInput) return;
+
+            const durationDays = Number(endInput.dataset.durationDays || 1);
+            if (!Number.isFinite(durationDays) || durationDays < 1) return;
+
+            const formatDate = (dateValue) => {
+                const year = dateValue.getFullYear();
+                const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+                const day = String(dateValue.getDate()).padStart(2, '0');
+
+                return `${year}-${month}-${day}`;
+            };
+
+            const syncEndDate = () => {
+                if (!startInput.value) return;
+
+                const startDate = new Date(`${startInput.value}T00:00:00`);
+                if (Number.isNaN(startDate.getTime())) return;
+
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + (durationDays - 1));
+                endInput.value = formatDate(endDate);
+            };
+
+            startInput.addEventListener('change', syncEndDate);
+            startInput.addEventListener('input', syncEndDate);
+            syncEndDate();
+        })();
+
+        (function () {
+            const popup = document.getElementById('reschedule-conflict-popup');
+            if (!popup) return;
+
+            const closePopup = () => {
+                popup.remove();
+            };
+
+            popup.querySelectorAll('[data-close-reschedule-popup]').forEach((button) => {
+                button.addEventListener('click', closePopup);
+            });
+
+            popup.addEventListener('click', (event) => {
+                if (event.target === popup) {
+                    closePopup();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closePopup();
                 }
             });
         })();

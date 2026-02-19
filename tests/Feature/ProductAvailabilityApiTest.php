@@ -31,7 +31,7 @@ class ProductAvailabilityApiTest extends TestCase
         ]);
     }
 
-    public function test_availability_endpoint_returns_partially_available_when_only_some_days_conflict(): void
+    public function test_availability_endpoint_returns_not_available_when_buffered_range_conflicts(): void
     {
         $equipment = $this->createEquipment([
             'name' => 'Aputure 600D',
@@ -69,7 +69,7 @@ class ProductAvailabilityApiTest extends TestCase
         $response->assertOk();
         $response->assertJson([
             'ok' => false,
-            'status' => 'partially_available',
+            'status' => 'not_available',
         ]);
         $this->assertNotEmpty($response->json('conflicts'));
     }
@@ -110,6 +110,50 @@ class ProductAvailabilityApiTest extends TestCase
 
         $bufferDate = now()->addDays(6)->toDateString();
         $response = $this->getJson(route('product.availability', ['slug' => $equipment->slug], false) . '?start_date=' . $bufferDate . '&end_date=' . $bufferDate . '&qty=1');
+
+        $response->assertOk();
+        $response->assertJson([
+            'ok' => false,
+            'status' => 'not_available',
+        ]);
+    }
+
+    public function test_availability_endpoint_blocks_buffer_day_before_existing_booking(): void
+    {
+        $equipment = $this->createEquipment([
+            'name' => 'DJI RS 3',
+            'slug' => 'dji-rs-3',
+            'stock' => 1,
+            'status' => 'ready',
+        ]);
+
+        $renter = User::factory()->create();
+        $startDate = now()->addDays(9)->toDateString();
+        $order = Order::create([
+            'user_id' => $renter->id,
+            'order_number' => 'MNK-AVAIL-BUFFER-BEFORE',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'lunas',
+            'status' => 'paid',
+            'total_amount' => 175000,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $startDate,
+            'midtrans_order_id' => 'MNK-AVAIL-BUFFER-BEFORE',
+            'paid_at' => now(),
+        ]);
+
+        $order->items()->create([
+            'equipment_id' => $equipment->id,
+            'qty' => 1,
+            'price' => 175000,
+            'subtotal' => 175000,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $startDate,
+            'rental_days' => 1,
+        ]);
+
+        $bufferBeforeDate = now()->addDays(8)->toDateString();
+        $response = $this->getJson(route('product.availability', ['slug' => $equipment->slug], false) . '?start_date=' . $bufferBeforeDate . '&end_date=' . $bufferBeforeDate . '&qty=1');
 
         $response->assertOk();
         $response->assertJson([

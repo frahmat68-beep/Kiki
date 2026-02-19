@@ -365,6 +365,77 @@ class CheckoutOrderItemTest extends TestCase
         $this->assertStringContainsString('Zoom F8n tidak tersedia pada tanggal:', $message);
     }
 
+    public function test_checkout_rejects_on_buffer_day_before_existing_booking(): void
+    {
+        $user = User::factory()->create();
+        $this->seedCompletedVerifiedProfile($user);
+        $otherUser = User::factory()->create();
+
+        $category = Category::create(['name' => 'Audio']);
+        $equipment = Equipment::create([
+            'category_id' => $category->id,
+            'name' => 'Sennheiser EW100',
+            'description' => 'Wireless Mic',
+            'price_per_day' => 180000,
+            'stock' => 1,
+            'status' => 'ready',
+            'image' => null,
+        ]);
+
+        $existingStart = now()->addDays(8)->toDateString();
+        $existingEnd = now()->addDays(8)->toDateString();
+        $bufferBeforeDay = now()->addDays(7)->toDateString();
+
+        $existingOrder = Order::create([
+            'user_id' => $otherUser->id,
+            'order_number' => 'MNK-EXIST-BUFFER-BEFORE',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'lunas',
+            'status' => 'paid',
+            'total_amount' => 180000,
+            'rental_start_date' => $existingStart,
+            'rental_end_date' => $existingEnd,
+            'midtrans_order_id' => 'MNK-EXIST-BUFFER-BEFORE',
+            'paid_at' => now(),
+        ]);
+
+        $existingOrder->items()->create([
+            'equipment_id' => $equipment->id,
+            'qty' => 1,
+            'price' => 180000,
+            'subtotal' => 180000,
+            'rental_start_date' => $existingStart,
+            'rental_end_date' => $existingEnd,
+            'rental_days' => 1,
+        ]);
+
+        $this->mock(MidtransService::class, function ($mock) {
+            $mock->shouldNotReceive('createSnapToken');
+        });
+
+        $this->withSession([
+            'cart.items' => [
+                'equipment:' . $equipment->id => [
+                    'equipment_id' => $equipment->id,
+                    'name' => $equipment->name,
+                    'price' => 180000,
+                    'qty' => 1,
+                    'key' => 'equipment:' . $equipment->id,
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('checkout.store'), [
+            'rental_start_date' => $bufferBeforeDay,
+            'rental_end_date' => $bufferBeforeDay,
+            'confirm_profile' => 'on',
+        ]);
+
+        $response->assertStatus(422);
+        $message = (string) $response->json('message');
+        $this->assertStringContainsString('Sennheiser EW100 tidak tersedia pada tanggal:', $message);
+    }
+
     private function seedCompletedVerifiedProfile(User $user): void
     {
         $nik = str_pad((string) (3276000000000000 + $user->id), 16, '0', STR_PAD_LEFT);

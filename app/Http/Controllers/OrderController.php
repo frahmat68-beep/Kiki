@@ -93,7 +93,7 @@ class OrderController extends Controller
         }
 
         $currentDurationDays = $this->resolveOrderDurationDays($order);
-        $newDurationDays = $newStartDate->diffInDays($newEndDate) + 1;
+        $newDurationDays = (int) ($newStartDate->diffInDays($newEndDate) + 1);
         if ($currentDurationDays > 0 && $newDurationDays !== $currentDurationDays) {
             return redirect()
                 ->route('account.orders.show', $order)
@@ -137,7 +137,9 @@ class OrderController extends Controller
                         continue;
                     }
 
-                    for ($cursor = $newStartDate->copy(); $cursor->lte($newEndDate); $cursor->addDay()) {
+                    $windowStart = $newStartDate->copy()->subDays(AvailabilityService::BUFFER_DAYS);
+                    $windowEnd = $newEndDate->copy()->addDays(AvailabilityService::BUFFER_DAYS);
+                    for ($cursor = $windowStart; $cursor->lte($windowEnd); $cursor->addDay()) {
                         $dateKey = $cursor->toDateString();
                         $requestedDailyByEquipment[$equipmentId][$dateKey] = ($requestedDailyByEquipment[$equipmentId][$dateKey] ?? 0) + $qty;
                     }
@@ -177,7 +179,7 @@ class OrderController extends Controller
                             $list .= ', ...';
                         }
 
-                        throw new \RuntimeException("{$equipment->name} tidak tersedia pada tanggal: {$list}.", 422);
+                        throw new \RuntimeException("{$equipment->name} sedang disewa pada tanggal: {$list}. Silakan pilih tanggal lain.", 422);
                     }
                 }
 

@@ -38,18 +38,23 @@ class AvailabilityService
         }
 
         if (($equipment->status ?? 'ready') !== 'ready') {
+            $bufferedStart = $start->copy()->subDays(self::BUFFER_DAYS);
+            $bufferedEnd = $end->copy()->addDays(self::BUFFER_DAYS);
+
             return [
                 'ok' => false,
                 'reason' => ($equipment->status ?? 'unavailable') === 'maintenance' ? 'maintenance' : 'equipment_unavailable',
-                'conflicts' => $this->dateRangeKeys($start, $end),
+                'conflicts' => $this->dateRangeKeys($bufferedStart, $bufferedEnd),
                 'daily' => [],
             ];
         }
 
-        $daily = $this->getDailyReservedUnits($equipment, $start, $end, $ignoreOrderId);
+        $bufferedStart = $start->copy()->subDays(self::BUFFER_DAYS);
+        $bufferedEnd = $end->copy()->addDays(self::BUFFER_DAYS);
+        $daily = $this->getDailyReservedUnits($equipment, $bufferedStart, $bufferedEnd, $ignoreOrderId);
         $conflicts = [];
 
-        foreach ($this->dateRangeKeys($start, $end) as $dateKey) {
+        foreach ($this->dateRangeKeys($bufferedStart, $bufferedEnd) as $dateKey) {
             $reserved = (int) data_get($daily, $dateKey . '.qty', 0);
             $available = max((int) $equipment->stock - $reserved, 0);
 
@@ -79,8 +84,8 @@ class AvailabilityService
             return [];
         }
 
-        $windowStart = $start->copy()->subDay();
-        $windowEnd = $end->copy();
+        $windowStart = $start->copy()->subDays(self::BUFFER_DAYS);
+        $windowEnd = $end->copy()->addDays(self::BUFFER_DAYS);
         $daily = [];
 
         $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd, $ignoreOrderId, $excludeUserId);
@@ -102,11 +107,19 @@ class AvailabilityService
                 ]);
             }
 
-            $bufferDate = $bookingEnd->copy()->addDays(self::BUFFER_DAYS);
-            $this->appendDailyReservation($daily, $bufferDate, $start, $end, $qty, [
-                'type' => 'buffer',
-                'order_number' => $orderNumber,
-            ]);
+            for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
+                $bufferBeforeDate = $bookingStart->copy()->subDays($offset);
+                $this->appendDailyReservation($daily, $bufferBeforeDate, $start, $end, $qty, [
+                    'type' => 'buffer_before',
+                    'order_number' => $orderNumber,
+                ]);
+
+                $bufferAfterDate = $bookingEnd->copy()->addDays($offset);
+                $this->appendDailyReservation($daily, $bufferAfterDate, $start, $end, $qty, [
+                    'type' => 'buffer_after',
+                    'order_number' => $orderNumber,
+                ]);
+            }
         }
 
         if (Schema::hasTable('equipment_maintenance_windows')) {
@@ -146,7 +159,9 @@ class AvailabilityService
 
         $entries = collect();
 
-        $items = $this->fetchBlockingOrderItems($equipment->id, $start->copy()->subDay(), $end, null, $excludeUserId);
+        $windowStart = $start->copy()->subDays(self::BUFFER_DAYS);
+        $windowEnd = $end->copy()->addDays(self::BUFFER_DAYS);
+        $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd, null, $excludeUserId);
         foreach ($items as $item) {
             $order = $item->order;
             $bookingStart = $this->normalizeDate($item->rental_start_date ?? $order?->rental_start_date);
@@ -155,7 +170,9 @@ class AvailabilityService
                 continue;
             }
 
-            if ($bookingEnd->lt($start) || $bookingStart->gt($end)) {
+            $bookingWindowStart = $bookingStart->copy()->subDays(self::BUFFER_DAYS);
+            $bookingWindowEnd = $bookingEnd->copy()->addDays(self::BUFFER_DAYS);
+            if ($bookingWindowEnd->lt($start) || $bookingWindowStart->gt($end)) {
                 continue;
             }
 
@@ -170,17 +187,32 @@ class AvailabilityService
                 'reason' => null,
             ]);
 
-            $bufferDate = $bookingEnd->copy()->addDays(self::BUFFER_DAYS);
-            if ($bufferDate->betweenIncluded($start, $end)) {
-                $entries->push([
-                    'type' => 'buffer',
-                    'order_number' => $orderNumber,
-                    'start_date' => $bufferDate->toDateString(),
-                    'end_date' => $bufferDate->toDateString(),
-                    'qty' => max((int) ($item->qty ?? 0), 1),
-                    'label' => 'Buffer 1 Hari',
-                    'reason' => null,
-                ]);
+            for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
+                $bufferBeforeDate = $bookingStart->copy()->subDays($offset);
+                if ($bufferBeforeDate->betweenIncluded($start, $end)) {
+                    $entries->push([
+                        'type' => 'buffer_before',
+                        'order_number' => $orderNumber,
+                        'start_date' => $bufferBeforeDate->toDateString(),
+                        'end_date' => $bufferBeforeDate->toDateString(),
+                        'qty' => max((int) ($item->qty ?? 0), 1),
+                        'label' => 'Buffer Sebelum Sewa',
+                        'reason' => null,
+                    ]);
+                }
+
+                $bufferAfterDate = $bookingEnd->copy()->addDays($offset);
+                if ($bufferAfterDate->betweenIncluded($start, $end)) {
+                    $entries->push([
+                        'type' => 'buffer_after',
+                        'order_number' => $orderNumber,
+                        'start_date' => $bufferAfterDate->toDateString(),
+                        'end_date' => $bufferAfterDate->toDateString(),
+                        'qty' => max((int) ($item->qty ?? 0), 1),
+                        'label' => 'Buffer Setelah Sewa',
+                        'reason' => null,
+                    ]);
+                }
             }
         }
 

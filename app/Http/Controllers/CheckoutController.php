@@ -391,13 +391,16 @@ class CheckoutController extends Controller
             }
 
             try {
-                $cursor = Carbon::parse($startDate)->startOfDay();
+                $start = Carbon::parse($startDate)->startOfDay();
                 $end = Carbon::parse($endDate)->startOfDay();
-                if ($end->lt($cursor)) {
+                if ($end->lt($start)) {
                     continue;
                 }
 
-                while ($cursor->lte($end)) {
+                $cursor = $start->copy()->subDays(AvailabilityService::BUFFER_DAYS);
+                $windowEnd = $end->copy()->addDays(AvailabilityService::BUFFER_DAYS);
+
+                while ($cursor->lte($windowEnd)) {
                     $dateKey = $cursor->toDateString();
                     $dailyDemand[$equipmentId][$dateKey] = ($dailyDemand[$equipmentId][$dateKey] ?? 0) + $qty;
                     $cursor->addDay();
