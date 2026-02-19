@@ -15,7 +15,6 @@
         <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">Checkout</p>
                     <h1 class="text-2xl sm:text-3xl font-semibold text-slate-900">Konfirmasi Sewa</h1>
                     <p class="text-sm text-slate-600">Review jadwal tiap alat sebelum pembayaran.</p>
                 </div>

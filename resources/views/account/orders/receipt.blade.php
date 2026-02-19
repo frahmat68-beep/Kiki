@@ -81,21 +81,23 @@
             box-shadow: var(--invoice-shadow);
         }
 
+        .brand-logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.96);
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 18px rgba(3, 10, 32, 0.24);
+        }
+
         .brand-logo {
             display: block;
             width: auto;
             height: 34px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 4px 10px rgba(5, 16, 44, 0.35));
-        }
-
-        .brand-kicker {
-            margin: 0;
-            font-size: 11px;
-            letter-spacing: .18em;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: rgba(232, 240, 255, 0.86);
+            filter: none;
         }
 
         .invoice-title {
@@ -763,8 +765,9 @@
     <main class="invoice-shell">
         <header class="invoice-header" aria-label="Invoice Header">
             <div>
-                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo">
-                <p class="brand-kicker">Manake Rental</p>
+                <span class="brand-logo-wrap">
+                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo">
+                </span>
                 <h1 class="invoice-title">{{ __('ui.invoice.title') }}</h1>
                 <p class="invoice-subtitle">{{ __('ui.invoice.subtitle') }}</p>
             </div>
@@ -936,14 +939,13 @@
             </details>
 
             <div class="invoice-foot">
-                <strong>Manake Rental</strong> • {{ $contactPhone }} • {{ $contactEmail }} • {{ $footerAddress }}<br>
+                <strong>Manake</strong> • {{ $contactPhone }} • {{ $contactEmail }} • {{ $footerAddress }}<br>
                 {{ __('ui.invoice.auto_note') }}
             </div>
         </section>
     </main>
 
     <div class="actions" aria-label="Invoice Actions">
-        <a href="{{ route('account.orders.show', $order) }}" class="action-btn">{{ __('ui.invoice.actions.back_to_detail') }}</a>
         <a href="{{ route('account.orders.receipt.pdf', $order) }}" class="action-btn">{{ __('ui.invoice.actions.download_pdf') }}</a>
         <button type="button" class="action-btn" id="share-invoice-btn">{{ __('ui.invoice.actions.share') }}</button>
         <button type="button" class="action-btn primary" onclick="window.print()">{{ __('ui.invoice.actions.print') }}</button>

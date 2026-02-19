@@ -7,7 +7,6 @@
         $groups = collect($groupedEquipments ?? []);
         $activeCategorySlug = $activeCategorySlug ?? '';
         $search = trim((string) ($search ?? request('q', '')));
-        $catalogKicker = setting('copy.catalog.kicker', __('app.catalog.kicker'));
         $catalogTitle = setting('copy.catalog.title', __('app.catalog.title'));
         $catalogSubtitle = setting('copy.catalog.subtitle', __('app.catalog.subtitle'));
         $categoryLabel = setting('copy.catalog.category_label', __('app.catalog.filter_category'));
@@ -19,7 +18,6 @@
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
             <div class="flex flex-col gap-3">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ $catalogKicker }}</p>
                     <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">{{ $catalogTitle }}</h1>
                     <p class="text-sm text-slate-600">{{ $catalogSubtitle }}</p>
                 </div>
@@ -27,7 +25,7 @@
 
             <div class="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-slate-500">{{ $categoryLabel }}</p>
+                    <p class="text-xs font-semibold text-slate-500">{{ $categoryLabel }}</p>
                     @if ($search !== '')
                         <a href="{{ route('catalog', $activeCategorySlug !== '' ? ['category' => $activeCategorySlug] : []) }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
                             Reset Pencarian
@@ -77,7 +75,6 @@
                 <section>
                     <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">Kategori</p>
                             <h2 class="text-2xl font-semibold text-slate-900">{{ $category->name }}</h2>
                             @if (!empty($category->description))
                                 <p class="text-sm text-slate-500">{{ $category->description }}</p>
@@ -222,7 +219,7 @@
                                                 <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
                                                     <div class="flex items-start justify-between gap-3">
                                                         <div>
-                                                            <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">Pesan Cepat</p>
+                                                            <p class="text-xs font-semibold text-blue-600">Pesan Cepat</p>
                                                             <h4 class="mt-1 text-base font-semibold text-slate-900">{{ $item->name }}</h4>
                                                             <p class="text-xs text-slate-500">Isi tanggal sewa, lalu langsung masuk keranjang.</p>
                                                         </div>

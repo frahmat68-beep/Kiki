@@ -86,7 +86,6 @@
         <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">Order</p>
                     <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Detail Pesanan</h1>
                     <p class="text-sm text-slate-500">Pantau status pembayaran dan progres rental di sini.</p>
                 </div>

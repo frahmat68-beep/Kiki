@@ -33,7 +33,6 @@
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ __('app.product.detail_title') }}</p>
                     <h1 class="text-2xl sm:text-3xl font-semibold text-slate-900">{{ $equipment->name }}</h1>
                     <p class="text-sm text-slate-600">{{ $equipment->category?->name ?? __('app.category.title') }}</p>
                 </div>

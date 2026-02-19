@@ -19,7 +19,6 @@
     <div class="mx-auto max-w-7xl">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ __('ui.cart.kicker') }}</p>
                 <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.cart.title') }}</h2>
                 <p class="text-sm text-slate-500">{{ __('ui.cart.subtitle') }}</p>
             </div>

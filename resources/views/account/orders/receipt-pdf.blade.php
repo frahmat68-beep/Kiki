@@ -500,7 +500,6 @@
             <tr>
                 <td style="width: 64%; padding-right: 10px;">
                     <img src="{{ $logoUrl }}" alt="Manake" class="brand-logo">
-                    <p class="brand-kicker">Manake Rental</p>
                     <h1 class="invoice-title">{{ __('ui.invoice.title') }}</h1>
                     <p class="invoice-subtitle">{{ __('ui.invoice.subtitle') }}</p>
                 </td>
@@ -657,7 +656,7 @@
         <p class="terms-title">{{ __('ui.invoice.sections.terms') }}</p>
         @include('account.orders.partials.terms-list', ['terms' => $terms])
         <p class="footer-mini">
-            <strong>Manake Rental</strong> • {{ $contactPhone }} • {{ $contactEmail }} • {{ $footerAddress }}<br>
+            <strong>Manake</strong> • {{ $contactPhone }} • {{ $contactEmail }} • {{ $footerAddress }}<br>
             {{ __('ui.invoice.auto_note') }}
         </p>
     </div>

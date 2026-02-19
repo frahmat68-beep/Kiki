@@ -7,7 +7,6 @@
         <div class="max-w-6xl mx-auto px-6 py-12">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ __('ui.nav.contact') ?? 'Contact' }}</p>
                     <h1 class="text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white">Kontak Manake</h1>
                     <p class="text-sm text-slate-600 dark:text-slate-300">Hubungi kami untuk pemesanan dan kolaborasi.</p>
                 </div>

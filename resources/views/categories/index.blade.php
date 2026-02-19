@@ -7,8 +7,7 @@
         <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ __('app.category.title') }}</p>
-                    <h1 class="mt-2 text-2xl font-semibold text-slate-900 sm:text-3xl">Jelajahi Kategori Rental</h1>
+                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Jelajahi Kategori Rental</h1>
                     <p class="mt-2 text-sm text-slate-500">Pilih kategori untuk melihat alat yang tersedia saat ini.</p>
                 </div>
                 <a href="{{ route('catalog') }}" class="btn-secondary inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition">
@@ -35,8 +34,7 @@
                 <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($categories as $category)
                         <article class="card rounded-2xl p-5 shadow-sm">
-                            <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">Kategori</p>
-                            <h2 class="mt-2 text-lg font-semibold text-slate-900">{{ $category->name }}</h2>
+                            <h2 class="text-lg font-semibold text-slate-900">{{ $category->name }}</h2>
                             <p class="mt-2 text-sm text-slate-500 line-clamp-2">{{ $category->description ?: __('app.category.all_subtitle') }}</p>
                             <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
                                 <span>{{ $category->equipments_count }} alat</span>

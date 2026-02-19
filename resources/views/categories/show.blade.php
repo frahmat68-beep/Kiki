@@ -6,7 +6,6 @@
     @php
         $categoryName = $category->name ?? __('app.category.title');
         $categoryDescription = $category->description ?: setting('copy.category.subtitle', 'Daftar alat pada kategori ini.');
-        $categoryKicker = setting('copy.category.kicker', __('app.category.title'));
         $totalLabel = setting('copy.category.total_label', 'Total alat');
         $emptyTitle = setting('copy.category.empty_title', 'Belum ada alat di kategori ini.');
         $emptySubtitle = setting('copy.category.empty_subtitle', 'Silakan cek kategori lain atau hubungi admin.');
@@ -26,8 +25,7 @@
 
             <div class="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ $categoryKicker }}</p>
-                    <h1 class="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">{{ $categoryName }}</h1>
+                    <h1 class="text-3xl font-semibold text-slate-900 sm:text-4xl">{{ $categoryName }}</h1>
                     <p class="mt-3 max-w-2xl text-sm text-slate-600">{{ $categoryDescription }}</p>
                 </div>
                 <div class="flex flex-wrap gap-2">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -33,6 +34,7 @@ class CategoryController extends Controller
         $userOverview = null;
         $recentUserOrders = collect();
         $damageAlertOrder = null;
+        $guestRentalSnapshot = collect();
         $canResolveUsage = Schema::hasTable('order_items') && Schema::hasTable('orders');
 
         if (Schema::hasTable('categories')) {
@@ -123,9 +125,37 @@ class CategoryController extends Controller
                         && (string) ($order->damagePayment?->status ?? '') !== Order::PAYMENT_PAID;
                 });
             }
+        } elseif (Schema::hasTable('orders') && Schema::hasTable('order_items') && Schema::hasTable('equipments')) {
+            $guestRentalSnapshot = OrderItem::query()
+                ->with([
+                    'equipment:id,name',
+                    'order:id,status_pesanan,status_pembayaran,rental_start_date,rental_end_date',
+                ])
+                ->whereHas('order', function ($query) {
+                    $query
+                        ->where('status_pesanan', Order::STATUS_ON_RENT)
+                        ->where('status_pembayaran', Order::PAYMENT_PAID);
+                })
+                ->latest('id')
+                ->limit(8)
+                ->get(['id', 'order_id', 'equipment_id', 'qty', 'rental_start_date', 'rental_end_date'])
+                ->map(function (OrderItem $item) {
+                    $startDate = $item->rental_start_date ?: $item->order?->rental_start_date;
+                    $endDate = $item->rental_end_date ?: $item->order?->rental_end_date;
+
+                    return [
+                        'name' => (string) ($item->equipment?->name ?: 'Equipment'),
+                        'qty' => max((int) ($item->qty ?? 1), 1),
+                        'start_date' => $startDate,
+                        'end_date' => $endDate,
+                    ];
+                })
+                ->filter(fn (array $item) => $item['name'] !== '')
+                ->take(5)
+                ->values();
         }
 
-        return view('welcome', compact('category', 'productsReady', 'userOverview', 'recentUserOrders', 'damageAlertOrder'));
+        return view('welcome', compact('category', 'productsReady', 'userOverview', 'recentUserOrders', 'damageAlertOrder', 'guestRentalSnapshot'));
     }
 
     public function show(string $slug)

@@ -19,7 +19,6 @@
 @section('content')
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <p class="text-xs font-semibold uppercase tracking-widest text-blue-600">{{ __('ui.nav.my_orders') }}</p>
             <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.nav.my_orders') }}</h2>
             <p class="text-sm text-slate-500">Semua order dan status pembayaran kamu.</p>
         </div>
@@ -79,17 +78,7 @@
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
                                     {{ $meta['label'] }}
                                 </span>
-                                @if ($canOpenInvoice)
-                                    <button
-                                        type="button"
-                                        data-open-invoice-modal
-                                        data-invoice-url="{{ route('account.orders.receipt', $order) }}"
-                                        data-order-number="{{ $orderNumber }}"
-                                        class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600"
-                                    >
-                                        Invoice
-                                    </button>
-                                @elseif (($order->status_pembayaran ?? 'pending') !== 'paid')
+                                @if (($order->status_pembayaran ?? 'pending') !== 'paid')
                                     <a href="{{ route('booking.pay', $order) }}" class="rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700">
                                         Bayar
                                     </a>
@@ -195,7 +184,6 @@
         <div class="relative z-10 flex h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-2xl">
             <div class="flex items-center justify-between bg-blue-600 px-4 py-3 text-white sm:px-5">
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-100">Invoice</p>
                     <h3 id="order-invoice-modal-title" class="text-base font-semibold sm:text-lg">
                         Detail Invoice
                     </h3>
@@ -203,10 +191,13 @@
                 <button
                     type="button"
                     data-close-invoice-modal
-                    class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-blue-300/80 bg-blue-500/60 text-xl leading-none text-white transition hover:bg-blue-500"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-blue-300/80 bg-blue-500/60 p-0 text-white transition hover:bg-blue-500"
                     aria-label="Tutup modal"
                 >
-                    ×
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
                 </button>
             </div>
 
