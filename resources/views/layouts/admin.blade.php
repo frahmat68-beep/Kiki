@@ -18,8 +18,34 @@
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif; }
-        :root { --manake-heading-blue: #1d4ed8; }
-        :is(h1, h2, h3)[class*="text-slate-"] { color: var(--manake-heading-blue); }
+        :root {
+            --manake-heading-h1: #1d4ed8;
+            --manake-heading-h2: #2563eb;
+            --manake-heading-h3: #1e40af;
+            --manake-heading-h4: #1d4ed8;
+        }
+        header :is(h1, h2, h3) {
+            color: var(--manake-heading-h1) !important;
+            letter-spacing: -0.012em;
+        }
+        main h1 {
+            color: var(--manake-heading-h1) !important;
+            letter-spacing: -0.015em;
+            font-weight: 800;
+        }
+        main h2 {
+            color: var(--manake-heading-h2) !important;
+            letter-spacing: -0.012em;
+            font-weight: 700;
+        }
+        main h3 {
+            color: var(--manake-heading-h3) !important;
+            font-weight: 700;
+        }
+        main :is(h4, h5, h6) {
+            color: var(--manake-heading-h4) !important;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="min-h-screen">

@@ -21,7 +21,7 @@
             <div class="p-6 text-slate-800 sm:p-8 lg:p-10">
                 <div>
                     <div>
-                        <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.admin.admin_login') }}</h2>
+                        <h2 class="text-2xl font-semibold text-blue-700">{{ __('ui.admin.admin_login') }}</h2>
                         <p class="mt-2 text-sm text-slate-500">{{ __('ui.admin.login_intro') }}</p>
                     </div>
                 </div>

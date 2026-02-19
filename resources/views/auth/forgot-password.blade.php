@@ -37,7 +37,7 @@
             </div>
 
             <div class="p-8 md:p-10">
-                <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.auth.forgot_title') }}</h2>
+                <h2 class="text-2xl font-semibold text-blue-700">{{ __('ui.auth.forgot_title') }}</h2>
                 <p class="mt-2 text-sm text-slate-500">{{ __('ui.auth.forgot_help') }}</p>
 
                 @if (session('status'))

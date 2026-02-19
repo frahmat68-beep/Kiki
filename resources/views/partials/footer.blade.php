@@ -5,6 +5,17 @@
             <p class="mt-3 text-sm leading-relaxed text-blue-100/90">
                 {{ setting('footer.about', setting('footer_description', site_content('footer.about', __('app.footer.about_body')))) }}
             </p>
+            <div class="mt-4 rounded-xl border border-blue-300/25 bg-blue-950/35 p-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-200">{{ __('app.footer.rules_title') }}</p>
+                <a
+                    href="{{ route('rental.rules') }}"
+                    class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-white transition hover:text-blue-200"
+                >
+                    {{ __('app.footer.rules_link') }}
+                    <span aria-hidden="true">→</span>
+                </a>
+                <p class="mt-2 text-xs text-blue-200/80">{{ __('app.footer.rules_note') }}</p>
+            </div>
         </div>
 
         <div>

@@ -58,6 +58,7 @@ Route::get('/equipment/{slug}', [PageController::class, 'equipmentRedirect'])->n
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
 
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::get('/rental-rules', [PageController::class, 'rentalRules'])->name('rental.rules');
 Route::post('/payment/callback', [PaymentController::class, 'handleNotification'])->name('payment.callback');
 Route::post('/midtrans/callback', [PaymentController::class, 'handleNotification'])->name('midtrans.callback');
 
