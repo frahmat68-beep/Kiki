@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>Booking | Manake Rental</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
 <body class="bg-slate-100">

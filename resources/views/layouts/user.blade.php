@@ -10,7 +10,7 @@
         $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
     @endphp
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -40,7 +40,7 @@
     <style>
         [x-cloak] { display: none !important; }
         body {
-            font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
             color: var(--manake-body-color) !important;
             font-weight: var(--manake-body-weight);
             font-style: var(--manake-body-style);
