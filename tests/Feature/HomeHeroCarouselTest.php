@@ -192,4 +192,15 @@ class HomeHeroCarouselTest extends TestCase
         $response->assertSee('x3');
         $response->assertSee('Tanggal sewa:');
     }
+
+    public function test_home_logged_in_user_uses_rental_overview_without_stat_cards(): void
+    {
+        $response = $this->actingAs(User::factory()->create())->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Overview Alat Disewa');
+        $response->assertDontSee('Pending Bayar');
+        $response->assertDontSee('Siap Diambil');
+        $response->assertDontSee('Sedang Disewa');
+    }
 }

@@ -33,6 +33,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if (empty($cartItems))
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
                     <p class="text-sm text-slate-600">{{ __('ui.cart.empty') }}</p>

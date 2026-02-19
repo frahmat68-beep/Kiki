@@ -6,6 +6,7 @@
 @php
     $formatIdr = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
     $canViewInvoice = static fn ($order) => ($order->status_pembayaran ?? 'pending') === 'paid' && ! $order->hasOutstandingDamageFee();
+    $canRescheduleOrder = static fn ($order) => in_array((string) ($order->status_pesanan ?? ''), ['menunggu_pembayaran', 'diproses', 'lunas'], true);
 
     $paymentMeta = function ($status) {
         return match ($status) {
@@ -55,15 +56,19 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-slate-900">Rental Aktif</h3>
-                <a href="{{ route('booking.history') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Lihat semua</a>
             </div>
 
             <div class="mt-5 space-y-4">
                 @forelse ($activeRentals as $order)
                     @php
                         $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
-                        $canOpenInvoice = $canViewInvoice($order);
                         $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
+                        $durationDays = 1;
+                        if ($order->rental_start_date && $order->rental_end_date && $order->rental_end_date->gte($order->rental_start_date)) {
+                            $durationDays = $order->rental_start_date->diffInDays($order->rental_end_date) + 1;
+                        }
+                        $itemUnits = (int) ($order->items?->sum('qty') ?? 0);
+                        $canReschedule = $canRescheduleOrder($order);
                     @endphp
                     <article class="rounded-xl border border-slate-100 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -73,6 +78,12 @@
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>
                                 <p class="mt-2 text-xs font-semibold text-slate-500">Total {{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    {{ max((int) ($durationDays ?? 1), 1) }} hari • {{ max($itemUnits, 0) }} unit
+                                </p>
+                                <p class="mt-1 text-[11px] text-slate-500">
+                                    {{ $canReschedule ? 'Bisa reschedule sebelum barang diambil.' : 'Reschedule ditutup karena barang sudah diambil.' }}
+                                </p>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
@@ -83,21 +94,9 @@
                                         Bayar
                                     </a>
                                 @endif
-                                @if ($canOpenInvoice)
-                                    <button
-                                        type="button"
-                                        data-open-invoice-modal
-                                        data-invoice-url="{{ route('account.orders.receipt', $order) }}"
-                                        data-order-number="{{ $orderNumber }}"
-                                        class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600"
-                                    >
-                                        Detail
-                                    </button>
-                                @else
-                                    <a href="{{ route('account.orders.show', $order) }}" class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600">
-                                        Detail
-                                    </a>
-                                @endif
+                                <a href="{{ route('account.orders.show', $order) }}" class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600">
+                                    Detail & Reschedule
+                                </a>
                             </div>
                         </div>
                     </article>
@@ -116,7 +115,6 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-slate-900">Riwayat Terbaru</h3>
-                <a href="{{ route('booking.history') }}" class="text-xs font-semibold text-slate-500 hover:text-blue-600">Riwayat</a>
             </div>
 
             <div class="mt-4 divide-y divide-slate-100">
@@ -148,12 +146,10 @@
                                     data-order-number="{{ $orderNumber }}"
                                     class="text-xs font-semibold text-blue-600 hover:text-blue-700"
                                 >
-                                    Lihat
+                                    Invoice
                                 </button>
                             @else
-                                <a href="{{ route('account.orders.show', $order) }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                                    Lihat
-                                </a>
+                                <span class="text-xs font-semibold text-slate-400">Invoice</span>
                             @endif
                         </div>
                     </div>

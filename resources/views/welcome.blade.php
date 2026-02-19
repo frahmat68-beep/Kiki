@@ -105,48 +105,29 @@
                         {{ $heroSubtitle ?: __('app.landing.hero_desc') }}
                     </p>
 
-                    @if (! $isLoggedIn)
-                        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                            <div class="flex items-center justify-between gap-2">
-                                <h2 class="text-sm font-semibold text-slate-900">Overview Alat Disewa</h2>
-                                <span class="text-xs font-semibold text-slate-500">Live</span>
-                            </div>
-                            <div class="mt-3 space-y-2.5">
-                                @forelse ($guestRentalSnapshot as $rental)
-                                    <article class="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
-                                        <div class="flex items-start justify-between gap-2">
-                                            <p class="text-sm font-semibold text-slate-900">{{ $rental['name'] }}</p>
-                                            <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">x{{ $rental['qty'] }}</span>
-                                        </div>
-                                        <p class="mt-1 text-xs text-slate-600">
-                                            Tanggal sewa: {{ $formatLandingDate($rental['start_date']) }} - {{ $formatLandingDate($rental['end_date']) }}
-                                        </p>
-                                    </article>
-                                @empty
-                                    <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
-                                        Belum ada jadwal alat yang sedang disewa.
+                    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                        <div class="flex items-center justify-between gap-2">
+                            <h2 class="text-sm font-semibold text-slate-900">Overview Alat Disewa</h2>
+                            <span class="text-xs font-semibold text-slate-500">Live</span>
+                        </div>
+                        <div class="mt-3 space-y-2.5">
+                            @forelse ($guestRentalSnapshot as $rental)
+                                <article class="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <p class="text-sm font-semibold text-slate-900">{{ $rental['name'] }}</p>
+                                        <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">x{{ $rental['qty'] }}</span>
                                     </div>
-                                @endforelse
-                            </div>
+                                    <p class="mt-1 text-xs text-slate-600">
+                                        Tanggal sewa: {{ $formatLandingDate($rental['start_date']) }} - {{ $formatLandingDate($rental['end_date']) }}
+                                    </p>
+                                </article>
+                            @empty
+                                <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
+                                    Belum ada jadwal alat yang sedang disewa.
+                                </div>
+                            @endforelse
                         </div>
-                    @elseif ($userOverview)
-                        <div class="mt-5">
-                            <div class="grid grid-cols-1 gap-2.5 min-[390px]:grid-cols-2 sm:grid-cols-3 sm:gap-3">
-                                <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Pending Bayar</p>
-                                    <p class="mt-1 text-lg font-semibold text-amber-600">{{ (int) ($userOverview['pending_payment'] ?? 0) }}</p>
-                                </article>
-                                <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Siap Diambil</p>
-                                    <p class="mt-1 text-lg font-semibold text-blue-600">{{ (int) ($userOverview['ready_pickup'] ?? 0) }}</p>
-                                </article>
-                                <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Sedang Disewa</p>
-                                    <p class="mt-1 text-lg font-semibold text-amber-600">{{ (int) ($userOverview['on_rent'] ?? 0) }}</p>
-                                </article>
-                            </div>
-                        </div>
-                    @endif
+                    </div>
 
                     @if ($isLoggedIn && $damageAlertOrder)
                         <a href="{{ route('account.orders.show', $damageAlertOrder) }}" class="mt-4 block rounded-2xl border-2 border-rose-300 bg-rose-50 p-4 shadow-sm transition hover:border-rose-400">

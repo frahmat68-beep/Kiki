@@ -125,7 +125,9 @@ class CategoryController extends Controller
                         && (string) ($order->damagePayment?->status ?? '') !== Order::PAYMENT_PAID;
                 });
             }
-        } elseif (Schema::hasTable('orders') && Schema::hasTable('order_items') && Schema::hasTable('equipments')) {
+        }
+
+        if (Schema::hasTable('orders') && Schema::hasTable('order_items') && Schema::hasTable('equipments')) {
             $today = now()->startOfDay();
 
             $guestRentalSnapshot = OrderItem::query()
