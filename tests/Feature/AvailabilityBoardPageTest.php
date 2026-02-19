@@ -19,7 +19,8 @@ class AvailabilityBoardPageTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Pusat Cek Ketersediaan Alat');
-        $response->assertSee('Matriks Ketersediaan Alat');
+        $response->assertSee('Klik tanggal di kalender');
+        $response->assertDontSee('Matriks Ketersediaan Alat');
     }
 
     public function test_availability_board_shows_busy_equipment_for_selected_date(): void

@@ -38,6 +38,7 @@ class AvailabilityBoardController extends Controller
                 'selectedBusyRows' => collect(),
                 'selectedFreeRows' => collect(),
                 'monthlySchedules' => collect(),
+                'dailySchedulesByDate' => [],
                 'summary' => [
                     'total_equipments' => 0,
                     'busy_equipments' => 0,
@@ -191,6 +192,7 @@ class AvailabilityBoardController extends Controller
             $calendarStart,
             $calendarEnd
         );
+        $dailySchedulesByDate = $this->buildDailySchedulesByDate($monthlySchedules, $calendarStart, $calendarEnd);
 
         return view('availability.board', [
             'search' => $search,
@@ -210,6 +212,7 @@ class AvailabilityBoardController extends Controller
                 ->sortBy('name')
                 ->values(),
             'monthlySchedules' => $monthlySchedules,
+            'dailySchedulesByDate' => $dailySchedulesByDate,
             'summary' => [
                 'total_equipments' => $totalEquipments,
                 'busy_equipments' => $selectedBusyCount,
@@ -268,6 +271,61 @@ class AvailabilityBoardController extends Controller
             ->values();
     }
 
+    private function buildDailySchedulesByDate(Collection $monthlySchedules, Carbon $calendarStart, Carbon $calendarEnd): array
+    {
+        if ($monthlySchedules->isEmpty()) {
+            return [];
+        }
+
+        $result = [];
+
+        foreach ($monthlySchedules as $schedule) {
+            $startDate = $this->parseDate(data_get($schedule, 'start_date'));
+            $endDate = $this->parseDate(data_get($schedule, 'end_date'));
+
+            if (! $startDate || ! $endDate || $endDate->lt($startDate)) {
+                continue;
+            }
+
+            $rangeStart = $startDate->lt($calendarStart) ? $calendarStart->copy() : $startDate->copy();
+            $rangeEnd = $endDate->gt($calendarEnd) ? $calendarEnd->copy() : $endDate->copy();
+
+            for ($cursor = $rangeStart->copy(); $cursor->lte($rangeEnd); $cursor->addDay()) {
+                $dateKey = $cursor->toDateString();
+                if (! array_key_exists($dateKey, $result)) {
+                    $result[$dateKey] = [];
+                }
+
+                $result[$dateKey][] = [
+                    'equipment_name' => (string) data_get($schedule, 'equipment_name', 'Equipment'),
+                    'order_number' => (string) data_get($schedule, 'order_number', '-'),
+                    'status_pesanan' => (string) data_get($schedule, 'status_pesanan', '-'),
+                    'status_label' => $this->resolveOrderStatusLabel((string) data_get($schedule, 'status_pesanan', '')),
+                    'qty' => max((int) data_get($schedule, 'qty', 1), 1),
+                    'start_date' => $startDate->toDateString(),
+                    'end_date' => $endDate->toDateString(),
+                ];
+            }
+        }
+
+        foreach ($result as $dateKey => $rows) {
+            usort($rows, function (array $left, array $right): int {
+                $leftName = (string) ($left['equipment_name'] ?? '');
+                $rightName = (string) ($right['equipment_name'] ?? '');
+                $nameCompare = strcasecmp($leftName, $rightName);
+                if ($nameCompare !== 0) {
+                    return $nameCompare;
+                }
+
+                return strcasecmp((string) ($left['order_number'] ?? ''), (string) ($right['order_number'] ?? ''));
+            });
+
+            $result[$dateKey] = $rows;
+        }
+
+        return $result;
+    }
+
     private function resolveMonthDate(string $monthValue): Carbon
     {
         if ($monthValue !== '' && preg_match('/^\d{4}-\d{2}$/', $monthValue) === 1) {
@@ -323,6 +381,35 @@ class AvailabilityBoardController extends Controller
             'unavailable' => 'bg-rose-100 text-rose-700',
             default => 'bg-slate-100 text-slate-700',
         };
+    }
+
+    private function resolveOrderStatusLabel(string $status): string
+    {
+        return match ($status) {
+            'menunggu_pembayaran' => 'Menunggu Pembayaran',
+            'diproses' => 'Diproses',
+            'lunas' => 'Lunas',
+            'barang_dipinjam' => 'Sedang Disewa',
+            'barang_diambil' => 'Sedang Disewa',
+            'dikembalikan' => 'Dikembalikan',
+            'selesai' => 'Selesai',
+            'dibatalkan' => 'Dibatalkan',
+            'barang_rusak' => 'Klaim Kerusakan',
+            default => str($status)->replace('_', ' ')->title()->value(),
+        };
+    }
+
+    private function parseDate(mixed $value): ?Carbon
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse((string) $value)->startOfDay();
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 
     private function resolveSourceLabel(string $type): string
