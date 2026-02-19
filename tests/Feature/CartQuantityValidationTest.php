@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Equipment;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -93,6 +94,55 @@ class CartQuantityValidationTest extends TestCase
 
         $items = session()->get('cart.items', []);
         $this->assertSame(1, (int) data_get($items, $key . '.qty'));
+    }
+
+    public function test_cart_add_rejects_when_same_user_existing_booking_exceeds_remaining_stock(): void
+    {
+        $user = User::factory()->create();
+        $equipment = $this->createEquipment([
+            'stock' => 20,
+        ]);
+
+        $startDate = now()->addDays(5)->toDateString();
+        $endDate = now()->addDays(7)->toDateString();
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'order_number' => 'MNK-SELF-STOCK-LOCK',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'lunas',
+            'status' => 'paid',
+            'total_amount' => 1500000,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $endDate,
+            'midtrans_order_id' => 'MNK-SELF-STOCK-LOCK',
+            'paid_at' => now(),
+        ]);
+
+        $order->items()->create([
+            'equipment_id' => $equipment->id,
+            'qty' => 15,
+            'price' => $equipment->price_per_day,
+            'subtotal' => 15 * (int) $equipment->price_per_day * 3,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $endDate,
+            'rental_days' => 3,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('cart.add'), [
+            'equipment_id' => $equipment->id,
+            'qty' => 7,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $endDate,
+        ]);
+
+        $response->assertRedirect(route('cart'));
+        $response->assertSessionHas('error', function ($message) use ($equipment) {
+            $text = (string) $message;
+
+            return str_contains($text, $equipment->name) && str_contains($text, 'sedang disewa pada tanggal');
+        });
+        $this->assertSame([], session()->get('cart.items', []));
     }
 
     private function createEquipment(array $overrides = []): Equipment

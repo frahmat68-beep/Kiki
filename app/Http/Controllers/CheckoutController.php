@@ -166,8 +166,7 @@ class CheckoutController extends Controller
                         throw new \RuntimeException("{$equipment->name} sedang tidak bisa disewa.", 422);
                     }
 
-                    // Allow repeat booking by the same user while previous order is still active.
-                    $reservedDaily = $availability->getDailyReservedUnits($equipment, $startDate, $endDate, null, $userId);
+                    $reservedDaily = $availability->getDailyReservedUnits($equipment, $startDate, $endDate);
                     $requestedDaily = $requestedDailyByEquipment[(int) $equipmentId] ?? [];
 
                     $conflictDates = collect($requestedDaily)

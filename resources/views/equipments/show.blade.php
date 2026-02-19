@@ -130,13 +130,19 @@
                                 @foreach ($bookingRanges as $range)
                                     @php
                                         $rangeType = $range['type'] ?? 'booking';
+                                        $isCurrentUserSchedule = (bool) ($range['is_current_user'] ?? false);
                                         $rangeLabel = match ($rangeType) {
-                                            'buffer' => __('app.product.buffer_label'),
+                                            'buffer_before', 'buffer_after' => $isCurrentUserSchedule
+                                                ? __('app.product.my_buffer_label')
+                                                : __('app.product.buffer_label'),
                                             'maintenance' => __('app.product.maintenance_label'),
+                                            'booking' => $isCurrentUserSchedule
+                                                ? __('app.product.my_booking_label')
+                                                : __('app.product.booked_label'),
                                             default => __('app.product.booked_label'),
                                         };
                                         $rangeDotClass = match ($rangeType) {
-                                            'buffer' => 'bg-indigo-500',
+                                            'buffer_before', 'buffer_after' => 'bg-indigo-500',
                                             'maintenance' => 'bg-rose-500',
                                             default => 'bg-amber-500',
                                         };

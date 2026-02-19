@@ -42,7 +42,7 @@
             :admin-role="$adminRole"
         />
 
-        <div class="lg:pl-16">
+        <div class="lg:pl-72">
             <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
                 <div class="mx-auto flex h-16 w-full max-w-[1320px] items-center justify-between gap-3 px-4 sm:px-6">
                     <div class="flex min-w-0 items-center gap-3">
@@ -54,8 +54,8 @@
                             </svg>
                         </button>
                         <div class="min-w-0">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.panel_title') }}</p>
                             <h1 class="truncate text-lg font-semibold text-slate-900">@yield('page_title', __('ui.admin.dashboard'))</h1>
+                            <p class="text-xs text-slate-500">{{ __('ui.admin.panel_title') }}</p>
                         </div>
                     </div>
 

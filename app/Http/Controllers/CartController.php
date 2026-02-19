@@ -128,8 +128,7 @@ class CartController extends Controller
 
         $conflictMessage = $this->resolveCartConflictMessage(
             $draftItems->values()->all(),
-            $availability,
-            auth('web')->id() ? (int) auth('web')->id() : null
+            $availability
         );
         if ($conflictMessage) {
             return redirect()
@@ -152,8 +151,7 @@ class CartController extends Controller
 
             $conflictMessage = $this->resolveCartConflictMessage(
                 $draftItems->values()->all(),
-                $availability,
-                auth('web')->id() ? (int) auth('web')->id() : null
+                $availability
             );
             if ($conflictMessage) {
                 return redirect()
@@ -188,8 +186,7 @@ class CartController extends Controller
 
             $conflictMessage = $this->resolveCartConflictMessage(
                 $draftItems->values()->all(),
-                $availability,
-                auth('web')->id() ? (int) auth('web')->id() : null
+                $availability
             );
             if ($conflictMessage) {
                 return redirect()
@@ -232,7 +229,7 @@ class CartController extends Controller
         return $price * $qty;
     }
 
-    private function resolveCartConflictMessage(array $draftItems, AvailabilityService $availability, ?int $excludeUserId = null): ?string
+    private function resolveCartConflictMessage(array $draftItems, AvailabilityService $availability): ?string
     {
         $equipmentIds = collect($draftItems)
             ->map(fn (array $item) => (int) ($item['equipment_id'] ?? $item['product_id'] ?? 0))
@@ -320,9 +317,7 @@ class CartController extends Controller
             $reservedDaily = $availability->getDailyReservedUnits(
                 $equipment,
                 $rangeStart,
-                $rangeEnd,
-                null,
-                $excludeUserId
+                $rangeEnd
             );
 
             $conflictDates = collect($dailyDemand)

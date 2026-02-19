@@ -134,7 +134,10 @@ class EquipmentController extends Controller
             $equipmentQuery->withSum('activeOrderItems as reserved_units', 'qty');
         }
         $equipment = $equipmentQuery->firstOrFail();
-        $bookingRanges = $availabilityService->getBlockedSchedules($equipment, auth()->id());
+        $bookingRanges = $availabilityService->getBlockedSchedules(
+            $equipment,
+            auth('web')->check() ? (int) auth('web')->id() : null
+        );
 
         return view('equipments.show', compact('equipment', 'bookingRanges'));
     }

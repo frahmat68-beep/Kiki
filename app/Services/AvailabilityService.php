@@ -75,8 +75,7 @@ class AvailabilityService
         Equipment $equipment,
         Carbon|string $startDate,
         Carbon|string $endDate,
-        ?int $ignoreOrderId = null,
-        ?int $excludeUserId = null
+        ?int $ignoreOrderId = null
     ): array {
         $start = $this->normalizeDate($startDate);
         $end = $this->normalizeDate($endDate);
@@ -88,7 +87,7 @@ class AvailabilityService
         $windowEnd = $end->copy()->addDays(self::BUFFER_DAYS);
         $daily = [];
 
-        $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd, $ignoreOrderId, $excludeUserId);
+        $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd, $ignoreOrderId);
         foreach ($items as $item) {
             $order = $item->order;
             $bookingStart = $this->normalizeDate($item->rental_start_date ?? $order?->rental_start_date);
@@ -150,7 +149,7 @@ class AvailabilityService
 
     public function getBlockedSchedules(
         Equipment $equipment,
-        ?int $excludeUserId = null,
+        ?int $currentUserId = null,
         ?Carbon $from = null,
         ?Carbon $to = null
     ): Collection {
@@ -161,7 +160,7 @@ class AvailabilityService
 
         $windowStart = $start->copy()->subDays(self::BUFFER_DAYS);
         $windowEnd = $end->copy()->addDays(self::BUFFER_DAYS);
-        $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd, null, $excludeUserId);
+        $items = $this->fetchBlockingOrderItems($equipment->id, $windowStart, $windowEnd);
         foreach ($items as $item) {
             $order = $item->order;
             $bookingStart = $this->normalizeDate($item->rental_start_date ?? $order?->rental_start_date);
@@ -169,6 +168,9 @@ class AvailabilityService
             if (! $bookingStart || ! $bookingEnd || $bookingEnd->lt($bookingStart)) {
                 continue;
             }
+
+            $isCurrentUser = $currentUserId !== null
+                && (int) ($order?->user_id ?? 0) === (int) $currentUserId;
 
             $bookingWindowStart = $bookingStart->copy()->subDays(self::BUFFER_DAYS);
             $bookingWindowEnd = $bookingEnd->copy()->addDays(self::BUFFER_DAYS);
@@ -185,6 +187,7 @@ class AvailabilityService
                 'qty' => max((int) ($item->qty ?? 0), 1),
                 'label' => 'Booked',
                 'reason' => null,
+                'is_current_user' => $isCurrentUser,
             ]);
 
             for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
@@ -198,6 +201,7 @@ class AvailabilityService
                         'qty' => max((int) ($item->qty ?? 0), 1),
                         'label' => 'Buffer Sebelum Sewa',
                         'reason' => null,
+                        'is_current_user' => $isCurrentUser,
                     ]);
                 }
 
@@ -211,6 +215,7 @@ class AvailabilityService
                         'qty' => max((int) ($item->qty ?? 0), 1),
                         'label' => 'Buffer Setelah Sewa',
                         'reason' => null,
+                        'is_current_user' => $isCurrentUser,
                     ]);
                 }
             }
@@ -238,6 +243,7 @@ class AvailabilityService
                     'qty' => max((int) $equipment->stock, 1),
                     'label' => 'Maintenance',
                     'reason' => $window->reason,
+                    'is_current_user' => false,
                 ]);
             }
         }
@@ -254,8 +260,7 @@ class AvailabilityService
         int $equipmentId,
         Carbon $windowStart,
         Carbon $windowEnd,
-        ?int $ignoreOrderId = null,
-        ?int $excludeUserId = null
+        ?int $ignoreOrderId = null
     ): Collection {
         if (! Schema::hasTable('order_items') || ! Schema::hasTable('orders')) {
             return collect();
@@ -266,10 +271,9 @@ class AvailabilityService
         return OrderItem::query()
             ->with(['order:id,user_id,order_number,midtrans_order_id,status_pesanan,status_pembayaran,rental_start_date,rental_end_date,created_at'])
             ->where('equipment_id', $equipmentId)
-            ->whereHas('order', function ($query) use ($windowStart, $windowEnd, $holdCutoff, $ignoreOrderId, $excludeUserId) {
+            ->whereHas('order', function ($query) use ($windowStart, $windowEnd, $holdCutoff, $ignoreOrderId) {
                 $query
                     ->when($ignoreOrderId, fn ($subQuery) => $subQuery->where('id', '!=', $ignoreOrderId))
-                    ->when($excludeUserId, fn ($subQuery) => $subQuery->where('user_id', '!=', $excludeUserId))
                     ->whereDate('rental_start_date', '<=', $windowEnd->toDateString())
                     ->whereDate('rental_end_date', '>=', $windowStart->toDateString())
                     ->where(function ($statusQuery) use ($holdCutoff) {

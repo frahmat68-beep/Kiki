@@ -167,7 +167,7 @@ class CheckoutOrderItemTest extends TestCase
         $this->assertStringContainsString('Aputure 600D tidak tersedia pada tanggal:', $message);
     }
 
-    public function test_checkout_allows_overlap_when_conflict_only_from_same_user_order(): void
+    public function test_checkout_rejects_overlap_even_when_conflict_from_same_user_order(): void
     {
         $user = User::factory()->create();
         $this->seedCompletedVerifiedProfile($user);
@@ -208,7 +208,7 @@ class CheckoutOrderItemTest extends TestCase
         ]);
 
         $this->mock(MidtransService::class, function ($mock) {
-            $mock->shouldReceive('createSnapToken')->once()->andReturn('snap-self-overlap-token');
+            $mock->shouldNotReceive('createSnapToken');
         });
 
         $this->withSession([
@@ -229,8 +229,9 @@ class CheckoutOrderItemTest extends TestCase
             'confirm_profile' => 'on',
         ]);
 
-        $response->assertOk();
-        $response->assertJsonPath('snap_token', 'snap-self-overlap-token');
+        $response->assertStatus(422);
+        $message = (string) $response->json('message');
+        $this->assertStringContainsString('Nanlite Forza 300 tidak tersedia pada tanggal:', $message);
     }
 
     public function test_checkout_allows_when_existing_rental_does_not_overlap_dates(): void
