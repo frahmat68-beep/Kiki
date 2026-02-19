@@ -19,6 +19,8 @@
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+        :root { --manake-heading-blue: #1d4ed8; }
+        :is(h1, h2, h3)[class*="text-slate-"] { color: var(--manake-heading-blue); }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800">

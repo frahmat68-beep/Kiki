@@ -77,5 +77,6 @@ class AvailabilityBoardPageTest extends TestCase
         $response->assertSee('Mic Wireless Pro');
         $response->assertSee('Alat Terpakai di');
         $response->assertSee('dipakai 4 unit');
+        $response->assertDontSee('MNK-AVAIL-BOARD');
     }
 }

@@ -118,8 +118,7 @@
 
             <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">Availability Board</p>
-                    <h1 class="mt-2 text-2xl font-semibold text-slate-900 sm:text-3xl">Pusat Cek Ketersediaan Alat</h1>
+                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Pusat Cek Ketersediaan Alat</h1>
                     <p class="mt-2 max-w-2xl text-sm text-slate-600 sm:text-base">
                         Klik tanggal di kalender untuk melihat pesanan alat yang sedang berjalan dan pantau ketersediaan dengan cepat.
                     </p>
@@ -165,6 +164,7 @@
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Kalender Pemakaian</p>
                         <h2 class="mt-1 text-xl font-semibold text-slate-900">{{ $monthLabel }}</h2>
+                        <p class="mt-1 text-[11px] text-slate-500 sm:hidden">Tap tanggal untuk lihat detail.</p>
                     </div>
                     <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
                         <a
@@ -185,13 +185,13 @@
                     </div>
                 </div>
 
-                <div class="px-5 py-4">
-                    <div class="grid grid-cols-7 gap-2">
+                <div class="px-3 py-3 sm:px-5 sm:py-4">
+                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
                         @foreach ($weekdayLabels as $weekday)
-                            <p class="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ $weekday }}</p>
+                            <p class="text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-[11px]">{{ $weekday }}</p>
                         @endforeach
                     </div>
-                    <div class="mt-2 grid grid-cols-7 gap-2">
+                    <div class="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2">
                         @foreach ($calendarDays as $day)
                             @php
                                 $toneClass = $toneClasses[$day['tone']] ?? $toneClasses['calm'];
@@ -200,21 +200,29 @@
                             @endphp
                             <button
                                 type="button"
-                                class="board-cell group w-full rounded-xl border px-2 py-2.5 text-left {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
+                                class="board-cell group w-full rounded-lg border px-1.5 py-1.5 text-left sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
                                 @click="openScheduleModal('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
                                 aria-haspopup="dialog"
                                 aria-label="Lihat detail tanggal {{ \Carbon\Carbon::parse($day['date'])->translatedFormat('d F Y') }}"
                             >
                                 <div class="flex items-center justify-between gap-2">
-                                    <p class="text-xs font-semibold {{ $todayClass }}">{{ $day['day'] }}</p>
+                                    <p class="text-[11px] font-semibold sm:text-xs {{ $todayClass }}">{{ $day['day'] }}</p>
                                     @if ($day['is_selected'])
                                         <span class="inline-flex h-2.5 w-2.5 rounded-full bg-blue-600"></span>
                                     @endif
                                 </div>
-                                <p class="mt-2 text-[11px] font-semibold">
+                                <div class="mt-1.5 sm:hidden">
+                                    @if ((int) $day['busy_equipments'] === 0 && (int) $day['reserved_units'] === 0)
+                                        <p class="text-[9px] font-medium opacity-70">kosong</p>
+                                    @else
+                                        <p class="text-[9px] font-semibold leading-tight">{{ $day['busy_equipments'] }} alat</p>
+                                        <p class="text-[9px] leading-tight">{{ $day['reserved_units'] }} unit</p>
+                                    @endif
+                                </div>
+                                <p class="mt-2 hidden text-[11px] font-semibold sm:block">
                                     {{ $day['busy_equipments'] }} alat terpakai
                                 </p>
-                                <p class="mt-0.5 text-[10px]">
+                                <p class="mt-0.5 hidden text-[10px] sm:block">
                                     {{ $day['reserved_units'] }} unit dipakai
                                 </p>
                             </button>
@@ -228,7 +236,7 @@
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Tanggal Dipilih</p>
                     <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ $selectedDateLabel }}</h2>
 
-                    <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Total Alat</p>
                             <p class="mt-1 text-2xl font-semibold text-slate-900">{{ $summary['total_equipments'] ?? 0 }}</p>
@@ -292,9 +300,6 @@
                             @if ($row['source_labels']->isNotEmpty())
                                 <p class="mt-1 text-xs text-slate-600">{{ $row['source_labels']->implode(', ') }}</p>
                             @endif
-                            @if ($row['order_numbers']->isNotEmpty())
-                                <p class="mt-1 text-[11px] text-slate-500">Order: {{ $row['order_numbers']->take(3)->implode(', ') }}</p>
-                            @endif
                         </article>
                     @empty
                         <p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
@@ -320,7 +325,7 @@
                                 • Qty {{ $schedule['qty'] }}
                             </p>
                             <p class="mt-1 text-[11px] text-slate-500">
-                                {{ $schedule['order_number'] }} • {{ strtoupper($schedule['status_pesanan']) }}
+                                {{ strtoupper($schedule['status_pesanan']) }}
                             </p>
                         </article>
                     @empty
@@ -336,15 +341,15 @@
             x-cloak
             x-show="scheduleModalOpen"
             x-transition.opacity
-            class="fixed inset-0 z-[95] flex items-center justify-center p-4 sm:p-6"
+            class="fixed inset-0 z-[95] flex items-end justify-center p-2 sm:items-center sm:p-6"
             role="dialog"
             aria-modal="true"
             @click.self="closeScheduleModal()"
         >
             <div class="absolute inset-0 bg-slate-950/55 backdrop-blur-[1px]"></div>
 
-            <div class="availability-surface relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
-                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-5 py-4">
+            <div class="availability-surface relative z-10 w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl">
+                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-5 sm:py-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Detail Tanggal</p>
                         <h2 class="mt-1 text-xl font-semibold text-slate-900" x-text="modalDateLabel"></h2>
@@ -359,8 +364,8 @@
                     </button>
                 </div>
 
-                <div class="px-5 py-4">
-                    <div class="grid grid-cols-3 gap-3">
+                <div class="px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
                             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Alat Terpakai</p>
                             <p class="mt-1 text-lg font-semibold text-slate-900" x-text="modalBusyEquipments"></p>
@@ -375,23 +380,19 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 max-h-[26rem] space-y-2 overflow-y-auto pr-1">
+                    <div class="mt-4 max-h-[52vh] space-y-2 overflow-y-auto pr-1 sm:max-h-[26rem]">
                         <template x-if="modalSchedules.length === 0">
                             <p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-500">
                                 Tidak ada pesanan aktif pada tanggal ini.
                             </p>
                         </template>
 
-                        <template x-for="(item, index) in modalSchedules" :key="`${item.order_number}-${item.equipment_name}-${index}`">
+                        <template x-for="(item, index) in modalSchedules" :key="`${item.equipment_name}-${index}`">
                             <article class="board-item rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
                                         <p class="text-sm font-semibold text-slate-900" x-text="item.equipment_name"></p>
-                                        <p class="mt-0.5 text-xs text-slate-500">
-                                            <span x-text="item.order_number"></span>
-                                            •
-                                            <span x-text="item.status_label"></span>
-                                        </p>
+                                        <p class="mt-0.5 text-xs text-slate-500" x-text="item.status_label"></p>
                                     </div>
                                     <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700" x-text="`x${item.qty}`"></span>
                                 </div>

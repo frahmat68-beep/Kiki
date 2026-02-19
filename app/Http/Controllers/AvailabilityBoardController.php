@@ -298,7 +298,6 @@ class AvailabilityBoardController extends Controller
 
                 $result[$dateKey][] = [
                     'equipment_name' => (string) data_get($schedule, 'equipment_name', 'Equipment'),
-                    'order_number' => (string) data_get($schedule, 'order_number', '-'),
                     'status_pesanan' => (string) data_get($schedule, 'status_pesanan', '-'),
                     'status_label' => $this->resolveOrderStatusLabel((string) data_get($schedule, 'status_pesanan', '')),
                     'qty' => max((int) data_get($schedule, 'qty', 1), 1),
@@ -317,7 +316,7 @@ class AvailabilityBoardController extends Controller
                     return $nameCompare;
                 }
 
-                return strcasecmp((string) ($left['order_number'] ?? ''), (string) ($right['order_number'] ?? ''));
+                return strcasecmp((string) ($left['status_label'] ?? ''), (string) ($right['status_label'] ?? ''));
             });
 
             $result[$dateKey] = $rows;
