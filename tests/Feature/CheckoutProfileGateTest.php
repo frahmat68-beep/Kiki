@@ -1,0 +1,140 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class CheckoutProfileGateTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function completeProfilePayload(): array
+    {
+        return [
+            'full_name' => 'Fikri Rahmat',
+            'nik' => '3276020202020001',
+            'date_of_birth' => '1997-02-02',
+            'gender' => 'male',
+            'phone' => '081234567890',
+            'address_line' => 'Jl. Contoh No. 123 RT 01/03',
+            'kelurahan' => 'Cijerah',
+            'kecamatan' => 'Bandung Kulon',
+            'city' => 'Bandung',
+            'province' => 'Jawa Barat',
+            'postal_code' => '40213',
+            'maps_url' => 'https://maps.google.com/?q=bandung',
+            'emergency_name' => 'Alya',
+            'emergency_relation' => 'Saudara',
+            'emergency_phone' => '081234000000',
+        ];
+    }
+
+    public function test_guest_is_redirected_from_checkout_to_login(): void
+    {
+        $response = $this->get(route('checkout'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_without_completed_profile_is_redirected(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        $profile = Profile::updateOrCreate(
+            ['user_id' => $user->id],
+            ['is_completed' => false]
+        );
+
+        $this->assertFalse($profile->is_completed);
+
+        $response = $this->get(route('checkout'));
+
+        $response->assertRedirect(route('profile.complete'));
+    }
+
+    public function test_profile_completion_persists_and_allows_checkout(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        $payload = [
+            'full_name' => 'Fikri Rahmat',
+            'nik' => '3276020202020001',
+            'date_of_birth' => '1997-02-02',
+            'gender' => 'male',
+            'phone' => '081234567890',
+            'address_line' => 'Jl. Contoh No. 123 RT 01/03',
+            'kelurahan' => 'Cijerah',
+            'kecamatan' => 'Bandung Kulon',
+            'city' => 'Bandung',
+            'province' => 'Jawa Barat',
+            'postal_code' => '40213',
+            'maps_url' => 'https://maps.google.com/?q=bandung',
+            'emergency_name' => 'Alya',
+            'emergency_relation' => 'Saudara',
+            'emergency_phone' => '081234000000',
+        ];
+
+        $response = $this->post(route('profile.complete.store'), $payload);
+
+        $response->assertRedirect(route('phone.verify'));
+
+        $this->assertDatabaseHas('profiles', [
+            'user_id' => $user->id,
+            'full_name' => 'Fikri Rahmat',
+            'nik' => '3276020202020001',
+            'phone' => '081234567890',
+            'address_line' => 'Jl. Contoh No. 123 RT 01/03',
+            'is_completed' => true,
+        ]);
+
+        $profile = Profile::where('user_id', $user->id)->first();
+        $this->assertNotNull($profile);
+        $this->assertTrue((bool) $profile->is_completed);
+        $this->assertNull($profile->phone_verified_at);
+
+        $profile->update([
+            'phone_verified_at' => now(),
+        ]);
+
+        $checkoutResponse = $this->get(route('checkout'));
+
+        $checkoutResponse->assertOk();
+    }
+
+    public function test_authenticated_user_with_unverified_phone_is_redirected_to_phone_verify(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $response = $this->post(route('profile.complete.store'), $this->completeProfilePayload());
+        $response->assertRedirect(route('phone.verify'));
+
+        $checkoutResponse = $this->get(route('checkout'));
+        $checkoutResponse->assertRedirect(route('phone.verify'));
+    }
+
+    public function test_authenticated_user_with_unverified_email_is_redirected_to_verification_notice(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            array_merge($this->completeProfilePayload(), [
+                'is_completed' => true,
+                'completed_at' => now(),
+                'phone_verified_at' => now(),
+            ])
+        );
+
+        $this->actingAs($user);
+        $response = $this->get(route('checkout'));
+
+        $response->assertRedirect(route('verification.notice'));
+    }
+}

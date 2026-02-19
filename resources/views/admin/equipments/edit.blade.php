@@ -1,0 +1,213 @@
+@extends('layouts.admin', ['activePage' => 'equipments'])
+
+@section('title', 'Edit Alat')
+@section('page_title', 'Edit Alat')
+
+@section('content')
+    <div class="max-w-4xl mx-auto space-y-6">
+        <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900">Edit Alat</h2>
+                    <p class="text-xs text-slate-500">Perbarui detail, slug, dan status alat.</p>
+                </div>
+                <a href="{{ route('admin.equipments.index') }}" class="text-sm text-slate-600 hover:text-blue-600">← Kembali ke List</a>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p class="text-[11px] uppercase tracking-widest text-slate-500">Total Stok</p>
+                    <p class="mt-1 text-xl font-semibold text-slate-900">{{ $equipment->stock }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p class="text-[11px] uppercase tracking-widest text-slate-500">Sedang Dipakai</p>
+                    <p class="mt-1 text-xl font-semibold text-amber-600">{{ $equipment->reserved_units }}</p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p class="text-[11px] uppercase tracking-widest text-slate-500">Unit Tersedia</p>
+                    <p class="mt-1 text-xl font-semibold text-emerald-600">{{ $equipment->available_units }}</p>
+                </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-900">Kalender Pemakaian Alat</h3>
+                        <p class="text-xs text-slate-500">Status alat tetap ready, tapi bentrok tanggal sewa akan ditolak saat checkout.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a
+                            href="{{ route('admin.equipments.edit', ['slug' => $equipment->slug, 'month' => $bookingCalendar['previous_month']]) }}"
+                            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600"
+                        >
+                            ←
+                        </a>
+                        <span class="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">{{ $bookingCalendar['month_label'] }}</span>
+                        <a
+                            href="{{ route('admin.equipments.edit', ['slug' => $equipment->slug, 'month' => $bookingCalendar['next_month']]) }}"
+                            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600"
+                        >
+                            →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-3 grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    <span>Sen</span>
+                    <span>Sel</span>
+                    <span>Rab</span>
+                    <span>Kam</span>
+                    <span>Jum</span>
+                    <span>Sab</span>
+                    <span>Min</span>
+                </div>
+                <div class="mt-2 grid grid-cols-7 gap-2">
+                    @foreach ($bookingCalendar['days'] as $day)
+                        <div class="min-h-[68px] rounded-lg border px-2 py-2 {{ $day['in_month'] ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-100 text-slate-400' }}">
+                            <p class="text-xs font-semibold">{{ $day['day'] }}</p>
+                            @if ($day['booked_qty'] > 0)
+                                <p class="mt-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                                    Disewa {{ $day['booked_qty'] }}
+                                </p>
+                            @else
+                                <p class="mt-1 text-[10px] text-slate-400">-</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-3 space-y-2">
+                    @forelse ($bookingCalendar['events'] as $event)
+                        <div class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                            <p class="font-semibold text-slate-800">{{ $event['order_number'] }} • {{ $event['customer'] }}</p>
+                            <p class="mt-0.5">{{ \Carbon\Carbon::parse($event['start_date'])->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($event['end_date'])->translatedFormat('d M Y') }} • Qty {{ $event['qty'] }}</p>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-500">Belum ada jadwal sewa pada bulan ini.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('admin.equipments.update', $equipment->slug) }}" enctype="multipart/form-data" class="mt-6 space-y-6">
+                @csrf
+                @method('PUT')
+
+                @if ($errors->any())
+                    <div class="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Nama Alat</label>
+                        <input
+                            name="name"
+                            type="text"
+                            value="{{ old('name', $equipment->name) }}"
+                            required
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Slug</label>
+                        <input
+                            name="slug"
+                            type="text"
+                            value="{{ old('slug', $equipment->slug) }}"
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Kategori</label>
+                        <select
+                            name="category_id"
+                            required
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                            <option value="">Pilih kategori</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ (string) old('category_id', $equipment->category_id) === (string) $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Harga / Hari</label>
+                        <input
+                            name="price_per_day"
+                            type="number"
+                            value="{{ old('price_per_day', $equipment->price_per_day) }}"
+                            required
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Jumlah Barang (Total Stok)</label>
+                        <input
+                            name="stock"
+                            type="number"
+                            min="0"
+                            max="9999"
+                            value="{{ old('stock', $equipment->stock) }}"
+                            required
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                        <p class="mt-1 text-xs text-slate-400">Unit tersedia dihitung: total stok - unit yang sedang dipakai.</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500">Status</label>
+                        <select
+                            name="status"
+                            required
+                            class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                        >
+                            <option value="ready" {{ old('status', $equipment->status) === 'ready' ? 'selected' : '' }}>Ready</option>
+                            <option value="unavailable" {{ old('status', $equipment->status) === 'unavailable' ? 'selected' : '' }}>Unavailable</option>
+                            <option value="maintenance" {{ old('status', $equipment->status) === 'maintenance' ? 'selected' : '' }}>Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-slate-500">Upload Foto</label>
+                    <div class="mt-2 flex items-center justify-between gap-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-700">Tarik & lepas file</p>
+                            <p class="text-xs text-slate-500">Format JPG/PNG/WEBP. Max 2MB.</p>
+                            @php
+                                $imagePath = $equipment->image_path ?? $equipment->image;
+                                $imageUrl = $imagePath ? (str_starts_with($imagePath, 'http') ? $imagePath : asset('storage/' . $imagePath)) : null;
+                            @endphp
+                            @if ($imageUrl)
+                                <img src="{{ $imageUrl }}" alt="Current image" class="mt-3 h-24 w-24 rounded-xl object-contain border border-slate-200 bg-white p-1">
+                            @endif
+                        </div>
+                        <label class="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600 transition">
+                            Ganti File
+                            <input name="image" type="file" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-slate-500">Spesifikasi</label>
+                    <textarea
+                        name="specifications"
+                        rows="5"
+                        class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                    >{{ old('specifications', $equipment->specifications ?? $equipment->description) }}</textarea>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <p class="text-xs text-slate-500">Perubahan akan tersimpan dan kembali ke list.</p>
+                    <div class="flex gap-2">
+                        <a href="{{ route('admin.equipments.index') }}" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600 transition">Batal</a>
+                        <button type="submit" class="rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+@endsection

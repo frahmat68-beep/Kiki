@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --bg: #0f1115;
+        --surface: #171a1f;
+        --surface-2: #1f242c;
+        --border: #2b313a;
+        --text: #e6e9ee;
+        --muted: #98a1ad;
+        --brand: #5e718b;
+        --brand-2: #4e6078;
+        --danger: #ef4444;
+        --success: #7f9f7f;
+    }
+
+    html[data-theme-resolved='light'] {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --border: #d6deeb;
+        --text: #0f172a;
+        --muted: #475569;
+    }
+
+    body {
+        color: var(--text);
+        background: var(--bg);
+    }
+}
+
+@layer components {
+    .card {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .input {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .input::placeholder {
+        color: var(--muted);
+    }
+
+    .btn-primary {
+        background: var(--brand);
+        color: #fff;
+        border: 1px solid transparent;
+        transition: background-color 160ms ease, transform 120ms ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--brand-2);
+    }
+
+    .btn-primary:active {
+        transform: translateY(1px);
+    }
+
+    .btn-secondary {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        transition: border-color 160ms ease, color 160ms ease, transform 120ms ease;
+    }
+
+    .btn-secondary:hover {
+        border-color: color-mix(in oklab, var(--brand) 35%, var(--border));
+        color: var(--brand);
+    }
+
+    .btn-secondary:active {
+        transform: translateY(1px);
+    }
+
+    .badge-status {
+        border: 1px solid var(--border);
+        background: color-mix(in oklab, var(--surface-2) 75%, var(--surface));
+        color: var(--muted);
+    }
+
+    .badge-status-success {
+        border-color: color-mix(in oklab, var(--success) 40%, var(--border));
+        background: color-mix(in oklab, var(--success) 18%, var(--surface));
+        color: color-mix(in oklab, var(--success) 65%, #d1fae5);
+    }
+
+    .badge-status-warning {
+        border-color: color-mix(in oklab, #f59e0b 40%, var(--border));
+        background: color-mix(in oklab, #f59e0b 16%, var(--surface));
+        color: color-mix(in oklab, #f59e0b 75%, #fef3c7);
+    }
+
+    .badge-status-danger {
+        border-color: color-mix(in oklab, var(--danger) 40%, var(--border));
+        background: color-mix(in oklab, var(--danger) 14%, var(--surface));
+        color: color-mix(in oklab, var(--danger) 70%, #fee2e2);
+    }
+}

@@ -1,0 +1,131 @@
+# Manake Rental (Laravel 12)
+
+Manake Rental adalah aplikasi rental alat produksi dengan alur end-to-end:
+- Login/register user
+- Checkout rental
+- Pembayaran Midtrans Snap
+- Generate resi setelah pembayaran lunas
+- Admin CMS untuk konten website + upload gambar
+- Editor teks user-facing per halaman (landing, catalog, kategori, footer)
+
+## Fitur Utama
+
+- Public storefront: home, catalog, category, product detail, footer dinamis
+- User area: overview, booking history, pembayaran, receipt
+- Admin panel:
+  - Dashboard
+  - Categories CRUD
+  - Equipments CRUD
+  - Orders monitor + update status
+  - Users list + reset password (tanpa lihat password asli)
+  - Content Manager (text + image)
+  - Editor Teks Website (text-only, per halaman user)
+  - Website Settings (brand/SEO/social/logo/favicon)
+- Audit log admin (`audit_logs`)
+
+## Setup Lokal
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan storage:link
+npm install
+npm run dev
+php artisan serve
+```
+
+## Super Admin Seeder
+
+Seeder `SuperAdminSeeder` membuat / update akun:
+- Email: `frahmat68@gmail.com`
+- Nama: `Fikri Rahmat`
+- Role: `super_admin`
+- Password diambil dari env `SUPERADMIN_PASSWORD` (fallback `SUPER_ADMIN_PASSWORD`)
+
+Contoh:
+
+```env
+SUPERADMIN_PASSWORD=ChangeMe123!
+```
+
+## Health Check Script
+
+Gunakan script berikut sebelum release:
+
+```bash
+bash scripts/doctor.sh
+```
+
+Script akan menjalankan:
+- `composer dump-autoload`
+- `php artisan config:clear`
+- `php artisan route:clear`
+- `php artisan view:clear`
+- `php artisan cache:clear`
+- `php artisan route:list --name=admin` (sanity check route admin)
+- `php artisan migrate --force`
+- auto-create `public/storage` link bila belum ada
+- `php artisan test`
+- `npm run build` (jika npm tersedia)
+
+Opsional skip build frontend:
+
+```bash
+SKIP_FRONTEND_BUILD=1 bash scripts/doctor.sh
+```
+
+## Deployment Checklist
+
+1. Environment & key
+- Set `APP_ENV=production`
+- Set `APP_DEBUG=false`
+- Jalankan `php artisan key:generate` bila `APP_KEY` belum ada
+
+2. Database
+- Pastikan koneksi DB benar
+- Jalankan `php artisan migrate --force`
+
+3. Storage & permissions
+- Jalankan `php artisan storage:link`
+- Pastikan `storage/` dan `bootstrap/cache/` writable oleh web server
+
+4. Cache
+- Jalankan `php artisan config:cache`
+- Jalankan `php artisan route:cache`
+- Jalankan `php artisan view:cache`
+
+5. Queue & scheduler
+- Jika ada job async, jalankan worker queue (Supervisor/systemd)
+- Tambahkan cron scheduler:
+  - `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
+
+6. HTTPS & security
+- Wajib aktifkan HTTPS di reverse proxy/web server
+- Set `APP_URL` ke domain HTTPS
+- Verifikasi callback Midtrans memakai endpoint HTTPS
+
+7. Midtrans
+- Set env berikut:
+
+```env
+MIDTRANS_SERVER_KEY=...
+MIDTRANS_CLIENT_KEY=...
+MIDTRANS_IS_PRODUCTION=false
+OTP_REQUIRED=false
+OTP_TTL_MINUTES=5
+```
+
+Keterangan OTP:
+- `OTP_REQUIRED=false`: alur user tetap seperti sekarang (tanpa wajib OTP).
+- `OTP_REQUIRED=true`: user baru/login yang belum verifikasi akan diarahkan ke halaman OTP email.
+
+## Testing
+
+```bash
+php artisan test
+```
+
+Target release: seluruh test harus green sebelum deploy.
