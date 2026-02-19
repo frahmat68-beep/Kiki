@@ -8,6 +8,7 @@ use App\Services\AvailabilityService;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Category;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class EquipmentController extends Controller
 {
@@ -140,6 +141,62 @@ class EquipmentController extends Controller
         );
 
         return view('equipments.show', compact('equipment', 'bookingRanges'));
+    }
+
+    public function suggestions(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $query = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($query) < 2 || ! Schema::hasTable('equipments')) {
+            return response()->json(['data' => []]);
+        }
+
+        $builder = Equipment::query()
+            ->with('category')
+            ->orderBy('name');
+        $hasDescriptionColumn = Schema::hasColumn('equipments', 'description');
+
+        if (Schema::hasTable('order_items') && Schema::hasTable('orders')) {
+            $builder->withSum('activeOrderItems as reserved_units', 'qty');
+        }
+
+        $items = $builder
+            ->where(function ($searchBuilder) use ($query, $hasDescriptionColumn) {
+                $searchBuilder->where('name', 'like', '%' . $query . '%')
+                    ->orWhere('slug', 'like', '%' . $query . '%')
+                    ->orWhereHas('category', function ($categoryBuilder) use ($query) {
+                        $categoryBuilder->where('name', 'like', '%' . $query . '%');
+                    });
+
+                if ($hasDescriptionColumn) {
+                    $searchBuilder->orWhere('description', 'like', '%' . $query . '%');
+                }
+            })
+            ->limit(8)
+            ->get();
+
+        $data = $items->map(function (Equipment $equipment) {
+            $imagePath = (string) ($equipment->image_path ?? $equipment->image ?? '');
+            $imageUrl = $imagePath !== ''
+                ? (Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : asset('storage/' . ltrim($imagePath, '/')))
+                : asset('MANAKE-FAV-M.png');
+
+            return [
+                'name' => (string) $equipment->name,
+                'slug' => (string) $equipment->slug,
+                'category' => (string) ($equipment->category?->name ?? 'Lainnya'),
+                'image_url' => $imageUrl,
+                'price_per_day' => (int) ($equipment->price_per_day ?? 0),
+                'available_units' => (int) ($equipment->available_units ?? 0),
+                'overview' => Str::of((string) ($equipment->description ?? ''))
+                    ->squish()
+                    ->limit(88)
+                    ->value(),
+                'detail_url' => route('product.show', $equipment->slug),
+            ];
+        })->values();
+
+        return response()->json(['data' => $data]);
     }
 
     public function availability(Request $request, string $slug, AvailabilityService $availabilityService)

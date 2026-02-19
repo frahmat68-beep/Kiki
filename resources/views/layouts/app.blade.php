@@ -11,14 +11,14 @@
         $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
     @endphp
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('head')
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+        body { font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif; }
         :root { --manake-heading-blue: #1d4ed8; }
         :is(h1, h2, h3)[class*="text-slate-"] { color: var(--manake-heading-blue); }
     </style>
@@ -136,19 +136,31 @@
                     </svg>
                 </button>
 
-                <form method="GET" action="{{ route('catalog') }}" class="relative order-3 w-full sm:order-2 sm:flex-1 sm:max-w-2xl">
+                <form
+                    id="global-catalog-search-form"
+                    method="GET"
+                    action="{{ route('catalog') }}"
+                    data-search-suggest-url="{{ route('search.suggestions') }}"
+                    class="relative order-3 w-full sm:order-2 sm:flex-1 sm:max-w-2xl"
+                >
                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M8.5 3.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM2 8.5a6.5 6.5 0 1 1 11.158 4.157l3.092 3.093a1 1 0 0 1-1.414 1.414l-3.093-3.092A6.5 6.5 0 0 1 2 8.5Z" clip-rule="evenodd" />
                         </svg>
                     </span>
                     <input
+                        id="global-catalog-search-input"
                         type="text"
                         name="q"
                         value="{{ $searchQuery }}"
                         placeholder="{{ __('ui.nav.search_placeholder') }}"
+                        autocomplete="off"
                         class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                     >
+                    <div
+                        id="global-catalog-search-dropdown"
+                        class="absolute left-0 right-0 top-[calc(100%+0.45rem)] z-50 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+                    ></div>
                 </form>
 
                 <div class="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:gap-3">
@@ -496,6 +508,186 @@
         headers.set('X-CSRF-TOKEN', window.csrfToken);
         return fetch(url, { ...options, headers });
     };
+
+    (function () {
+        const form = document.getElementById('global-catalog-search-form');
+        const input = document.getElementById('global-catalog-search-input');
+        const dropdown = document.getElementById('global-catalog-search-dropdown');
+        if (!form || !input || !dropdown) {
+            return;
+        }
+
+        const endpoint = form.dataset.searchSuggestUrl || '';
+        const minimumQueryLength = 2;
+        let debounceTimer = null;
+        let activeAbortController = null;
+        let lastItems = [];
+
+        const formatRupiah = (value) => {
+            const amount = Number(value || 0);
+            return `Rp ${amount.toLocaleString('id-ID')}`;
+        };
+
+        const hideDropdown = () => {
+            dropdown.classList.add('hidden');
+        };
+
+        const showDropdown = () => {
+            dropdown.classList.remove('hidden');
+        };
+
+        const createItemNode = (item) => {
+            const link = document.createElement('a');
+            link.href = item.detail_url || '#';
+            link.className = 'flex items-center gap-3 border-b border-slate-100 px-3 py-2.5 transition hover:bg-blue-50';
+
+            const image = document.createElement('img');
+            image.src = item.image_url || '{{ asset('MANAKE-FAV-M.png') }}';
+            image.alt = item.name || 'Equipment';
+            image.loading = 'lazy';
+            image.className = 'h-12 w-12 rounded-lg border border-slate-200 bg-slate-50 object-cover';
+            link.appendChild(image);
+
+            const content = document.createElement('div');
+            content.className = 'min-w-0 flex-1';
+
+            const name = document.createElement('p');
+            name.className = 'truncate text-sm font-semibold text-slate-900';
+            name.textContent = item.name || 'Equipment';
+            content.appendChild(name);
+
+            const meta = document.createElement('p');
+            meta.className = 'mt-0.5 truncate text-xs italic text-slate-500';
+            meta.textContent = item.overview || item.category || '';
+            content.appendChild(meta);
+
+            const pricing = document.createElement('p');
+            pricing.className = 'mt-0.5 text-[11px] font-medium text-blue-700';
+            pricing.textContent = `${formatRupiah(item.price_per_day)} / hari`;
+            content.appendChild(pricing);
+
+            link.appendChild(content);
+
+            const stockBadge = document.createElement('span');
+            stockBadge.className = 'rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700';
+            stockBadge.textContent = `sisa ${Math.max(Number(item.available_units || 0), 0)}`;
+            link.appendChild(stockBadge);
+
+            return link;
+        };
+
+        const renderDropdown = (items, query) => {
+            dropdown.innerHTML = '';
+            lastItems = items;
+
+            const list = document.createElement('div');
+            list.className = 'max-h-[22rem] overflow-y-auto';
+
+            if (!items.length) {
+                const emptyState = document.createElement('p');
+                emptyState.className = 'px-3 py-3 text-xs text-slate-500';
+                emptyState.textContent = `Tidak ada hasil untuk "${query}".`;
+                list.appendChild(emptyState);
+            } else {
+                items.forEach((item) => {
+                    list.appendChild(createItemNode(item));
+                });
+            }
+
+            dropdown.appendChild(list);
+
+            const footer = document.createElement('a');
+            footer.href = `{{ route('catalog') }}?q=${encodeURIComponent(query)}`;
+            footer.className = 'block border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50';
+            footer.textContent = `Telusuri hasil "${query}"`;
+            dropdown.appendChild(footer);
+
+            showDropdown();
+        };
+
+        const fetchSuggestions = async (query) => {
+            if (!endpoint) {
+                return [];
+            }
+
+            if (activeAbortController) {
+                activeAbortController.abort();
+            }
+            activeAbortController = new AbortController();
+
+            try {
+                const url = new URL(endpoint, window.location.origin);
+                url.searchParams.set('q', query);
+
+                const response = await fetch(url.toString(), {
+                    headers: { Accept: 'application/json' },
+                    signal: activeAbortController.signal,
+                });
+                if (!response.ok) {
+                    return [];
+                }
+
+                const payload = await response.json().catch(() => ({}));
+                return Array.isArray(payload.data) ? payload.data : [];
+            } catch (error) {
+                if (error && error.name === 'AbortError') {
+                    return null;
+                }
+                return [];
+            }
+        };
+
+        input.addEventListener('input', () => {
+            const query = input.value.trim();
+
+            if (query.length < minimumQueryLength) {
+                hideDropdown();
+                dropdown.innerHTML = '';
+                lastItems = [];
+                return;
+            }
+
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+
+            debounceTimer = window.setTimeout(async () => {
+                const activeQuery = input.value.trim();
+                if (activeQuery.length < minimumQueryLength) {
+                    hideDropdown();
+                    return;
+                }
+
+                const items = await fetchSuggestions(activeQuery);
+                if (items === null) {
+                    return;
+                }
+                if (input.value.trim() !== activeQuery) {
+                    return;
+                }
+
+                renderDropdown(items, activeQuery);
+            }, 220);
+        });
+
+        input.addEventListener('focus', () => {
+            if (lastItems.length > 0 && input.value.trim().length >= minimumQueryLength) {
+                showDropdown();
+            }
+        });
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                hideDropdown();
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!form.contains(event.target)) {
+                hideDropdown();
+            }
+        });
+    })();
 </script>
 
 </body>

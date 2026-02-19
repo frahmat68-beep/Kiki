@@ -13,10 +13,34 @@
     $weekdayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
     $toneClasses = [
         'calm' => 'border-slate-200 bg-white text-slate-700',
-        'light' => 'border-blue-100 bg-blue-50/70 text-slate-700',
-        'busy' => 'border-blue-200 bg-blue-100/70 text-slate-800',
-        'critical' => 'border-slate-900 bg-slate-900 text-white',
+        'busy' => 'border-amber-200 bg-amber-50 text-amber-800',
+        'critical' => 'border-rose-200 bg-rose-50 text-rose-800',
     ];
+
+    $equipmentClientRows = $equipmentRows
+        ->map(function (array $row) {
+            $dayCells = collect($row['day_cells'] ?? [])->map(function ($cell) {
+                return [
+                    'reserved' => (int) data_get($cell, 'reserved', 0),
+                    'available' => (int) data_get($cell, 'available', 0),
+                    'is_blocked' => (bool) data_get($cell, 'is_blocked', false),
+                ];
+            })->all();
+
+            return [
+                'id' => (int) data_get($row, 'id', 0),
+                'name' => (string) data_get($row, 'name', 'Equipment'),
+                'slug' => (string) data_get($row, 'slug', ''),
+                'category' => (string) data_get($row, 'category', 'Lainnya'),
+                'category_id' => (int) data_get($row, 'category_id', 0),
+                'price_per_day' => (int) data_get($row, 'price_per_day', 0),
+                'image_url' => (string) data_get($row, 'image_url', asset('MANAKE-FAV-M.png')),
+                'status' => (string) data_get($row, 'status', 'ready'),
+                'stock' => (int) data_get($row, 'stock', 0),
+                'day_cells' => $dayCells,
+            ];
+        })
+        ->values();
 @endphp
 
 @push('head')
@@ -45,6 +69,7 @@
 
         .board-cell {
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            user-select: none;
         }
 
         .board-cell:hover {
@@ -78,22 +103,126 @@
         class="mx-auto max-w-7xl space-y-6"
         x-data="{
             schedulesByDate: @js($dailySchedulesByDate ?? []),
+            equipmentRows: @js($equipmentClientRows),
+            productUrlTemplate: @js(route('product.show', ['slug' => '__slug__'])),
+            cartUrl: @js(route('cart')),
             scheduleModalOpen: false,
+            rangeModalOpen: false,
             modalDate: '',
             modalDateLabel: '',
             modalBusyEquipments: 0,
             modalReservedUnits: 0,
             modalAvailableEquipments: 0,
             modalSchedules: [],
-            formatDateLabel(value) {
-                if (!value) return '-';
+            isSelectingRange: false,
+            selectionAnchorDate: '',
+            rangeDragged: false,
+            skipNextClick: false,
+            selectedRangeDates: [],
+            rangeCategoryOptions: [],
+            selectedRangeCategoryId: 'all',
+            rangeAvailableRows: [],
+            initBoard() {
+                this.selectedRangeDates = [];
+            },
+            parseDate(value) {
                 const parsed = new Date(`${value}T00:00:00`);
-                if (Number.isNaN(parsed.getTime())) return value;
+                if (Number.isNaN(parsed.getTime())) {
+                    return null;
+                }
+                return parsed;
+            },
+            formatDateLabel(value) {
+                const parsed = this.parseDate(value);
+                if (!parsed) {
+                    return value || '-';
+                }
                 return new Intl.DateTimeFormat('id-ID', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
                 }).format(parsed);
+            },
+            buildDateRange(startDate, endDate) {
+                const start = this.parseDate(startDate);
+                const end = this.parseDate(endDate);
+                if (!start || !end) {
+                    return [];
+                }
+
+                const min = start <= end ? start : end;
+                const max = start <= end ? end : start;
+                const output = [];
+
+                const cursor = new Date(min);
+                while (cursor <= max) {
+                    const year = cursor.getFullYear();
+                    const month = String(cursor.getMonth() + 1).padStart(2, '0');
+                    const day = String(cursor.getDate()).padStart(2, '0');
+                    output.push(`${year}-${month}-${day}`);
+                    cursor.setDate(cursor.getDate() + 1);
+                }
+
+                return output;
+            },
+            isDateInSelection(date) {
+                return this.selectedRangeDates.includes(date);
+            },
+            beginDateSelection(date) {
+                this.isSelectingRange = true;
+                this.selectionAnchorDate = date;
+                this.rangeDragged = false;
+                this.selectedRangeDates = [date];
+            },
+            hoverDateSelection(date) {
+                if (!this.isSelectingRange) {
+                    return;
+                }
+
+                const nextRange = this.buildDateRange(this.selectionAnchorDate, date);
+                if (nextRange.length > 1) {
+                    this.rangeDragged = true;
+                }
+                this.selectedRangeDates = nextRange;
+            },
+            finishDateSelection(date) {
+                if (!this.isSelectingRange) {
+                    return;
+                }
+
+                this.selectedRangeDates = this.buildDateRange(this.selectionAnchorDate, date);
+                const shouldOpenRangeModal = this.rangeDragged || this.selectedRangeDates.length > 1;
+
+                this.isSelectingRange = false;
+                this.selectionAnchorDate = '';
+
+                if (shouldOpenRangeModal) {
+                    this.skipNextClick = true;
+                    this.openRangeSelectionModal();
+                }
+            },
+            cancelDanglingSelection() {
+                if (!this.isSelectingRange) {
+                    return;
+                }
+
+                const shouldOpenRangeModal = this.rangeDragged || this.selectedRangeDates.length > 1;
+                this.isSelectingRange = false;
+                this.selectionAnchorDate = '';
+
+                if (shouldOpenRangeModal) {
+                    this.skipNextClick = true;
+                    this.openRangeSelectionModal();
+                }
+            },
+            handleDayClick(date, busyEquipments, reservedUnits, availableEquipments) {
+                if (this.skipNextClick) {
+                    this.skipNextClick = false;
+                    return;
+                }
+
+                this.selectedRangeDates = [date];
+                this.openScheduleModal(date, busyEquipments, reservedUnits, availableEquipments);
             },
             openScheduleModal(date, busyEquipments, reservedUnits, availableEquipments) {
                 this.modalDate = date;
@@ -103,14 +232,142 @@
                 this.modalAvailableEquipments = availableEquipments;
                 this.modalSchedules = Array.isArray(this.schedulesByDate[date]) ? this.schedulesByDate[date] : [];
                 this.scheduleModalOpen = true;
-                document.body.classList.add('overflow-hidden');
+                this.syncBodyLock();
             },
             closeScheduleModal() {
                 this.scheduleModalOpen = false;
-                document.body.classList.remove('overflow-hidden');
+                this.syncBodyLock();
+            },
+            getRangeStartDate() {
+                return this.selectedRangeDates.length ? this.selectedRangeDates[0] : '';
+            },
+            getRangeEndDate() {
+                return this.selectedRangeDates.length ? this.selectedRangeDates[this.selectedRangeDates.length - 1] : '';
+            },
+            getRangeDurationLabel() {
+                const days = this.selectedRangeDates.length;
+                if (days <= 0) {
+                    return '-';
+                }
+                return `${days} hari`;
+            },
+            computeRangeAvailability() {
+                if (!this.selectedRangeDates.length) {
+                    this.rangeAvailableRows = [];
+                    this.rangeCategoryOptions = [];
+                    return;
+                }
+
+                const rows = [];
+
+                this.equipmentRows.forEach((row) => {
+                    if (!row || String(row.status || '') !== 'ready') {
+                        return;
+                    }
+
+                    let minAvailable = Number.MAX_SAFE_INTEGER;
+
+                    this.selectedRangeDates.forEach((date) => {
+                        const cell = row.day_cells && row.day_cells[date] ? row.day_cells[date] : null;
+                        const available = cell ? Number(cell.available || 0) : Number(row.stock || 0);
+                        minAvailable = Math.min(minAvailable, Number.isFinite(available) ? available : 0);
+                    });
+
+                    if (!Number.isFinite(minAvailable)) {
+                        minAvailable = 0;
+                    }
+
+                    if (minAvailable <= 0) {
+                        return;
+                    }
+
+                    rows.push({
+                        ...row,
+                        min_available: minAvailable,
+                    });
+                });
+
+                rows.sort((left, right) => {
+                    if (right.min_available !== left.min_available) {
+                        return right.min_available - left.min_available;
+                    }
+                    return String(left.name || '').localeCompare(String(right.name || ''), 'id');
+                });
+
+                this.rangeAvailableRows = rows;
+
+                const categoryMap = new Map();
+                rows.forEach((row) => {
+                    const id = String(row.category_id || 0);
+                    if (!categoryMap.has(id)) {
+                        categoryMap.set(id, row.category || 'Lainnya');
+                    }
+                });
+
+                this.rangeCategoryOptions = Array.from(categoryMap, ([id, name]) => ({ id, name }))
+                    .sort((a, b) => String(a.name).localeCompare(String(b.name), 'id'));
+            },
+            openRangeSelectionModal() {
+                this.computeRangeAvailability();
+                this.selectedRangeCategoryId = 'all';
+                this.rangeModalOpen = true;
+                this.syncBodyLock();
+            },
+            closeRangeSelectionModal() {
+                this.rangeModalOpen = false;
+                this.selectedRangeDates = [];
+                this.rangeAvailableRows = [];
+                this.rangeCategoryOptions = [];
+                this.selectedRangeCategoryId = 'all';
+                this.syncBodyLock();
+            },
+            getFilteredRangeRows() {
+                if (this.selectedRangeCategoryId === 'all') {
+                    return this.rangeAvailableRows;
+                }
+
+                return this.rangeAvailableRows.filter((row) => String(row.category_id || 0) === this.selectedRangeCategoryId);
+            },
+            buildProductUrl(slug) {
+                const safeSlug = encodeURIComponent(String(slug || '').trim());
+                const baseUrl = this.productUrlTemplate.replace('__slug__', safeSlug);
+                const params = new URLSearchParams();
+
+                const startDate = this.getRangeStartDate();
+                const endDate = this.getRangeEndDate();
+                if (startDate) {
+                    params.set('rental_start_date', startDate);
+                }
+                if (endDate) {
+                    params.set('rental_end_date', endDate);
+                }
+
+                if (!params.toString()) {
+                    return baseUrl;
+                }
+
+                return `${baseUrl}?${params.toString()}`;
+            },
+            syncBodyLock() {
+                if (this.scheduleModalOpen || this.rangeModalOpen) {
+                    document.body.classList.add('overflow-hidden');
+                } else {
+                    document.body.classList.remove('overflow-hidden');
+                }
+            },
+            handleEscape() {
+                if (this.rangeModalOpen) {
+                    this.closeRangeSelectionModal();
+                    return;
+                }
+                if (this.scheduleModalOpen) {
+                    this.closeScheduleModal();
+                }
             },
         }"
-        x-on:keydown.escape.window="closeScheduleModal()"
+        x-init="initBoard()"
+        x-on:keydown.escape.window="handleEscape()"
+        x-on:pointerup.window="cancelDanglingSelection()"
     >
         <section class="availability-surface relative overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-white via-blue-50/70 to-slate-100 px-6 py-6 shadow-sm sm:px-7 sm:py-7">
             <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-100/70 blur-2xl"></div>
@@ -118,9 +375,9 @@
 
             <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Pusat Cek Ketersediaan Alat</h1>
-                    <p class="mt-2 max-w-2xl text-sm text-slate-600 sm:text-base">
-                        Klik tanggal di kalender untuk melihat pesanan alat yang sedang berjalan dan pantau ketersediaan dengan cepat.
+                    <h1 class="text-2xl font-extrabold text-blue-700 sm:text-3xl">Pusat Cek Ketersediaan Alat</h1>
+                    <p class="mt-2 max-w-2xl text-sm italic text-slate-600 sm:text-base">
+                        Klik tanggal di kalender untuk melihat pesanan aktif, atau drag beberapa hari sekaligus untuk cek rentang sewa.
                     </p>
                 </div>
 
@@ -163,8 +420,8 @@
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/70 px-5 py-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Kalender Pemakaian</p>
-                        <h2 class="mt-1 text-xl font-semibold text-slate-900">{{ $monthLabel }}</h2>
-                        <p class="mt-1 text-[11px] text-slate-500 sm:hidden">Tap tanggal untuk lihat detail.</p>
+                        <h2 class="mt-1 text-xl font-semibold text-blue-700">{{ $monthLabel }}</h2>
+                        <p class="mt-1 text-[11px] text-slate-500 sm:hidden">Tap tanggal untuk detail, drag untuk cek sewa rentang hari.</p>
                     </div>
                     <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
                         <a
@@ -196,12 +453,17 @@
                             @php
                                 $toneClass = $toneClasses[$day['tone']] ?? $toneClasses['calm'];
                                 $selectedClass = $day['is_selected'] ? 'ring-2 ring-blue-500 shadow-md shadow-blue-100' : '';
-                                $todayClass = $day['is_today'] ? ($day['tone'] === 'critical' ? 'text-blue-100' : 'text-blue-600') : '';
+                                $todayClass = $day['is_today'] ? 'text-blue-700 font-bold' : '';
+                                $hasUsage = (int) $day['busy_equipments'] > 0 || (int) $day['reserved_units'] > 0;
                             @endphp
                             <button
                                 type="button"
                                 class="board-cell group w-full rounded-lg border px-1.5 py-1.5 text-left sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
-                                @click="openScheduleModal('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
+                                @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
+                                @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
+                                @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
+                                @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
+                                x-bind:class="isDateInSelection('{{ $day['date'] }}') ? 'border-blue-400 bg-blue-100 text-blue-900 shadow-sm shadow-blue-100' : ''"
                                 aria-haspopup="dialog"
                                 aria-label="Lihat detail tanggal {{ \Carbon\Carbon::parse($day['date'])->translatedFormat('d F Y') }}"
                             >
@@ -211,20 +473,15 @@
                                         <span class="inline-flex h-2.5 w-2.5 rounded-full bg-blue-600"></span>
                                     @endif
                                 </div>
-                                <div class="mt-1.5 sm:hidden">
-                                    @if ((int) $day['busy_equipments'] === 0 && (int) $day['reserved_units'] === 0)
-                                        <p class="text-[9px] font-medium opacity-70">kosong</p>
-                                    @else
-                                        <p class="text-[9px] font-semibold leading-tight">{{ $day['busy_equipments'] }} alat</p>
-                                        <p class="text-[9px] leading-tight">{{ $day['reserved_units'] }} unit</p>
-                                    @endif
-                                </div>
-                                <p class="mt-2 hidden text-[11px] font-semibold sm:block">
-                                    {{ $day['busy_equipments'] }} alat terpakai
-                                </p>
-                                <p class="mt-0.5 hidden text-[10px] sm:block">
-                                    {{ $day['reserved_units'] }} unit dipakai
-                                </p>
+
+                                @if ($hasUsage)
+                                    <p class="mt-1.5 text-[9px] font-semibold leading-tight sm:mt-2 sm:text-[11px]">
+                                        {{ $day['busy_equipments'] }} alat terpakai
+                                    </p>
+                                    <p class="mt-0.5 text-[9px] leading-tight sm:text-[10px]">
+                                        {{ $day['reserved_units'] }} unit dipakai
+                                    </p>
+                                @endif
                             </button>
                         @endforeach
                     </div>
@@ -234,16 +491,16 @@
             <div class="space-y-4">
                 <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Tanggal Dipilih</p>
-                    <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ $selectedDateLabel }}</h2>
+                    <h2 class="mt-1 text-2xl font-semibold text-blue-700">{{ $selectedDateLabel }}</h2>
 
                     <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Total Alat</p>
                             <p class="mt-1 text-2xl font-semibold text-slate-900">{{ $summary['total_equipments'] ?? 0 }}</p>
                         </div>
-                        <div class="rounded-2xl border border-blue-100 bg-blue-50 px-3 py-3">
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-blue-500">Terpakai / Blokir</p>
-                            <p class="mt-1 text-2xl font-semibold text-blue-700">{{ $summary['busy_equipments'] ?? 0 }}</p>
+                        <div class="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-3">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-500">Sedang Disewa</p>
+                            <p class="mt-1 text-2xl font-semibold text-rose-700">{{ $summary['busy_equipments'] ?? 0 }}</p>
                         </div>
                         <div class="rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">Masih Kosong</p>
@@ -258,7 +515,7 @@
 
                 <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <h3 class="text-base font-semibold text-slate-900">Alat Paling Siap Dipakai</h3>
+                        <h3 class="text-base font-semibold text-blue-700">Alat Paling Siap Dipakai</h3>
                         <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
                             {{ $selectedFreeRows->count() }} kosong
                         </span>
@@ -272,7 +529,7 @@
                                         sisa {{ $row['selected_available'] }}
                                     </span>
                                 </div>
-                                <p class="mt-1 text-xs text-slate-500">{{ $row['category'] }}</p>
+                                <p class="mt-1 text-xs italic text-slate-500">{{ $row['category'] }}</p>
                             </article>
                         @empty
                             <p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
@@ -287,15 +544,15 @@
         <section class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-slate-900">Alat Terpakai di {{ $selectedDateLabel }}</h2>
-                    <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ $selectedBusyRows->count() }} alat</span>
+                    <h2 class="text-lg font-semibold text-blue-700">Alat Terpakai di {{ $selectedDateLabel }}</h2>
+                    <span class="rounded-full bg-rose-100 px-2.5 py-1 text-[11px] font-semibold text-rose-700">{{ $selectedBusyRows->count() }} alat</span>
                 </div>
                 <div class="mt-3 space-y-2">
                     @forelse ($selectedBusyRows->take(10) as $row)
                         <article class="board-item rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
                             <div class="flex items-center justify-between gap-2">
                                 <p class="text-sm font-semibold text-slate-900">{{ $row['name'] }}</p>
-                                <p class="text-xs font-semibold text-blue-600">dipakai {{ $row['selected_reserved'] }} unit</p>
+                                <p class="text-xs font-semibold text-rose-600">dipakai {{ $row['selected_reserved'] }} unit</p>
                             </div>
                             @if ($row['source_labels']->isNotEmpty())
                                 <p class="mt-1 text-xs text-slate-600">{{ $row['source_labels']->implode(', ') }}</p>
@@ -311,7 +568,7 @@
 
             <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-slate-900">Jadwal Aktif Bulan Ini</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">Jadwal Aktif Bulan Ini</h2>
                     <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ $monthlySchedules->count() }} jadwal</span>
                 </div>
                 <div class="mt-3 max-h-[29rem] space-y-2 overflow-y-auto pr-1">
@@ -352,7 +609,7 @@
                 <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-5 sm:py-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Detail Tanggal</p>
-                        <h2 class="mt-1 text-xl font-semibold text-slate-900" x-text="modalDateLabel"></h2>
+                        <h2 class="mt-1 text-xl font-semibold text-blue-700" x-text="modalDateLabel"></h2>
                     </div>
                     <button
                         type="button"
@@ -366,13 +623,13 @@
 
                 <div class="px-4 py-4 sm:px-5">
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Alat Terpakai</p>
-                            <p class="mt-1 text-lg font-semibold text-slate-900" x-text="modalBusyEquipments"></p>
+                        <div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-500">Alat Terpakai</p>
+                            <p class="mt-1 text-lg font-semibold text-rose-700" x-text="modalBusyEquipments"></p>
                         </div>
-                        <div class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-blue-500">Unit Dipakai</p>
-                            <p class="mt-1 text-lg font-semibold text-blue-700" x-text="modalReservedUnits"></p>
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-amber-600">Unit Dipakai</p>
+                            <p class="mt-1 text-lg font-semibold text-amber-700" x-text="modalReservedUnits"></p>
                         </div>
                         <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5">
                             <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">Masih Kosong</p>
@@ -399,6 +656,107 @@
                                 <p class="mt-2 text-xs text-slate-600">
                                     Periode: <span x-text="`${formatDateLabel(item.start_date)} - ${formatDateLabel(item.end_date)}`"></span>
                                 </p>
+                            </article>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            x-cloak
+            x-show="rangeModalOpen"
+            x-transition.opacity
+            class="fixed inset-0 z-[96] flex items-end justify-center p-2 sm:items-center sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            @click.self="closeRangeSelectionModal()"
+        >
+            <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]"></div>
+
+            <div class="availability-surface relative z-10 w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl">
+                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-blue-50/80 px-4 py-3 sm:px-5 sm:py-4">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Cek Rentang Sewa</p>
+                        <h2 class="mt-1 text-lg font-semibold text-blue-700">Mau sewa di tanggal ini?</h2>
+                        <p class="mt-1 text-xs text-slate-600">
+                            <span x-text="formatDateLabel(getRangeStartDate())"></span>
+                            -
+                            <span x-text="formatDateLabel(getRangeEndDate())"></span>
+                            •
+                            <span x-text="getRangeDurationLabel()"></span>
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 transition hover:border-blue-300 hover:text-blue-700"
+                        @click="closeRangeSelectionModal()"
+                        aria-label="Tutup popup sewa"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <div class="space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end">
+                        <div>
+                            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Filter Kategori Alat</label>
+                            <select
+                                x-model="selectedRangeCategoryId"
+                                class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            >
+                                <option value="all">Semua kategori</option>
+                                <template x-for="category in rangeCategoryOptions" :key="category.id">
+                                    <option :value="category.id" x-text="category.name"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Alat Tersedia</p>
+                            <p class="text-lg font-semibold text-emerald-700" x-text="getFilteredRangeRows().length"></p>
+                        </div>
+                        <a
+                            :href="cartUrl"
+                            class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                        >
+                            Lanjut ke Keranjang
+                        </a>
+                    </div>
+
+                    <div class="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
+                        <template x-if="getFilteredRangeRows().length === 0">
+                            <p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-500">
+                                Tidak ada alat tersedia penuh di rentang tanggal ini. Coba kategori lain atau ubah rentang drag.
+                            </p>
+                        </template>
+
+                        <template x-for="item in getFilteredRangeRows()" :key="`range-item-${item.id}`">
+                            <article class="board-item rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+                                <div class="flex items-start gap-3">
+                                    <img
+                                        :src="item.image_url"
+                                        :alt="item.name"
+                                        class="h-14 w-14 rounded-lg border border-slate-200 bg-white object-cover"
+                                        loading="lazy"
+                                    >
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-semibold text-slate-900" x-text="item.name"></p>
+                                        <p class="mt-0.5 text-xs italic text-slate-500" x-text="item.category"></p>
+                                        <p class="mt-1 text-[11px] font-medium text-blue-700">
+                                            Mulai dari <span x-text="`Rp ${Number(item.price_per_day || 0).toLocaleString('id-ID')}`"></span> / hari
+                                        </p>
+                                    </div>
+                                    <span class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700" x-text="`sisa min ${item.min_available}`"></span>
+                                </div>
+                                <div class="mt-2 flex flex-wrap items-center gap-2">
+                                    <a
+                                        :href="buildProductUrl(item.slug)"
+                                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
+                                    >
+                                        Pilih & Sewa
+                                    </a>
+                                    <span class="text-[11px] text-slate-500">Tanggal sewa akan terisi otomatis di detail alat.</span>
+                                </div>
                             </article>
                         </template>
                     </div>

@@ -18,8 +18,8 @@
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
             <div class="flex flex-col gap-3">
                 <div>
-                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">{{ $catalogTitle }}</h1>
-                    <p class="text-sm text-slate-600">{{ $catalogSubtitle }}</p>
+                    <h1 class="text-2xl font-extrabold text-blue-700 sm:text-3xl">{{ $catalogTitle }}</h1>
+                    <p class="text-sm italic text-slate-600">{{ $catalogSubtitle }}</p>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                 <section>
                     <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <h2 class="text-2xl font-semibold text-slate-900">{{ $category->name }}</h2>
+                            <h2 class="text-2xl font-semibold text-blue-700">{{ $category->name }}</h2>
                             @if (!empty($category->description))
                                 <p class="text-sm text-slate-500">{{ $category->description }}</p>
                             @endif

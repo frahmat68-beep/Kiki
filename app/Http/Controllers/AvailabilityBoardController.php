@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class AvailabilityBoardController extends Controller
 {
@@ -56,6 +57,9 @@ class AvailabilityBoardController extends Controller
             $calendarTotals[$dateKey] = [
                 'reserved_units' => 0,
                 'busy_equipments' => 0,
+                'booking_equipments' => 0,
+                'buffer_equipments' => 0,
+                'status_blocked_equipments' => 0,
             ];
         }
 
@@ -90,6 +94,12 @@ class AvailabilityBoardController extends Controller
                 $available = max((int) $equipment->stock - $reserved, 0);
                 $isBlockedByStatus = $statusValue !== 'ready';
                 $isBlocked = $isBlockedByStatus || $available <= 0;
+                $sourceTypes = collect(data_get($daily, $dateKey . '.sources', []))
+                    ->pluck('type')
+                    ->filter(fn ($type) => is_string($type) && $type !== '')
+                    ->values();
+                $hasBooking = $sourceTypes->contains(fn (string $type) => in_array($type, ['booking', 'maintenance'], true));
+                $hasBuffer = $sourceTypes->contains(fn (string $type) => in_array($type, ['buffer_before', 'buffer_after'], true));
 
                 $dayCells[$dateKey] = [
                     'reserved' => $reserved,
@@ -102,6 +112,14 @@ class AvailabilityBoardController extends Controller
                 }
                 if ($isBlocked || $reserved > 0) {
                     $calendarTotals[$dateKey]['busy_equipments']++;
+                }
+                if ($isBlockedByStatus) {
+                    $calendarTotals[$dateKey]['status_blocked_equipments']++;
+                }
+                if ($hasBooking || $isBlockedByStatus) {
+                    $calendarTotals[$dateKey]['booking_equipments']++;
+                } elseif ($hasBuffer) {
+                    $calendarTotals[$dateKey]['buffer_equipments']++;
                 }
             }
 
@@ -133,6 +151,10 @@ class AvailabilityBoardController extends Controller
                 'id' => (int) $equipment->id,
                 'name' => (string) $equipment->name,
                 'category' => (string) ($equipment->category?->name ?? '-'),
+                'category_id' => (int) ($equipment->category_id ?? 0),
+                'slug' => (string) ($equipment->slug ?? ''),
+                'price_per_day' => (int) ($equipment->price_per_day ?? 0),
+                'image_url' => $this->resolveEquipmentImageUrl($equipment),
                 'stock' => (int) ($equipment->stock ?? 0),
                 'status' => $statusValue,
                 'status_label' => $statusLabel,
@@ -162,15 +184,14 @@ class AvailabilityBoardController extends Controller
             $date = Carbon::parse($dateKey)->startOfDay();
             $busyEquipments = (int) data_get($calendarTotals, $dateKey . '.busy_equipments', 0);
             $reservedUnits = (int) data_get($calendarTotals, $dateKey . '.reserved_units', 0);
-            $busyRatio = $totalEquipments > 0 ? ($busyEquipments / max($totalEquipments, 1)) : 0;
+            $bookingEquipments = (int) data_get($calendarTotals, $dateKey . '.booking_equipments', 0);
+            $bufferEquipments = (int) data_get($calendarTotals, $dateKey . '.buffer_equipments', 0);
 
             $tone = 'calm';
-            if ($busyRatio >= 0.7) {
+            if ($bookingEquipments > 0) {
                 $tone = 'critical';
-            } elseif ($busyRatio >= 0.35) {
+            } elseif ($bufferEquipments > 0) {
                 $tone = 'busy';
-            } elseif ($busyRatio > 0) {
-                $tone = 'light';
             }
 
             return [
@@ -181,6 +202,8 @@ class AvailabilityBoardController extends Controller
                 'is_selected' => $dateKey === $selectedDateKey,
                 'reserved_units' => $reservedUnits,
                 'busy_equipments' => $busyEquipments,
+                'booking_equipments' => $bookingEquipments,
+                'buffer_equipments' => $bufferEquipments,
                 'available_equipments' => max($totalEquipments - $busyEquipments, 0),
                 'tone' => $tone,
                 'week_index' => $date->diffInDays($calendarStart) / 7,
@@ -409,6 +432,21 @@ class AvailabilityBoardController extends Controller
         } catch (\Throwable $exception) {
             return null;
         }
+    }
+
+    private function resolveEquipmentImageUrl(Equipment $equipment): string
+    {
+        $imagePath = (string) ($equipment->image_path ?? $equipment->image ?? '');
+
+        if ($imagePath !== '') {
+            if (Str::startsWith($imagePath, ['http://', 'https://'])) {
+                return $imagePath;
+            }
+
+            return asset('storage/' . ltrim($imagePath, '/'));
+        }
+
+        return asset('MANAKE-FAV-M.png');
     }
 
     private function resolveSourceLabel(string $type): string

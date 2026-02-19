@@ -47,6 +47,7 @@ Route::get('/theme/{theme}', [ThemeController::class, 'switch'])->name('theme.sw
 
 Route::get('/catalog', [EquipmentController::class, 'index'])->name('catalog');
 Route::get('/availability-board', [AvailabilityBoardController::class, 'index'])->name('availability.board');
+Route::get('/search/suggestions', [EquipmentController::class, 'suggestions'])->name('search.suggestions');
 Route::get('/equipments', [PageController::class, 'catalogRedirect'])->name('equipments.index');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 

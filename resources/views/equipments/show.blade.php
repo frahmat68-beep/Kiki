@@ -22,6 +22,14 @@
         ->filter()
         ->values();
     $availabilityEndpoint = route('product.availability', $equipment->slug);
+    $prefillStartDate = trim((string) (old('rental_start_date') ?: request('rental_start_date', request('start_date', ''))));
+    $prefillEndDate = trim((string) (old('rental_end_date') ?: request('rental_end_date', request('end_date', ''))));
+    if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillStartDate)) {
+        $prefillStartDate = '';
+    }
+    if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillEndDate)) {
+        $prefillEndDate = '';
+    }
 @endphp
 
 @section('title', $equipment->name)
@@ -181,6 +189,7 @@
                                 name="rental_start_date"
                                 form="rent-form"
                                 min="{{ now()->toDateString() }}"
+                                value="{{ $prefillStartDate }}"
                                 required
                                 class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
                             >
@@ -193,6 +202,7 @@
                                 name="rental_end_date"
                                 form="rent-form"
                                 min="{{ now()->toDateString() }}"
+                                value="{{ $prefillEndDate }}"
                                 required
                                 class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
                             >
@@ -449,6 +459,16 @@
             if (qtyInput) {
                 qtyInput.addEventListener('change', scheduleAvailabilityCheck);
                 qtyInput.addEventListener('input', scheduleAvailabilityCheck);
+            }
+
+            if (startInput && endInput) {
+                if (startInput.value) {
+                    endInput.min = startInput.value;
+                }
+                updateTotal();
+                if (startInput.value && endInput.value) {
+                    scheduleAvailabilityCheck();
+                }
             }
 
             if (rentForm && startInput && endInput) {

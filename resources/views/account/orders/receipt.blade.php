@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ __('ui.invoice.title') }} {{ $order->order_number ?? ('ORD-' . $order->id) }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <style>
         :root {
@@ -61,7 +61,7 @@
             padding: 24px;
             background: radial-gradient(980px 420px at -15% -10%, rgba(47, 95, 245, 0.14), transparent 60%), var(--invoice-bg);
             color: var(--invoice-text);
-            font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+            font-family: "Poppins", system-ui, -apple-system, sans-serif;
         }
 
         .invoice-shell {
