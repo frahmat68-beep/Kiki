@@ -16,6 +16,13 @@
         'busy' => 'border-amber-200 bg-amber-50 text-amber-800',
         'critical' => 'border-rose-200 bg-rose-50 text-rose-800',
     ];
+    $availabilityTitle = setting('copy.availability.title', 'Pusat Cek Ketersediaan Alat');
+    $availabilitySubtitle = setting('copy.availability.subtitle', 'Klik tanggal di kalender untuk melihat pesanan aktif, atau drag beberapa hari sekaligus untuk cek rentang sewa.');
+    $availabilityCalendarTitle = setting('copy.availability.calendar_title', 'Kalender Pemakaian');
+    $availabilitySelectedTitle = setting('copy.availability.selected_title', 'Tanggal Dipilih');
+    $availabilityReadyTitle = setting('copy.availability.ready_title', 'Alat Paling Siap Dipakai');
+    $availabilityBusyTitle = setting('copy.availability.busy_title', 'Alat Terpakai');
+    $availabilityMonthlyTitle = setting('copy.availability.monthly_title', 'Jadwal Aktif Bulan Ini');
 
     $equipmentClientRows = $equipmentRows
         ->map(function (array $row) {
@@ -75,6 +82,30 @@
         .board-cell:hover {
             transform: translateY(-1px);
             box-shadow: 0 9px 20px -18px rgba(15, 23, 42, 0.48);
+        }
+
+        @keyframes boardRangePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.26);
+            }
+            70% {
+                box-shadow: 0 0 0 9px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+            }
+        }
+
+        .board-cell--range {
+            border-color: #3b82f6 !important;
+            background: linear-gradient(160deg, #dbeafe 0%, #bfdbfe 100%) !important;
+            color: #0f172a !important;
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.22), 0 14px 28px -24px rgba(37, 99, 235, 0.75) !important;
+        }
+
+        .board-cell--range-dragging {
+            animation: boardRangePulse 0.8s ease-out infinite;
+            transform: translateY(-1px) scale(1.01);
         }
 
         .board-item {
@@ -375,9 +406,9 @@
 
             <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-blue-700 sm:text-3xl">Pusat Cek Ketersediaan Alat</h1>
+                    <h1 class="text-2xl font-extrabold text-blue-700 sm:text-3xl">{{ $availabilityTitle }}</h1>
                     <p class="mt-2 max-w-2xl text-sm italic text-slate-600 sm:text-base">
-                        Klik tanggal di kalender untuk melihat pesanan aktif, atau drag beberapa hari sekaligus untuk cek rentang sewa.
+                        {{ $availabilitySubtitle }}
                     </p>
                 </div>
 
@@ -419,7 +450,7 @@
             <article class="availability-surface overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/70 px-5 py-4">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Kalender Pemakaian</p>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilityCalendarTitle }}</p>
                         <h2 class="mt-1 text-xl font-semibold text-blue-700">{{ $monthLabel }}</h2>
                         <p class="mt-1 text-[11px] text-slate-500 sm:hidden">Tap tanggal untuk detail, drag untuk cek sewa rentang hari.</p>
                     </div>
@@ -463,7 +494,10 @@
                                 @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
                                 @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
                                 @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
-                                x-bind:class="isDateInSelection('{{ $day['date'] }}') ? 'border-blue-400 bg-blue-100 text-blue-900 shadow-sm shadow-blue-100' : ''"
+                                x-bind:class="{
+                                    'board-cell--range': isDateInSelection('{{ $day['date'] }}'),
+                                    'board-cell--range-dragging': isSelectingRange && isDateInSelection('{{ $day['date'] }}')
+                                }"
                                 aria-haspopup="dialog"
                                 aria-label="Lihat detail tanggal {{ \Carbon\Carbon::parse($day['date'])->translatedFormat('d F Y') }}"
                             >
@@ -490,7 +524,7 @@
 
             <div class="space-y-4">
                 <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Tanggal Dipilih</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilitySelectedTitle }}</p>
                     <h2 class="mt-1 text-2xl font-semibold text-blue-700">{{ $selectedDateLabel }}</h2>
 
                     <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -515,7 +549,7 @@
 
                 <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <h3 class="text-base font-semibold text-blue-700">Alat Paling Siap Dipakai</h3>
+                        <h3 class="text-base font-semibold text-blue-700">{{ $availabilityReadyTitle }}</h3>
                         <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
                             {{ $selectedFreeRows->count() }} kosong
                         </span>
@@ -544,7 +578,7 @@
         <section class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-blue-700">Alat Terpakai di {{ $selectedDateLabel }}</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">{{ $availabilityBusyTitle }} di {{ $selectedDateLabel }}</h2>
                     <span class="rounded-full bg-rose-100 px-2.5 py-1 text-[11px] font-semibold text-rose-700">{{ $selectedBusyRows->count() }} alat</span>
                 </div>
                 <div class="mt-3 space-y-2">
@@ -568,7 +602,7 @@
 
             <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-blue-700">Jadwal Aktif Bulan Ini</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">{{ $availabilityMonthlyTitle }}</h2>
                     <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ $monthlySchedules->count() }} jadwal</span>
                 </div>
                 <div class="mt-3 max-h-[29rem] space-y-2 overflow-y-auto pr-1">

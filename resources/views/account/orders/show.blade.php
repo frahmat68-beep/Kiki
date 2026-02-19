@@ -88,6 +88,13 @@
     $rescheduleConflictPopupMessage = (session('error') && (old('rental_start_date') || old('rental_end_date')))
         ? session('error')
         : null;
+    $orderDetailTitle = setting('copy.order_detail.title', 'Detail Pesanan');
+    $orderDetailSubtitle = setting('copy.order_detail.subtitle', 'Pantau status pembayaran dan progres rental di sini.');
+    $orderDetailBackLabel = setting('copy.order_detail.back_label', 'Kembali ke Riwayat');
+    $orderNumberLabel = setting('copy.order_detail.order_number_label', 'Nomor Order');
+    $orderProgressTitle = setting('copy.order_detail.progress_title', 'Progress Pesanan');
+    $orderItemsTitle = setting('copy.order_detail.items_title', 'Item Disewa');
+    $orderPaymentTitle = setting('copy.order_detail.payment_title', 'Pembayaran');
 @endphp
 
 @section('content')
@@ -95,10 +102,10 @@
         <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Detail Pesanan</h1>
-                    <p class="text-sm text-slate-500">Pantau status pembayaran dan progres rental di sini.</p>
+                    <h1 class="text-2xl font-semibold text-blue-700 sm:text-3xl">{{ $orderDetailTitle }}</h1>
+                    <p class="text-sm text-slate-500">{{ $orderDetailSubtitle }}</p>
                 </div>
-                <a href="{{ route('booking.history') }}" class="text-sm font-semibold text-slate-600 hover:text-blue-600">← Kembali ke Riwayat</a>
+                <a href="{{ route('booking.history') }}" class="text-sm font-semibold text-slate-600 hover:text-blue-600">← {{ $orderDetailBackLabel }}</a>
             </div>
         </div>
     </section>
@@ -168,9 +175,9 @@
                     <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div class="flex flex-wrap items-start justify-between gap-4">
                             <div>
-                                <p class="text-xs text-slate-500">Nomor Order</p>
+                                <p class="text-xs font-semibold uppercase tracking-[0.08em] text-blue-500">{{ $orderNumberLabel }}</p>
                                 <div class="mt-1 flex items-center gap-2">
-                                    <p id="order-number-text" class="text-lg font-semibold text-slate-900">{{ $order->order_number ?? ('ORD-' . $order->id) }}</p>
+                                    <p id="order-number-text" class="text-lg font-semibold text-blue-700">{{ $order->order_number ?? ('ORD-' . $order->id) }}</p>
                                     <button
                                         type="button"
                                         id="copy-order-number"
@@ -204,7 +211,7 @@
                     </article>
 
                     <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <h2 class="text-lg font-semibold text-slate-900">Progress Pesanan</h2>
+                        <h2 class="text-lg font-semibold text-blue-700">{{ $orderProgressTitle }}</h2>
                         <div class="mt-4 space-y-3">
                             @foreach ($timeline as $step)
                                 @php
@@ -240,13 +247,13 @@
                     </article>
 
                     <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <h2 class="text-lg font-semibold text-slate-900">Item Disewa</h2>
+                        <h2 class="text-lg font-semibold text-blue-700">{{ $orderItemsTitle }}</h2>
                         <div class="mt-4 space-y-3">
                             @forelse ($order->items as $item)
                                 <div class="rounded-xl border border-slate-100 p-4">
                                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <div>
-                                            <p class="text-sm font-semibold text-slate-900">{{ $item->equipment->name ?? 'Equipment' }}</p>
+                                            <p class="text-sm font-semibold text-blue-700">{{ $item->equipment->name ?? 'Equipment' }}</p>
                                             <p class="text-xs text-slate-500">Qty {{ $item->qty }} x {{ $formatIdr($item->price) }} / hari</p>
                                         </div>
                                         <p class="text-sm font-semibold text-slate-800">{{ $formatIdr($item->subtotal) }}</p>
@@ -275,7 +282,7 @@
                 </div>
 
                 <aside class="h-fit space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 class="text-lg font-semibold text-slate-900">Pembayaran</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">{{ $orderPaymentTitle }}</h2>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between text-slate-600">
                             <span>Midtrans Order ID</span>

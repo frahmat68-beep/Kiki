@@ -10,7 +10,7 @@ class SiteSettingsController extends Controller
 {
     public function edit()
     {
-        $keys = $this->keys();
+        $keys = array_merge($this->keys(), array_keys($this->typographyMap()));
         $settings = SiteSetting::whereIn('key', $keys)->pluck('value', 'key')->toArray();
 
         return view('admin.settings.edit', [
@@ -40,6 +40,15 @@ class SiteSettingsController extends Controller
             'social_tiktok' => ['nullable', 'string', 'max:255'],
             'contact_map_embed' => ['nullable', 'string', 'max:5000'],
             'contact_form_receiver_email' => ['nullable', 'email', 'max:150'],
+            'typography_heading_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
+            'typography_subheading_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
+            'typography_body_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
+            'typography_heading_weight' => ['nullable', 'in:600,700,800,900'],
+            'typography_body_weight' => ['nullable', 'in:400,500,600'],
+            'typography_heading_style' => ['nullable', 'in:normal,italic'],
+            'typography_body_style' => ['nullable', 'in:normal,italic'],
+            'typography_heading_scale' => ['nullable', 'in:sm,md,lg'],
+            'typography_body_scale' => ['nullable', 'in:sm,md,lg'],
         ]);
 
         foreach ($this->keys() as $key) {
@@ -56,8 +65,22 @@ class SiteSettingsController extends Controller
             site_setting_forget($key);
         }
 
+        foreach ($this->typographyMap() as $settingKey => $requestKey) {
+            SiteSetting::updateOrCreate(
+                ['key' => $settingKey],
+                [
+                    'value' => $data[$requestKey] ?? null,
+                    'type' => 'text',
+                    'group' => 'typography',
+                    'updated_by_admin_id' => auth('admin')->id(),
+                ]
+            );
+
+            site_setting_forget($settingKey);
+        }
+
         admin_audit('site_settings.update', 'site_settings', null, [
-            'keys' => $this->keys(),
+            'keys' => array_merge($this->keys(), array_keys($this->typographyMap())),
         ], auth('admin')->id());
 
         return back()->with('success', __('ui.admin.settings_saved'));
@@ -84,6 +107,21 @@ class SiteSettingsController extends Controller
             'social_tiktok',
             'contact_map_embed',
             'contact_form_receiver_email',
+        ];
+    }
+
+    private function typographyMap(): array
+    {
+        return [
+            'typography.heading_color' => 'typography_heading_color',
+            'typography.subheading_color' => 'typography_subheading_color',
+            'typography.body_color' => 'typography_body_color',
+            'typography.heading_weight' => 'typography_heading_weight',
+            'typography.body_weight' => 'typography_body_weight',
+            'typography.heading_style' => 'typography_heading_style',
+            'typography.body_style' => 'typography_body_style',
+            'typography.heading_scale' => 'typography_heading_scale',
+            'typography.body_scale' => 'typography_body_scale',
         ];
     }
 

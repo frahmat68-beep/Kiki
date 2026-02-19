@@ -15,36 +15,80 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('head')
+    @php
+        $resolveHexColor = static function ($value, string $fallback): string {
+            $resolved = trim((string) $value);
+            return preg_match('/^#([A-Fa-f0-9]{6})$/', $resolved) ? $resolved : $fallback;
+        };
+        $resolveIn = static function ($value, array $allowed, string $fallback): string {
+            $resolved = trim((string) $value);
+            return in_array($resolved, $allowed, true) ? $resolved : $fallback;
+        };
+        $headingScaleMap = ['sm' => '0.94', 'md' => '1', 'lg' => '1.08'];
+        $bodyScaleMap = ['sm' => '0.95', 'md' => '1', 'lg' => '1.05'];
+
+        $headingColor = $resolveHexColor(site_setting('typography.heading_color', '#1d4ed8'), '#1d4ed8');
+        $subheadingColor = $resolveHexColor(site_setting('typography.subheading_color', '#2563eb'), '#2563eb');
+        $bodyColor = $resolveHexColor(site_setting('typography.body_color', '#334155'), '#334155');
+        $headingWeight = $resolveIn(site_setting('typography.heading_weight', '800'), ['600', '700', '800', '900'], '800');
+        $bodyWeight = $resolveIn(site_setting('typography.body_weight', '400'), ['400', '500', '600'], '400');
+        $headingStyle = $resolveIn(site_setting('typography.heading_style', 'normal'), ['normal', 'italic'], 'normal');
+        $bodyStyle = $resolveIn(site_setting('typography.body_style', 'normal'), ['normal', 'italic'], 'normal');
+        $headingScaleKey = $resolveIn(site_setting('typography.heading_scale', 'md'), ['sm', 'md', 'lg'], 'md');
+        $bodyScaleKey = $resolveIn(site_setting('typography.body_scale', 'md'), ['sm', 'md', 'lg'], 'md');
+    @endphp
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+        body {
+            font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+            color: var(--manake-body-color) !important;
+            font-weight: var(--manake-body-weight);
+            font-style: var(--manake-body-style);
+            font-size: calc(1rem * var(--manake-body-scale));
+        }
         :root {
-            --manake-heading-h1: #1d4ed8;
-            --manake-heading-h2: #2563eb;
-            --manake-heading-h3: #1e40af;
-            --manake-heading-h4: #1d4ed8;
+            --manake-heading-h1: {{ $headingColor }};
+            --manake-heading-h2: {{ $subheadingColor }};
+            --manake-heading-h3: {{ $subheadingColor }};
+            --manake-heading-h4: {{ $headingColor }};
+            --manake-body-color: {{ $bodyColor }};
+            --manake-heading-weight: {{ $headingWeight }};
+            --manake-body-weight: {{ $bodyWeight }};
+            --manake-heading-style: {{ $headingStyle }};
+            --manake-body-style: {{ $bodyStyle }};
+            --manake-heading-scale: {{ $headingScaleMap[$headingScaleKey] ?? '1' }};
+            --manake-body-scale: {{ $bodyScaleMap[$bodyScaleKey] ?? '1' }};
         }
         header :is(h1, h2, h3) {
             color: var(--manake-heading-h1) !important;
             letter-spacing: -0.012em;
+            font-style: var(--manake-heading-style) !important;
+            font-weight: var(--manake-heading-weight) !important;
         }
         main h1 {
             color: var(--manake-heading-h1) !important;
             letter-spacing: -0.015em;
-            font-weight: 800;
+            font-style: var(--manake-heading-style) !important;
+            font-weight: var(--manake-heading-weight) !important;
+            font-size: calc(2rem * var(--manake-heading-scale)) !important;
         }
         main h2 {
             color: var(--manake-heading-h2) !important;
             letter-spacing: -0.012em;
-            font-weight: 700;
+            font-style: var(--manake-heading-style) !important;
+            font-weight: var(--manake-heading-weight) !important;
+            font-size: calc(1.5rem * var(--manake-heading-scale)) !important;
         }
         main h3 {
             color: var(--manake-heading-h3) !important;
-            font-weight: 700;
+            font-style: var(--manake-heading-style) !important;
+            font-weight: var(--manake-heading-weight) !important;
+            font-size: calc(1.125rem * var(--manake-heading-scale)) !important;
         }
         main :is(h4, h5, h6) {
             color: var(--manake-heading-h4) !important;
-            font-weight: 600;
+            font-style: var(--manake-heading-style) !important;
+            font-weight: var(--manake-heading-weight) !important;
         }
     </style>
 </head>

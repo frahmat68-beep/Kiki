@@ -112,6 +112,102 @@
                 </div>
             </div>
 
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Typography & Style Control</h2>
+                <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">
+                    Kontrol ini akan mempengaruhi gaya teks utama di web user/admin: warna heading, ketebalan font, italic, dan skala ukuran.
+                </p>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Warna Heading Utama (H1)</label>
+                        <input
+                            type="color"
+                            name="typography_heading_color"
+                            value="{{ old('typography_heading_color', $settings['typography.heading_color'] ?? '#1d4ed8') }}"
+                            class="mt-2 h-10 w-full rounded-xl border border-slate-200 bg-white px-1 py-1"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Warna Subheading (H2-H3)</label>
+                        <input
+                            type="color"
+                            name="typography_subheading_color"
+                            value="{{ old('typography_subheading_color', $settings['typography.subheading_color'] ?? '#2563eb') }}"
+                            class="mt-2 h-10 w-full rounded-xl border border-slate-200 bg-white px-1 py-1"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Warna Teks Body</label>
+                        <input
+                            type="color"
+                            name="typography_body_color"
+                            value="{{ old('typography_body_color', $settings['typography.body_color'] ?? '#334155') }}"
+                            class="mt-2 h-10 w-full rounded-xl border border-slate-200 bg-white px-1 py-1"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Weight Heading</label>
+                        <select name="typography_heading_weight" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['600', '700', '800', '900'] as $value)
+                                <option value="{{ $value }}" @selected(old('typography_heading_weight', $settings['typography.heading_weight'] ?? '800') === $value)>
+                                    {{ $value }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Weight Body</label>
+                        <select name="typography_body_weight" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['400', '500', '600'] as $value)
+                                <option value="{{ $value }}" @selected(old('typography_body_weight', $settings['typography.body_weight'] ?? '400') === $value)>
+                                    {{ $value }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Style Heading</label>
+                        <select name="typography_heading_style" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['normal' => 'Normal', 'italic' => 'Italic'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('typography_heading_style', $settings['typography.heading_style'] ?? 'normal') === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Style Body</label>
+                        <select name="typography_body_style" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['normal' => 'Normal', 'italic' => 'Italic'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('typography_body_style', $settings['typography.body_style'] ?? 'normal') === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Skala Ukuran Heading</label>
+                        <select name="typography_heading_scale" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['sm' => 'Kecil', 'md' => 'Normal', 'lg' => 'Besar'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('typography_heading_scale', $settings['typography.heading_scale'] ?? 'md') === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">Skala Ukuran Body</label>
+                        <select name="typography_body_scale" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                            @foreach (['sm' => 'Kecil', 'md' => 'Normal', 'lg' => 'Besar'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('typography_body_scale', $settings['typography.body_scale'] ?? 'md') === $value)>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <button class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition">
                 {{ __('ui.admin.settings_save') }}
             </button>

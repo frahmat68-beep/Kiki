@@ -7,6 +7,11 @@
     $formatIdr = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
     $canViewInvoice = static fn ($order) => ($order->status_pembayaran ?? 'pending') === 'paid' && ! $order->hasOutstandingDamageFee();
     $canRescheduleOrder = static fn ($order) => in_array((string) ($order->status_pesanan ?? ''), ['menunggu_pembayaran', 'diproses', 'lunas'], true);
+    $bookingTitle = setting('copy.booking.title', __('ui.nav.my_orders'));
+    $bookingSubtitle = setting('copy.booking.subtitle', 'Semua order dan status pembayaran kamu.');
+    $bookingActiveTitle = setting('copy.booking.active_title', 'Rental Aktif');
+    $bookingRecentTitle = setting('copy.booking.recent_title', 'Riwayat Terbaru');
+    $bookingCtaText = setting('copy.booking.cta_text', __('ui.actions.explore_catalog'));
 
     $paymentMeta = function ($status) {
         return match ($status) {
@@ -20,11 +25,11 @@
 @section('content')
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.nav.my_orders') }}</h2>
-            <p class="text-sm text-slate-500">Semua order dan status pembayaran kamu.</p>
+            <h2 class="text-2xl font-semibold text-blue-700">{{ $bookingTitle }}</h2>
+            <p class="text-sm text-slate-500">{{ $bookingSubtitle }}</p>
         </div>
         <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition">
-            {{ __('ui.actions.explore_catalog') }}
+            {{ $bookingCtaText }}
         </a>
     </div>
 
@@ -55,7 +60,7 @@
     <div class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr,1fr]">
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-900">Rental Aktif</h3>
+                <h3 class="text-sm font-semibold text-blue-700">{{ $bookingActiveTitle }}</h3>
             </div>
 
             <div class="mt-5 space-y-4">
@@ -73,7 +78,7 @@
                     <article class="rounded-xl border border-slate-100 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <p class="text-sm font-semibold text-slate-900">{{ $orderNumber }}</p>
+                                <p class="text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
                                 <p class="text-xs text-slate-500">
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>
@@ -114,7 +119,7 @@
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-900">Riwayat Terbaru</h3>
+                <h3 class="text-sm font-semibold text-blue-700">{{ $bookingRecentTitle }}</h3>
             </div>
 
             <div class="mt-4 divide-y divide-slate-100">
@@ -127,7 +132,7 @@
                     <div class="py-4">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-sm font-semibold text-slate-900">{{ $orderNumber }}</p>
+                                <p class="text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
                                 <p class="text-xs text-slate-500">
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>
