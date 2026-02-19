@@ -14,6 +14,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\AvailabilityBoardController;
 use App\Http\Controllers\UserPlaceholderController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -45,6 +46,7 @@ Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('lang.sw
 Route::get('/theme/{theme}', [ThemeController::class, 'switch'])->name('theme.switch');
 
 Route::get('/catalog', [EquipmentController::class, 'index'])->name('catalog');
+Route::get('/availability-board', [AvailabilityBoardController::class, 'index'])->name('availability.board');
 Route::get('/equipments', [PageController::class, 'catalogRedirect'])->name('equipments.index');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 

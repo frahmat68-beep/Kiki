@@ -15,6 +15,8 @@
         $rentalCalendar = $rentalCalendar ?? [];
         $calendarDays = collect($rentalCalendar['days'] ?? []);
         $calendarBaseQuery = request()->except(['calendar_month', 'page']);
+        $financialSummary = $financialSummary ?? [];
+        $formatIdr = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
         $isPaginator = $operationalOrders instanceof \Illuminate\Pagination\AbstractPaginator;
         $ordersCollection = $isPaginator ? $operationalOrders->getCollection() : collect($operationalOrders ?? []);
         $actionableCount = $ordersCollection->filter(fn ($order) => in_array((string) ($order->status_pesanan ?? ''), ['lunas', 'barang_diambil'], true))->count();
@@ -67,7 +69,33 @@
                     <a href="{{ route('admin.equipments.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
                         Cek Stok Alat
                     </a>
+                    <a href="{{ route('availability.board') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
+                        Calendar Ketersediaan
+                    </a>
                 </div>
+            </article>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Uang Masuk</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-900">{{ $formatIdr($financialSummary['cash_in'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-slate-500">Total pembayaran sukses (termasuk fee tambahan).</p>
+            </article>
+            <article class="rounded-2xl border border-blue-100 bg-blue-50 p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-blue-500">Pendapatan Sewa</p>
+                <p class="mt-2 text-2xl font-semibold text-blue-700">{{ $formatIdr($financialSummary['revenue'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-blue-600">Akumulasi subtotal order lunas.</p>
+            </article>
+            <article class="rounded-2xl border border-amber-100 bg-amber-50 p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-amber-600">Pajak Terkumpul</p>
+                <p class="mt-2 text-2xl font-semibold text-amber-700">{{ $formatIdr($financialSummary['tax'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-amber-700">Estimasi PPN 11% dari pendapatan sewa.</p>
+            </article>
+            <article class="rounded-2xl border border-rose-100 bg-rose-50 p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-rose-500">Fee Kerusakan</p>
+                <p class="mt-2 text-2xl font-semibold text-rose-700">{{ $formatIdr($financialSummary['damage_fee'] ?? 0) }}</p>
+                <p class="mt-1 text-xs text-rose-600">Biaya tambahan yang sudah berhasil dibayar.</p>
             </article>
         </section>
 

@@ -5,6 +5,7 @@ return [
         'dashboard' => 'Dashboard',
         'overview' => 'Overview',
         'catalog' => 'Katalog',
+        'check_availability' => 'Cek Alat',
         'category' => 'Kategori',
         'search_placeholder' => 'Cari kamera, lighting, audio...',
         'notifications' => 'Notifikasi',

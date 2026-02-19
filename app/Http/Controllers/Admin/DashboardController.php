@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderNotification;
+use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class DashboardController extends Controller
                     'returned' => 0,
                     'damaged' => 0,
                 ],
+                'financialSummary' => $this->buildFinancialSummary(),
                 'rentalCalendar' => $this->buildRentalCalendar($calendarMonth),
             ]);
         }
@@ -56,6 +58,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', [
             'summary' => $summary,
             'operationalOrders' => $operationalOrders,
+            'financialSummary' => $this->buildFinancialSummary($basePaidOrders),
             'rentalCalendar' => $this->buildRentalCalendar($calendarMonth),
         ]);
     }
@@ -249,5 +252,46 @@ class DashboardController extends Controller
         }
 
         return now()->startOfMonth();
+    }
+
+    private function buildFinancialSummary($basePaidOrders = null): array
+    {
+        $summary = [
+            'cash_in' => 0,
+            'revenue' => 0,
+            'tax' => 0,
+            'damage_fee' => 0,
+            'paid_orders' => 0,
+        ];
+
+        if (Schema::hasTable('orders')) {
+            $paidOrdersQuery = $basePaidOrders
+                ? (clone $basePaidOrders)
+                : Order::query()->where('status_pembayaran', Order::PAYMENT_PAID);
+
+            $paidOrders = $paidOrdersQuery
+                ->get(['id', 'total_amount']);
+
+            $summary['paid_orders'] = (int) $paidOrders->count();
+            $summary['revenue'] = (int) $paidOrders->sum(fn (Order $order) => (int) ($order->total_amount ?? 0));
+            $summary['tax'] = (int) $paidOrders->sum(fn (Order $order) => (int) round(((int) ($order->total_amount ?? 0)) * 0.11));
+        }
+
+        if (Schema::hasTable('payments')) {
+            $summary['cash_in'] = (int) Payment::query()
+                ->where('status', Order::PAYMENT_PAID)
+                ->sum('gross_amount');
+
+            $summary['damage_fee'] = (int) Payment::query()
+                ->where('status', Order::PAYMENT_PAID)
+                ->where('provider', Payment::PROVIDER_MIDTRANS_DAMAGE)
+                ->sum('gross_amount');
+        }
+
+        if ($summary['cash_in'] <= 0) {
+            $summary['cash_in'] = (int) ($summary['revenue'] + $summary['tax']);
+        }
+
+        return $summary;
     }
 }

@@ -5,6 +5,7 @@ return [
         'dashboard' => 'Dashboard',
         'overview' => 'Overview',
         'catalog' => 'Catalog',
+        'check_availability' => 'Check Gear',
         'category' => 'Categories',
         'search_placeholder' => 'Search cameras, lighting, audio...',
         'notifications' => 'Notifications',

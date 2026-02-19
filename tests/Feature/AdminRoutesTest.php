@@ -87,4 +87,32 @@ class AdminRoutesTest extends TestCase
             ->get(route('admin.users.show', $user))
             ->assertOk();
     }
+
+    public function test_admin_dashboard_shows_financial_summary_cards(): void
+    {
+        $admin = $this->createAdmin();
+        $user = User::factory()->create();
+
+        Order::create([
+            'user_id' => $user->id,
+            'order_number' => 'MNK-FIN-001',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'lunas',
+            'status' => 'paid',
+            'total_amount' => 300000,
+            'rental_start_date' => now()->toDateString(),
+            'rental_end_date' => now()->addDay()->toDateString(),
+            'paid_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('Uang Masuk');
+        $response->assertSee('Pendapatan Sewa');
+        $response->assertSee('Pajak Terkumpul');
+        $response->assertSee('Rp 333.000');
+        $response->assertSee('Rp 300.000');
+        $response->assertSee('Rp 33.000');
+    }
 }

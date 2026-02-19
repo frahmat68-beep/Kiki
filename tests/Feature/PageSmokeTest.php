@@ -29,6 +29,7 @@ class PageSmokeTest extends TestCase
             route('categories.index'),
             route('category.show', 'sample-category'),
             route('catalog'),
+            route('availability.board'),
             route('login'),
             route('register'),
             route('admin.login'),
