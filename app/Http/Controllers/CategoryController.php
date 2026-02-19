@@ -126,31 +126,76 @@ class CategoryController extends Controller
                 });
             }
         } elseif (Schema::hasTable('orders') && Schema::hasTable('order_items') && Schema::hasTable('equipments')) {
+            $today = now()->startOfDay();
+
             $guestRentalSnapshot = OrderItem::query()
                 ->with([
                     'equipment:id,name',
                     'order:id,status_pesanan,status_pembayaran,rental_start_date,rental_end_date',
                 ])
                 ->whereHas('order', function ($query) {
-                    $query
-                        ->where('status_pesanan', Order::STATUS_ON_RENT)
-                        ->where('status_pembayaran', Order::PAYMENT_PAID);
+                    $query->whereIn('status_pesanan', Order::HOLD_SLOT_STATUSES);
                 })
                 ->latest('id')
-                ->limit(8)
+                ->limit(120)
                 ->get(['id', 'order_id', 'equipment_id', 'qty', 'rental_start_date', 'rental_end_date'])
                 ->map(function (OrderItem $item) {
                     $startDate = $item->rental_start_date ?: $item->order?->rental_start_date;
                     $endDate = $item->rental_end_date ?: $item->order?->rental_end_date;
+                    if (! $startDate || ! $endDate) {
+                        return null;
+                    }
 
                     return [
+                        'equipment_id' => (int) ($item->equipment_id ?? 0),
                         'name' => (string) ($item->equipment?->name ?: 'Equipment'),
                         'qty' => max((int) ($item->qty ?? 1), 1),
                         'start_date' => $startDate,
                         'end_date' => $endDate,
                     ];
                 })
-                ->filter(fn (array $item) => $item['name'] !== '')
+                ->filter(function ($item) use ($today) {
+                    if (! is_array($item) || ($item['name'] ?? '') === '') {
+                        return false;
+                    }
+
+                    $endDate = $item['end_date'] instanceof \Carbon\CarbonInterface
+                        ? $item['end_date']->copy()->startOfDay()
+                        : \Carbon\Carbon::parse($item['end_date'])->startOfDay();
+
+                    return $endDate->gte($today);
+                })
+                ->groupBy(function (array $item) {
+                    $startDate = $item['start_date'] instanceof \Carbon\CarbonInterface
+                        ? $item['start_date']->toDateString()
+                        : \Carbon\Carbon::parse($item['start_date'])->toDateString();
+                    $endDate = $item['end_date'] instanceof \Carbon\CarbonInterface
+                        ? $item['end_date']->toDateString()
+                        : \Carbon\Carbon::parse($item['end_date'])->toDateString();
+
+                    return implode('|', [
+                        (int) ($item['equipment_id'] ?? 0),
+                        $startDate,
+                        $endDate,
+                    ]);
+                })
+                ->map(function ($items) {
+                    $first = $items->first();
+
+                    return [
+                        'name' => (string) ($first['name'] ?? 'Equipment'),
+                        'qty' => (int) $items->sum('qty'),
+                        'start_date' => $first['start_date'] ?? null,
+                        'end_date' => $first['end_date'] ?? null,
+                    ];
+                })
+                ->sortBy(function (array $item) {
+                    $startDate = $item['start_date'] instanceof \Carbon\CarbonInterface
+                        ? $item['start_date']->timestamp
+                        : \Carbon\Carbon::parse($item['start_date'])->timestamp;
+
+                    return $startDate . '|' . strtolower((string) ($item['name'] ?? ''));
+                })
                 ->take(5)
                 ->values();
         }

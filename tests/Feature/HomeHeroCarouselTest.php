@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -141,5 +142,54 @@ class HomeHeroCarouselTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Perhatian Tagihan Tambahan');
         $response->assertDontSee('id="damage-fee-popup"', false);
+    }
+
+    public function test_home_guest_rental_overview_shows_reserved_items_with_date_and_quantity(): void
+    {
+        $category = Category::create([
+            'name' => 'Audio',
+            'slug' => 'audio',
+        ]);
+
+        $equipment = Equipment::create([
+            'name' => 'HT Wlan UHF',
+            'slug' => 'ht-wlan-uhf',
+            'category_id' => $category->id,
+            'price_per_day' => 10000,
+            'stock' => 30,
+            'status' => 'ready',
+        ]);
+
+        $order = Order::create([
+            'user_id' => User::factory()->create()->id,
+            'order_number' => 'MNK-GUEST-RENTAL-1',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'barang_diambil',
+            'status' => 'paid',
+            'total_amount' => 120000,
+            'rental_start_date' => now()->toDateString(),
+            'rental_end_date' => now()->addDays(2)->toDateString(),
+            'midtrans_order_id' => 'MNK-GUEST-RENTAL-1',
+            'paid_at' => now()->subHour(),
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'equipment_id' => $equipment->id,
+            'qty' => 3,
+            'price' => 10000,
+            'subtotal' => 90000,
+            'rental_start_date' => now()->toDateString(),
+            'rental_end_date' => now()->addDays(2)->toDateString(),
+            'rental_days' => 3,
+        ]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Overview Alat Disewa');
+        $response->assertSee('HT Wlan UHF');
+        $response->assertSee('x3');
+        $response->assertSee('Tanggal sewa:');
     }
 }

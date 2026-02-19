@@ -108,7 +108,7 @@
                     @if (! $isLoggedIn)
                         <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                             <div class="flex items-center justify-between gap-2">
-                                <h2 class="text-sm font-semibold text-slate-900">Sedang Disewa Saat Ini</h2>
+                                <h2 class="text-sm font-semibold text-slate-900">Overview Alat Disewa</h2>
                                 <span class="text-xs font-semibold text-slate-500">Live</span>
                             </div>
                             <div class="mt-3 space-y-2.5">
@@ -119,12 +119,12 @@
                                             <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">x{{ $rental['qty'] }}</span>
                                         </div>
                                         <p class="mt-1 text-xs text-slate-600">
-                                            {{ $formatLandingDate($rental['start_date']) }} - {{ $formatLandingDate($rental['end_date']) }}
+                                            Tanggal sewa: {{ $formatLandingDate($rental['start_date']) }} - {{ $formatLandingDate($rental['end_date']) }}
                                         </p>
                                     </article>
                                 @empty
                                     <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-500">
-                                        Belum ada alat yang sedang disewa sekarang.
+                                        Belum ada jadwal alat yang sedang disewa.
                                     </div>
                                 @endforelse
                             </div>
