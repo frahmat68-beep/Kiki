@@ -4,6 +4,11 @@
 @section('page_title', __('ui.settings.title'))
 
 @section('content')
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-blue-700">{{ __('ui.settings.title') }}</h1>
+        <p class="mt-1 text-sm text-slate-500">Atur bahasa dan tema agar pengalaman pakai dashboard lebih nyaman.</p>
+    </div>
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr,0.8fr]">
         <div class="space-y-6">
             @if (session('status') === 'settings-updated')

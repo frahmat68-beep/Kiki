@@ -19,7 +19,7 @@
     <div class="mx-auto max-w-7xl">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-2xl font-semibold text-slate-900">{{ __('ui.cart.title') }}</h2>
+                <h2 class="text-2xl font-semibold text-blue-700">{{ __('ui.cart.title') }}</h2>
                 <p class="text-sm text-slate-500">{{ __('ui.cart.subtitle') }}</p>
             </div>
             <a href="{{ route('catalog') }}" class="text-sm font-semibold text-slate-600 hover:text-blue-600">← {{ __('ui.actions.back_to_catalog') }}</a>
@@ -131,7 +131,7 @@
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div>
-                            <h3 class="text-base font-semibold text-slate-900">{{ __('ui.cart.suggestions_title') }}</h3>
+                    <h3 class="text-base font-semibold text-blue-700">{{ __('ui.cart.suggestions_title') }}</h3>
                             <p class="text-xs text-slate-500">{{ __('ui.cart.suggestions_subtitle') }}</p>
                         </div>
                         <a href="{{ route('catalog') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">
@@ -169,7 +169,7 @@
 
             @if (! empty($cartItems))
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <h3 class="text-base font-semibold text-slate-900">{{ __('ui.cart.rules_title') }}</h3>
+                    <h3 class="text-base font-semibold text-blue-700">{{ __('ui.cart.rules_title') }}</h3>
                     <div class="mt-3 space-y-2 text-sm">
                         <details class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                             <summary class="cursor-pointer font-semibold text-slate-800">{{ __('ui.cart.rules_late_title') }}</summary>
@@ -189,7 +189,7 @@
             </div>
 
             <div class="h-fit self-start rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
-                <h3 class="text-lg font-semibold text-slate-900">{{ __('ui.cart.summary') }}</h3>
+                <h3 class="text-lg font-semibold text-blue-700">{{ __('ui.cart.summary') }}</h3>
                 <div class="mt-4 space-y-3 text-sm">
                     <div class="flex justify-between text-slate-600">
                         <span>{{ __('ui.cart.subtotal_per_day') }}</span>

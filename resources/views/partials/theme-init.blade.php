@@ -157,7 +157,7 @@
     }
 
     main {
-        min-height: calc(100vh - 140px);
+        min-height: calc(100vh - 210px);
     }
 
     * {
@@ -497,6 +497,34 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
+    .footer-rules-card {
+        background: linear-gradient(145deg, #0a1c58 0%, #274bbf 100%) !important;
+        border-color: rgba(147, 197, 253, 0.5) !important;
+        color: #eff6ff !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px rgba(5, 20, 62, 0.18);
+    }
+
+    .footer-rules-kicker {
+        color: #bfdbfe !important;
+    }
+
+    .footer-rules-link {
+        color: #ffffff !important;
+    }
+
+    .footer-rules-note {
+        color: #dbeafe !important;
+    }
+
+    .footer-rules-card:hover {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 28px rgba(5, 20, 62, 0.24);
+    }
+
+    html[data-theme-resolved='dark'] .footer-rules-card {
+        background: linear-gradient(145deg, #0a1431 0%, #1d3f9b 100%) !important;
+        border-color: rgba(96, 165, 250, 0.45) !important;
+    }
+
     @media (max-width: 1024px) {
         .group\/sidebar {
             background: var(--surface) !important;
@@ -518,7 +546,7 @@
 
     @media (max-width: 768px) {
         main {
-            min-height: calc(100vh - 96px);
+            min-height: calc(100vh - 150px);
         }
 
         .card,

@@ -103,7 +103,7 @@
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-900">Order Perlu Tindakan</h2>
+                        <h2 class="text-lg font-semibold text-blue-700">Order Perlu Tindakan</h2>
                         <p class="text-xs text-slate-500">Fokus ke aksi inti: konfirmasi diambil, dikembalikan, atau rusak.</p>
                     </div>
                     <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">
@@ -226,7 +226,7 @@
 
             <div class="space-y-4">
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <h3 class="text-base font-semibold text-slate-900">Alur Operasional Singkat</h3>
+                    <h3 class="text-base font-semibold text-blue-700">Alur Operasional Singkat</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-600">
                         <li>1. Status <span class="font-semibold">Siap Diambil</span> bisa dikonfirmasi mulai H-1.</li>
                         <li>2. Setelah diambil, ubah ke <span class="font-semibold">Konfirmasi Kembali</span> saat unit kembali.</li>
@@ -235,7 +235,7 @@
                 </section>
 
                 <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <summary class="cursor-pointer text-base font-semibold text-slate-900">
+                    <summary class="cursor-pointer text-base font-semibold text-blue-700">
                         Kalender Unit Disewa (Opsional)
                     </summary>
                     <div class="mt-4">

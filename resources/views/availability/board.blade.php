@@ -474,50 +474,54 @@
                 </div>
 
                 <div class="px-3 py-3 sm:px-5 sm:py-4">
-                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
-                        @foreach ($weekdayLabels as $weekday)
-                            <p class="text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-[11px]">{{ $weekday }}</p>
-                        @endforeach
-                    </div>
-                    <div class="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2">
-                        @foreach ($calendarDays as $day)
-                            @php
-                                $toneClass = $toneClasses[$day['tone']] ?? $toneClasses['calm'];
-                                $selectedClass = $day['is_selected'] ? 'ring-2 ring-blue-500 shadow-md shadow-blue-100' : '';
-                                $todayClass = $day['is_today'] ? 'text-blue-700 font-bold' : '';
-                                $hasUsage = (int) $day['busy_equipments'] > 0 || (int) $day['reserved_units'] > 0;
-                            @endphp
-                            <button
-                                type="button"
-                                class="board-cell group w-full rounded-lg border px-1.5 py-1.5 text-left sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
-                                @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
-                                @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
-                                @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
-                                @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
-                                x-bind:class="{
-                                    'board-cell--range': isDateInSelection('{{ $day['date'] }}'),
-                                    'board-cell--range-dragging': isSelectingRange && isDateInSelection('{{ $day['date'] }}')
-                                }"
-                                aria-haspopup="dialog"
-                                aria-label="Lihat detail tanggal {{ \Carbon\Carbon::parse($day['date'])->translatedFormat('d F Y') }}"
-                            >
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-[11px] font-semibold sm:text-xs {{ $todayClass }}">{{ $day['day'] }}</p>
-                                    @if ($day['is_selected'])
-                                        <span class="inline-flex h-2.5 w-2.5 rounded-full bg-blue-600"></span>
-                                    @endif
-                                </div>
+                    <div class="-mx-1 overflow-x-auto pb-1 px-1 sm:mx-0 sm:overflow-visible sm:px-0">
+                        <div class="min-w-[38rem] sm:min-w-0">
+                            <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                                @foreach ($weekdayLabels as $weekday)
+                                    <p class="text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-[11px]">{{ $weekday }}</p>
+                                @endforeach
+                            </div>
+                            <div class="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2">
+                                @foreach ($calendarDays as $day)
+                                    @php
+                                        $toneClass = $toneClasses[$day['tone']] ?? $toneClasses['calm'];
+                                        $selectedClass = $day['is_selected'] ? 'ring-2 ring-blue-500 shadow-md shadow-blue-100' : '';
+                                        $todayClass = $day['is_today'] ? 'text-blue-700 font-bold' : '';
+                                        $hasUsage = (int) $day['busy_equipments'] > 0 || (int) $day['reserved_units'] > 0;
+                                    @endphp
+                                    <button
+                                        type="button"
+                                        class="board-cell group w-full rounded-lg border px-1.5 py-2 text-left sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
+                                        @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
+                                        @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
+                                        @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
+                                        @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
+                                        x-bind:class="{
+                                            'board-cell--range': isDateInSelection('{{ $day['date'] }}'),
+                                            'board-cell--range-dragging': isSelectingRange && isDateInSelection('{{ $day['date'] }}')
+                                        }"
+                                        aria-haspopup="dialog"
+                                        aria-label="Lihat detail tanggal {{ \Carbon\Carbon::parse($day['date'])->translatedFormat('d F Y') }}"
+                                    >
+                                        <div class="flex items-center justify-between gap-2">
+                                            <p class="text-[11px] font-semibold sm:text-xs {{ $todayClass }}">{{ $day['day'] }}</p>
+                                            @if ($day['is_selected'])
+                                                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-blue-600"></span>
+                                            @endif
+                                        </div>
 
-                                @if ($hasUsage)
-                                    <p class="mt-1.5 text-[9px] font-semibold leading-tight sm:mt-2 sm:text-[11px]">
-                                        {{ $day['busy_equipments'] }} alat terpakai
-                                    </p>
-                                    <p class="mt-0.5 text-[9px] leading-tight sm:text-[10px]">
-                                        {{ $day['reserved_units'] }} unit dipakai
-                                    </p>
-                                @endif
-                            </button>
-                        @endforeach
+                                        @if ($hasUsage)
+                                            <p class="mt-1.5 text-[10px] font-semibold leading-tight sm:mt-2 sm:text-[11px]">
+                                                {{ $day['busy_equipments'] }} alat terpakai
+                                            </p>
+                                            <p class="mt-0.5 hidden text-[10px] leading-tight sm:block">
+                                                {{ $day['reserved_units'] }} unit dipakai
+                                            </p>
+                                        @endif
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </article>
