@@ -77,11 +77,10 @@
     @endphp
 
     <section class="bg-slate-50">
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
-            <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-8">
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:py-12">
+            <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-8">
                 <div class="min-w-0">
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">{{ __('app.landing.hero_kicker') }}</p>
-                    <h1 class="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
+                    <h1 class="max-w-3xl text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
                         @if ($heroTitle)
                             {{ $heroTitle }}
                         @else
@@ -96,21 +95,21 @@
 
                     @if ($isLoggedIn && $userOverview)
                         <div class="mt-5">
-                            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div class="grid grid-cols-1 gap-2.5 min-[390px]:grid-cols-2 sm:grid-cols-4 sm:gap-3">
                                 <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Total Order</p>
+                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Total Order</p>
                                     <p class="mt-1 text-lg font-semibold text-slate-900">{{ (int) ($userOverview['total_orders'] ?? 0) }}</p>
                                 </article>
                                 <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Pending Bayar</p>
+                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Pending Bayar</p>
                                     <p class="mt-1 text-lg font-semibold text-amber-600">{{ (int) ($userOverview['pending_payment'] ?? 0) }}</p>
                                 </article>
                                 <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Siap Diambil</p>
+                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Siap Diambil</p>
                                     <p class="mt-1 text-lg font-semibold text-blue-600">{{ (int) ($userOverview['ready_pickup'] ?? 0) }}</p>
                                 </article>
                                 <article class="rounded-xl border border-slate-200 bg-white px-3 py-3">
-                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Sedang Disewa</p>
+                                    <p class="text-[10px] font-semibold tracking-wide text-slate-500">Sedang Disewa</p>
                                     <p class="mt-1 text-lg font-semibold text-amber-600">{{ (int) ($userOverview['on_rent'] ?? 0) }}</p>
                                 </article>
                             </div>
@@ -135,11 +134,11 @@
                 <div class="min-w-0 w-full lg:max-w-[43rem] lg:justify-self-end">
                     @if ($heroImage)
                         <div class="card mb-4 overflow-hidden rounded-2xl shadow-sm">
-                            <img src="{{ $heroImage }}" alt="{{ $heroImageAlt }}" class="h-40 w-full object-cover sm:h-52 lg:h-56">
+                            <img src="{{ $heroImage }}" alt="{{ $heroImageAlt }}" class="h-36 w-full object-cover sm:h-52 lg:h-56">
                         </div>
                     @endif
                     <div class="card w-full overflow-hidden rounded-2xl shadow-sm">
-                        <div class="border-b border-slate-100 bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-4 text-white">
+                        <div class="border-b border-slate-100 bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3.5 text-white sm:px-5 sm:py-4">
                             <p class="text-xs font-semibold uppercase tracking-[0.18em]">{{ $readyPanelTitle }}</p>
                             <p class="mt-1 text-sm text-blue-100">{{ $readyPanelSubtitle }}</p>
                         </div>
@@ -158,7 +157,7 @@
                                         @endphp
                                         <div class="swiper-slide">
                                             <article class="card flex h-full flex-col overflow-hidden rounded-2xl bg-slate-50">
-                                                <div class="flex h-44 w-full items-center justify-center bg-slate-100/60 p-3 sm:h-52 lg:h-56">
+                                                <div class="flex h-40 w-full items-center justify-center bg-slate-100/60 p-3 sm:h-52 lg:h-56">
                                                     <img src="{{ $image }}" alt="{{ $name }}" class="h-full w-full object-contain">
                                                 </div>
                                                 <div class="p-4">
@@ -184,7 +183,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 flex items-center justify-between">
+                            <div class="mt-4 flex items-center justify-end gap-2 sm:justify-between">
                                 <button class="btn-secondary ready-prev inline-flex h-10 w-10 items-center justify-center rounded-full transition" aria-label="Previous">
                                     ‹
                                 </button>

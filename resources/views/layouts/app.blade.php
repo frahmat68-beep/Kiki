@@ -125,8 +125,8 @@
 
     <div class="lg:pl-16">
         <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
-            <div class="mx-auto flex w-full max-w-[1320px] flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:px-6">
-                <button class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm lg:hidden" type="button" @click="sidebarOpen = true" aria-label="Open menu">
+            <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center gap-2.5 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4">
+                <button class="order-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm lg:hidden" type="button" @click="sidebarOpen = true" aria-label="Open menu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="4" y1="7" x2="20" y2="7" />
                         <line x1="4" y1="12" x2="20" y2="12" />
@@ -134,7 +134,7 @@
                     </svg>
                 </button>
 
-                <form method="GET" action="{{ route('catalog') }}" class="relative w-full sm:flex-1 sm:max-w-2xl">
+                <form method="GET" action="{{ route('catalog') }}" class="relative order-3 w-full sm:order-2 sm:flex-1 sm:max-w-2xl">
                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M8.5 3.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM2 8.5a6.5 6.5 0 1 1 11.158 4.157l3.092 3.093a1 1 0 0 1-1.414 1.414l-3.093-3.092A6.5 6.5 0 0 1 2 8.5Z" clip-rule="evenodd" />
@@ -149,7 +149,7 @@
                     >
                 </form>
 
-                <div class="ml-auto flex items-center gap-2 sm:gap-3">
+                <div class="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:gap-3">
                     @if ($isAuthenticated)
                         <div class="relative" @click.outside="notifOpen = false">
                             <button
@@ -271,7 +271,7 @@
             </div>
         </header>
 
-        <main class="px-4 py-6 sm:px-6 sm:py-8">
+        <main class="px-4 py-5 sm:px-6 sm:py-8">
             <div class="mx-auto w-full max-w-[1320px]">
                 @yield('content')
             </div>

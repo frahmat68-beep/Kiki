@@ -78,7 +78,6 @@
                             ☰
                         </button>
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.overview.kicker') }}</p>
                             <h1 class="text-lg font-semibold text-slate-900">@yield('page_title', __('ui.overview.title'))</h1>
                         </div>
                     </div>
