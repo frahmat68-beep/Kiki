@@ -491,7 +491,7 @@
                                     @endphp
                                     <button
                                         type="button"
-                                        class="board-cell group w-full rounded-lg border px-1.5 py-2 text-left sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
+                                        class="board-cell group flex h-[4.75rem] w-full flex-col rounded-lg border px-1.5 py-2 text-left sm:h-[8.75rem] sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
                                         @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
                                         @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
                                         @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
@@ -511,12 +511,14 @@
                                         </div>
 
                                         @if ($hasUsage)
-                                            <p class="mt-1.5 text-[10px] font-semibold leading-tight sm:mt-2 sm:text-[11px]">
-                                                {{ $day['busy_equipments'] }} alat terpakai
-                                            </p>
-                                            <p class="mt-0.5 hidden text-[10px] leading-tight sm:block">
-                                                {{ $day['reserved_units'] }} unit dipakai
-                                            </p>
+                                            <div class="mt-auto">
+                                                <p class="text-[10px] font-semibold leading-tight sm:text-[11px]">
+                                                    {{ $day['busy_equipments'] }} alat terpakai
+                                                </p>
+                                                <p class="mt-0.5 hidden text-[10px] leading-tight sm:block">
+                                                    {{ $day['reserved_units'] }} unit dipakai
+                                                </p>
+                                            </div>
                                         @endif
                                     </button>
                                 @endforeach
