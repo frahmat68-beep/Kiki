@@ -108,9 +108,33 @@
         $adminName = auth('admin')->user()->name ?? 'Admin';
         $adminRole = auth('admin')->user()->role ?? 'admin';
         $isSuperAdmin = auth('admin')->check() && $adminRole === 'super_admin';
+        $adminCmsMenu = [
+            [
+                'key' => 'copy',
+                'label' => __('ui.admin.copywriting'),
+                'url' => route('admin.copy.edit', 'landing'),
+            ],
+            [
+                'key' => 'website',
+                'label' => __('ui.admin.website_settings'),
+                'url' => route('admin.website.edit'),
+            ],
+            [
+                'key' => 'content',
+                'label' => __('ui.admin.legacy_content'),
+                'url' => route('admin.content.index'),
+            ],
+        ];
+        if ($isSuperAdmin) {
+            $adminCmsMenu[] = [
+                'key' => 'db',
+                'label' => __('ui.admin.db_explorer'),
+                'url' => route('admin.db.index'),
+            ];
+        }
     @endphp
 
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen">
+    <div x-data="{ sidebarOpen: false, adminSettingsOpen: false }" class="min-h-screen">
         <div x-cloak x-show="sidebarOpen" class="fixed inset-0 z-40 bg-slate-900/40 lg:hidden" @click="sidebarOpen = false"></div>
 
         <x-admin.sidebar
@@ -141,6 +165,30 @@
 
                     <div class="flex items-center gap-2 sm:gap-3">
                         <a href="/" class="hidden text-sm font-semibold text-slate-600 transition hover:text-blue-600 sm:inline">{{ __('ui.admin.view_website') }}</a>
+                        <div class="relative" @click.outside="adminSettingsOpen = false">
+                            <button
+                                type="button"
+                                class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                                @click="adminSettingsOpen = !adminSettingsOpen"
+                                :aria-expanded="adminSettingsOpen.toString()"
+                                aria-label="{{ __('ui.nav.settings') }}"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+                                </svg>
+                            </button>
+                            <div x-cloak x-show="adminSettingsOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-56 rounded-xl p-2 shadow-lg">
+                                @foreach ($adminCmsMenu as $menu)
+                                    <a
+                                        href="{{ $menu['url'] }}"
+                                        class="block rounded-lg px-3 py-2 text-sm font-semibold transition {{ $activePage === $menu['key'] ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}"
+                                    >
+                                        {{ $menu['label'] }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
                             {{ strtoupper(substr($adminName, 0, 1)) }}
                         </div>

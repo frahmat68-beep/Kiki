@@ -47,32 +47,25 @@
             'active' => request()->routeIs('booking.*') || request()->routeIs('overview') || request()->routeIs('dashboard') || request()->routeIs('account.orders.*'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" /></svg>',
         ];
-        $items[] = [
-            'key' => 'settings',
-            'label' => __('ui.nav.settings'),
-            'url' => route('settings.index'),
-            'active' => request()->routeIs('settings.*'),
-            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>',
-        ];
-    } else {
-        $items[] = [
-            'key' => 'settings',
-            'label' => __('ui.nav.settings'),
-            'url' => '#',
-            'active' => false,
-            'prefs' => true,
-            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>',
-        ];
     }
 
-    $compactLogoUrl = $logoUrl ?: asset('MANAKE-FAV-M.png');
-    $compactLogoUrlDark = asset('MANAKE-FAV-M-white.png');
-    if ($logoUrl && ! str_contains((string) $logoUrl, 'MANAKE-FAV-M.png')) {
-        $compactLogoUrlDark = $logoUrl;
-    }
     $brandLogoPath = site_setting('brand.logo_path');
-    $expandedLogoUrl = $brandLogoPath ? asset('storage/' . $brandLogoPath) : asset('manake-logo-blue.png');
-    $expandedLogoUrlDark = $brandLogoPath ? asset('storage/' . $brandLogoPath) : asset('manake-logo-white.png');
+    $brandLogoFilename = strtolower((string) pathinfo((string) $brandLogoPath, PATHINFO_BASENAME));
+    $logoLooksWhite = str_contains($brandLogoFilename, 'white') || str_contains($brandLogoFilename, 'putih');
+    $storedLogoUrl = $brandLogoPath ? asset('storage/' . $brandLogoPath) : null;
+
+    $compactLogoUrl = ($storedLogoUrl && ! $logoLooksWhite)
+        ? $storedLogoUrl
+        : ($logoUrl ?: asset('MANAKE-FAV-M.png'));
+    $compactLogoUrlDark = ($storedLogoUrl && $logoLooksWhite)
+        ? $storedLogoUrl
+        : asset('MANAKE-FAV-M-white.png');
+    $expandedLogoUrl = ($storedLogoUrl && ! $logoLooksWhite)
+        ? $storedLogoUrl
+        : asset('manake-logo-blue.png');
+    $expandedLogoUrlDark = ($storedLogoUrl && $logoLooksWhite)
+        ? $storedLogoUrl
+        : asset('manake-logo-white.png');
     $activeCategorySlug = (string) request()->query('category', request()->route('slug', ''));
     $submenuEnabledRaw = strtolower(trim((string) setting('catalog.sidebar_submenu_enabled', '1')));
     $submenuEnabled = ! in_array($submenuEnabledRaw, ['0', 'false', 'off', 'no', 'tidak'], true);

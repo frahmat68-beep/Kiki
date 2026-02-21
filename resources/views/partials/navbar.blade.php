@@ -1,8 +1,11 @@
 @php
     $brandLogo = site_setting('brand.logo_path');
     $brandName = site_setting('brand.name', 'Manake');
-    $logoUrlLight = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-blue.png');
-    $logoUrlDark = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-white.png');
+    $brandLogoFilename = strtolower((string) pathinfo((string) $brandLogo, PATHINFO_BASENAME));
+    $logoLooksWhite = str_contains($brandLogoFilename, 'white') || str_contains($brandLogoFilename, 'putih');
+    $storedLogoUrl = $brandLogo ? asset('storage/' . $brandLogo) : null;
+    $logoUrlLight = ($storedLogoUrl && ! $logoLooksWhite) ? $storedLogoUrl : asset('manake-logo-blue.png');
+    $logoUrlDark = ($storedLogoUrl && $logoLooksWhite) ? $storedLogoUrl : asset('manake-logo-white.png');
     $locale = app()->getLocale();
     $currentTheme = $themePreference ?? request()->attributes->get('theme_preference', 'light');
     if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
