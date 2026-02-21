@@ -6,9 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('ui.admin.panel_title') . ' | Manake')</title>
     @php
-        $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = asset('MANAKE-FAV-M.png');
-        $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
+        $assetWithVersion = static function (string $file): string {
+            $path = public_path($file);
+            $version = file_exists($path) ? (string) filemtime($path) : '1';
+            return asset($file) . '?v=' . $version;
+        };
+        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
     @endphp
     <link
         rel="icon"
@@ -104,7 +108,7 @@
     @php
         $activePage = $activePage ?? '';
         $brandName = site_setting('brand.name', 'Manake');
-        $logoUrl = asset('MANAKE-FAV-M.png');
+        $logoUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $adminName = auth('admin')->user()->name ?? 'Admin';
         $adminRole = auth('admin')->user()->role ?? 'admin';
         $isSuperAdmin = auth('admin')->check() && $adminRole === 'super_admin';

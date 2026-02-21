@@ -6,9 +6,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('ui.admin.admin_login') }} | Manake.Id</title>
     @php
-        $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = asset('MANAKE-FAV-M.png');
-        $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
+        $assetWithVersion = static function (string $file): string {
+            $path = public_path($file);
+            $version = file_exists($path) ? (string) filemtime($path) : '1';
+            return asset($file) . '?v=' . $version;
+        };
+        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
+        $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
+        $logoUrlDark = $assetWithVersion('manake-logo-white.png');
     @endphp
     <link
         rel="icon"
@@ -78,8 +84,8 @@
                 </form>
             </div>
             <div class="hidden p-8 text-slate-100 lg:block lg:p-10 bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900">
-                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
-                <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
+                <img src="{{ $logoUrlLight }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
+                <img src="{{ $logoUrlDark }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
                 <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                     {{ __('ui.admin.login_heading') }}
                 </h1>

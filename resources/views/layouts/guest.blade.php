@@ -7,9 +7,15 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
         @php
-            $faviconPath = site_setting('brand.favicon_path');
-            $faviconLightUrl = asset('MANAKE-FAV-M.png');
-            $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
+            $assetWithVersion = static function (string $file): string {
+                $path = public_path($file);
+                $version = file_exists($path) ? (string) filemtime($path) : '1';
+                return asset($file) . '?v=' . $version;
+            };
+            $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
+            $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
+            $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
+            $logoUrlDark = $assetWithVersion('manake-logo-white.png');
         @endphp
         <link
             rel="icon"
@@ -99,8 +105,8 @@
         <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-10">
             <div>
                 <a href="/">
-                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
-                    <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
+                    <img src="{{ $logoUrlLight }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
+                    <img src="{{ $logoUrlDark }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
                 </a>
             </div>
 

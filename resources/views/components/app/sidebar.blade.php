@@ -65,13 +65,16 @@
         ];
     }
 
-    $brandLogoPath = site_setting('brand.logo_path');
-    $storedLogoUrl = $brandLogoPath ? asset('storage/' . $brandLogoPath) : null;
+    $assetWithVersion = static function (string $file): string {
+        $path = public_path($file);
+        $version = file_exists($path) ? (string) filemtime($path) : '1';
+        return asset($file) . '?v=' . $version;
+    };
 
-    $compactLogoUrl = asset('MANAKE-FAV-M.png');
-    $compactLogoUrlDark = $storedLogoUrl ?: asset('MANAKE-FAV-M-white.png');
-    $expandedLogoUrl = asset('manake-logo-blue.png');
-    $expandedLogoUrlDark = $storedLogoUrl ?: asset('manake-logo-white.png');
+    $compactLogoUrl = $assetWithVersion('MANAKE-FAV-M.png');
+    $compactLogoUrlDark = $assetWithVersion('MANAKE-FAV-M-white.png');
+    $expandedLogoUrl = $assetWithVersion('manake-logo-blue.png');
+    $expandedLogoUrlDark = $assetWithVersion('manake-logo-white.png');
     $activeCategorySlug = (string) request()->query('category', request()->route('slug', ''));
     $submenuEnabledRaw = strtolower(trim((string) setting('catalog.sidebar_submenu_enabled', '1')));
     $submenuEnabled = ! in_array($submenuEnabledRaw, ['0', 'false', 'off', 'no', 'tidak'], true);

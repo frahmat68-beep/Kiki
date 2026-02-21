@@ -7,9 +7,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', site_setting('seo.meta_title', setting('meta_title', setting('site_name', 'Manake.Id'))))</title>
     @php
-        $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = asset('MANAKE-FAV-M.png');
-        $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
+        $assetWithVersion = static function (string $file): string {
+            $path = public_path($file);
+            $version = file_exists($path) ? (string) filemtime($path) : '1';
+            return asset($file) . '?v=' . $version;
+        };
+        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
+        $cmsBrandLogoPath = site_setting('brand.logo_path');
+        $cmsBrandLogoUrl = $cmsBrandLogoPath ? asset('storage/' . $cmsBrandLogoPath) : null;
     @endphp
     <link
         rel="icon"
@@ -19,6 +25,9 @@
         data-light="{{ $faviconLightUrl }}"
         data-dark="{{ $faviconDarkUrl }}"
     >
+    @if ($cmsBrandLogoUrl)
+        <meta name="manake-cms-logo" content="{{ $cmsBrandLogoUrl }}">
+    @endif
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -105,7 +114,7 @@
 @php
     $isAuthenticated = auth('web')->check();
     $brandName = site_setting('brand.name', 'Manake');
-    $sidebarLogoUrl = asset('MANAKE-FAV-M.png');
+    $sidebarLogoUrl = $assetWithVersion('MANAKE-FAV-M.png');
     $locale = app()->getLocale();
 
     $categories = collect($navCategories ?? [])->filter(fn ($category) => ! empty($category->slug ?? null))->values();

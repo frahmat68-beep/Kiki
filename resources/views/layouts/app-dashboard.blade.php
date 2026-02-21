@@ -6,10 +6,22 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('ui.overview.title') . ' | Manake')</title>
     @php
-        $faviconPath = site_setting('brand.favicon_path');
-        $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $assetWithVersion = static function (string $file): string {
+            $path = public_path($file);
+            $version = file_exists($path) ? (string) filemtime($path) : '1';
+            return asset($file) . '?v=' . $version;
+        };
+        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
     @endphp
-    <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ $faviconLightUrl }}"
+        data-theme-favicon
+        data-light="{{ $faviconLightUrl }}"
+        data-dark="{{ $faviconDarkUrl }}"
+    >
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -102,12 +114,13 @@
         >
             <div class="flex items-center justify-between">
                 @php
-                    $brandLogo = site_setting('brand.logo_path');
                     $brandName = site_setting('brand.name', 'Manake');
-                    $logoUrl = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-blue.png');
+                    $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
+                    $logoUrlDark = $assetWithVersion('manake-logo-white.png');
                 @endphp
                 <a href="/" class="flex items-center gap-3 text-slate-900">
-                    <img src="{{ $logoUrl }}" alt="{{ $brandName }}" class="h-7">
+                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-7 dark:hidden">
+                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-7 dark:block">
                 </a>
                 <button class="lg:hidden text-slate-500" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">
                     ✕

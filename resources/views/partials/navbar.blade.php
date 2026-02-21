@@ -1,9 +1,12 @@
 @php
-    $brandLogo = site_setting('brand.logo_path');
     $brandName = site_setting('brand.name', 'Manake');
-    $storedLogoUrl = $brandLogo ? asset('storage/' . $brandLogo) : null;
-    $logoUrlLight = asset('manake-logo-blue.png');
-    $logoUrlDark = $storedLogoUrl ?: asset('manake-logo-white.png');
+    $assetWithVersion = static function (string $file): string {
+        $path = public_path($file);
+        $version = file_exists($path) ? (string) filemtime($path) : '1';
+        return asset($file) . '?v=' . $version;
+    };
+    $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
+    $logoUrlDark = $assetWithVersion('manake-logo-white.png');
     $locale = app()->getLocale();
     $currentTheme = $themePreference ?? request()->attributes->get('theme_preference', 'light');
     if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
