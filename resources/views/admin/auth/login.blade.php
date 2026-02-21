@@ -78,8 +78,8 @@
                 </form>
             </div>
             <div class="hidden p-8 text-slate-100 lg:block lg:p-10 bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900">
-                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto bg-white rounded-xl p-2">
-                <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark h-12 w-auto bg-white rounded-xl p-2">
+                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
+                <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
                 <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                     {{ __('ui.admin.login_heading') }}
                 </h1>

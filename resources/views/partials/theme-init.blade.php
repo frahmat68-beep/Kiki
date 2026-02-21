@@ -158,18 +158,6 @@
         --gradient-brand: linear-gradient(135deg, #030818 0%, #173485 54%, #0c1f4e 100%);
     }
 
-    .brand-logo-dark {
-        display: none !important;
-    }
-
-    html[data-theme-resolved='dark'] .brand-logo-light {
-        display: none !important;
-    }
-
-    html[data-theme-resolved='dark'] .brand-logo-dark {
-        display: block !important;
-    }
-
     html {
         background: var(--bg);
     }

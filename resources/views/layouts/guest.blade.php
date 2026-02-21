@@ -99,8 +99,8 @@
         <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-10">
             <div>
                 <a href="/">
-                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2">
-                    <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark h-12 w-auto rounded-xl bg-white p-2">
+                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
+                    <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
                 </a>
             </div>
 

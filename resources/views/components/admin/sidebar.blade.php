@@ -73,11 +73,6 @@
 
     $expandedLogoUrl = asset('manake-logo-blue.png');
     $expandedLogoUrlDark = asset('manake-logo-white.png');
-    $compactLogoUrl = $logoUrl ?: asset('MANAKE-FAV-M.png');
-    $compactLogoUrlDark = asset('MANAKE-FAV-M-white.png');
-    if ($logoUrl && ! str_contains((string) $logoUrl, 'MANAKE-FAV-M.png')) {
-        $compactLogoUrlDark = $logoUrl;
-    }
     $adminInitial = strtoupper(substr((string) ($adminName ?: 'A'), 0, 1));
 @endphp
 
@@ -87,10 +82,8 @@
 >
     <div class="flex h-16 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img src="{{ $compactLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-9 w-9 rounded-lg object-contain">
-            <img src="{{ $compactLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-9 w-9 rounded-lg object-contain">
-            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto object-contain">
-            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-8 w-auto object-contain">
+            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto object-contain dark:hidden">
+            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-8 w-auto object-contain dark:block">
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

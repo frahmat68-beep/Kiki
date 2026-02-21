@@ -37,8 +37,8 @@
         <div class="flex h-16 items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-6">
                 <a href="/" class="shrink-0">
-                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto">
-                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-8 w-auto">
+                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto dark:hidden">
+                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-8 w-auto dark:block">
                 </a>
 
                 <div class="hidden items-center gap-5 text-sm font-semibold text-slate-600 lg:flex">

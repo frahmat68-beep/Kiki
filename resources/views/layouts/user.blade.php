@@ -116,8 +116,8 @@
             @endphp
             <div class="flex items-center justify-between">
                 <a href="/" class="flex items-center gap-3 text-slate-900">
-                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-7">
-                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-7">
+                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-7 dark:hidden">
+                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-7 dark:block">
                 </a>
                 <button class="lg:hidden text-slate-500" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">
                     ✕
