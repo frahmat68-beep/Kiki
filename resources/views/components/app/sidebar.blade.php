@@ -118,7 +118,7 @@
             <img
                 x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                 alt="{{ $brandName }}"
-                class="h-9 w-auto shrink-0 object-contain lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
+                class="h-auto w-[9.5rem] shrink-0 object-contain object-left lg:hidden lg:w-[9rem] lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
             >
         </a>
         <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
