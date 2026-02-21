@@ -41,8 +41,43 @@
         ],
     ];
 
-    $expandedLogoUrl = asset('manake-logo-blue.png');
-    $expandedLogoUrlDark = asset('manake-logo-white.png');
+    $settingsItems = [
+        [
+            'key' => 'copy',
+            'label' => __('ui.admin.copywriting'),
+            'url' => route('admin.copy.edit', 'landing'),
+            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>',
+        ],
+        [
+            'key' => 'website',
+            'label' => __('ui.admin.website_settings'),
+            'url' => route('admin.website.edit'),
+            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" /></svg>',
+        ],
+        [
+            'key' => 'content',
+            'label' => __('ui.admin.legacy_content'),
+            'url' => route('admin.content.index'),
+            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>',
+        ],
+    ];
+
+    if ($isSuperAdmin) {
+        $settingsItems[] = [
+            'key' => 'db',
+            'label' => __('ui.admin.db_explorer'),
+            'url' => route('admin.db.index'),
+            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5" /><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3" /></svg>',
+        ];
+    }
+
+    $assetWithVersion = static function (string $file): string {
+        $path = public_path($file);
+        $version = file_exists($path) ? (string) filemtime($path) : '1';
+        return asset($file) . '?v=' . $version;
+    };
+    $expandedLogoUrl = $assetWithVersion('manake-logo-blue.png');
+    $expandedLogoUrlDark = $assetWithVersion('manake-logo-white.png');
     $adminInitial = strtoupper(substr((string) ($adminName ?: 'A'), 0, 1));
 @endphp
 
@@ -52,8 +87,8 @@
 >
     <div class="flex h-16 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto object-contain dark:hidden">
-            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-8 w-auto object-contain dark:block">
+            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-10 w-auto object-contain dark:hidden">
+            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-10 w-auto object-contain dark:block">
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -67,6 +102,19 @@
         <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_operational') }}</p>
         <nav class="mt-2 space-y-1">
             @foreach ($primaryItems as $item)
+                <a
+                    href="{{ $item['url'] }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                >
+                    <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
+                    <span>{{ $item['label'] }}</span>
+                </a>
+            @endforeach
+        </nav>
+
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_settings') }}</p>
+        <nav class="mt-2 space-y-1">
+            @foreach ($settingsItems as $item)
                 <a
                     href="{{ $item['url'] }}"
                     class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"

@@ -113,30 +113,6 @@
         if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
             $currentTheme = 'light';
         }
-        $adminCmsMenu = [
-            [
-                'key' => 'copy',
-                'label' => __('ui.admin.copywriting'),
-                'url' => route('admin.copy.edit', 'landing'),
-            ],
-            [
-                'key' => 'website',
-                'label' => __('ui.admin.website_settings'),
-                'url' => route('admin.website.edit'),
-            ],
-            [
-                'key' => 'content',
-                'label' => __('ui.admin.legacy_content'),
-                'url' => route('admin.content.index'),
-            ],
-        ];
-        if ($isSuperAdmin) {
-            $adminCmsMenu[] = [
-                'key' => 'db',
-                'label' => __('ui.admin.db_explorer'),
-                'url' => route('admin.db.index'),
-            ];
-        }
     @endphp
 
     <div x-data="{ sidebarOpen: false, adminSettingsOpen: false }" class="min-h-screen">
@@ -201,15 +177,6 @@
                                         </a>
                                     @endforeach
                                 </div>
-                                <div class="mx-2 mb-2 border-t border-slate-200"></div>
-                                @foreach ($adminCmsMenu as $menu)
-                                    <a
-                                        href="{{ $menu['url'] }}"
-                                        class="block rounded-lg px-3 py-2 text-sm font-semibold transition {{ $activePage === $menu['key'] ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}"
-                                    >
-                                        {{ $menu['label'] }}
-                                    </a>
-                                @endforeach
                             </div>
                         </div>
                         <div class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
