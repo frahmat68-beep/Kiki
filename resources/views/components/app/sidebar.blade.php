@@ -111,24 +111,14 @@
             class="flex min-w-0 items-center gap-3 rounded-xl px-1 py-1 text-slate-900 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
         >
             <img
-                src="{{ $compactLogoUrl }}"
+                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $compactLogoUrlDark }}' : '{{ $compactLogoUrl }}'"
                 alt="{{ $brandName }}"
-                class="brand-logo-light hidden h-9 w-9 shrink-0 rounded-xl object-contain lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden dark:lg:hidden"
+                class="h-9 w-9 shrink-0 rounded-xl object-contain hidden lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
             >
             <img
-                src="{{ $compactLogoUrlDark }}"
+                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                 alt="{{ $brandName }}"
-                class="brand-logo-dark hidden h-9 w-9 shrink-0 rounded-xl object-contain dark:lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
-            >
-            <img
-                src="{{ $expandedLogoUrl }}"
-                alt="{{ $brandName }}"
-                class="brand-logo-light h-9 w-auto shrink-0 object-contain dark:hidden lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block dark:lg:group-hover/sidebar:hidden dark:lg:group-focus-within/sidebar:hidden"
-            >
-            <img
-                src="{{ $expandedLogoUrlDark }}"
-                alt="{{ $brandName }}"
-                class="brand-logo-dark hidden h-9 w-auto shrink-0 object-contain dark:block lg:hidden dark:lg:hidden dark:lg:group-hover/sidebar:block dark:lg:group-focus-within/sidebar:block"
+                class="h-9 w-auto shrink-0 object-contain lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
             >
         </a>
         <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
