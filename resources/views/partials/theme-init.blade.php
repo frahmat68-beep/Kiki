@@ -137,25 +137,25 @@
 
     html[data-theme-resolved='dark'] {
         color-scheme: dark;
-        --bg: #070f24;
-        --bg-soft: #0b1733;
-        --surface: #101f3e;
-        --surface-2: #152a50;
-        --surface-3: #1a345f;
-        --border: #29426c;
-        --text: #e7eefb;
-        --text-muted: #a5b7d8;
-        --text-soft: #7d96be;
-        --primary: #4f7dff;
-        --primary-strong: #3a64de;
-        --primary-soft: rgba(79, 125, 255, 0.14);
-        --primary-ring: rgba(79, 125, 255, 0.32);
+        --bg: #0a1222;
+        --bg-soft: #111c31;
+        --surface: #132039;
+        --surface-2: #192944;
+        --surface-3: #223656;
+        --border: #304666;
+        --text: #edf2ff;
+        --text-muted: #c1cfe6;
+        --text-soft: #97abc9;
+        --primary: #5b84ff;
+        --primary-strong: #4570e6;
+        --primary-soft: rgba(91, 132, 255, 0.2);
+        --primary-ring: rgba(91, 132, 255, 0.36);
         --success: #34d399;
         --warning: #fbbf24;
         --danger: #fb7185;
-        --shadow-soft: 0 20px 42px rgba(2, 8, 23, 0.48), 0 8px 20px rgba(2, 8, 23, 0.3);
-        --shadow-xs: 0 12px 26px rgba(2, 8, 23, 0.36);
-        --gradient-brand: linear-gradient(135deg, #030818 0%, #173485 54%, #0c1f4e 100%);
+        --shadow-soft: 0 20px 44px rgba(2, 8, 23, 0.52), 0 8px 24px rgba(2, 8, 23, 0.34);
+        --shadow-xs: 0 12px 28px rgba(2, 8, 23, 0.4);
+        --gradient-brand: linear-gradient(135deg, #040b1d 0%, #1b3475 54%, #0d214d 100%);
     }
 
     html {
@@ -451,6 +451,24 @@
     table tbody tr:hover {
         background: color-mix(in oklab, var(--surface-2) 72%, var(--surface));
         transform: translateY(-1px);
+    }
+
+    html[data-theme-resolved='dark'] table thead th {
+        background: color-mix(in oklab, var(--surface-2) 85%, var(--surface));
+        color: color-mix(in oklab, var(--text-muted) 88%, #fff);
+        border-bottom-color: color-mix(in oklab, var(--border) 78%, transparent);
+    }
+
+    html[data-theme-resolved='dark'] table tbody td {
+        border-bottom-color: color-mix(in oklab, var(--border) 70%, transparent);
+    }
+
+    html[data-theme-resolved='dark'] table tbody tr:nth-child(even) {
+        background: color-mix(in oklab, var(--surface-2) 54%, var(--surface));
+    }
+
+    html[data-theme-resolved='dark'] table tbody tr:hover {
+        background: color-mix(in oklab, var(--surface-3) 66%, var(--surface));
     }
 
     table thead th:first-child {

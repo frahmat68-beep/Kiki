@@ -166,17 +166,17 @@
                             <div x-cloak x-show="adminSettingsOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-64 rounded-xl p-2 shadow-lg">
                                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.language') }}</p>
                                 <div class="mb-2 grid grid-cols-2 gap-2 px-2">
-                                    <a href="{{ route('lang.switch', 'id') }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                    <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
                                         {{ __('ui.languages.id') }}
                                     </a>
-                                    <a href="{{ route('lang.switch', 'en') }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                    <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
                                         {{ __('ui.languages.en') }}
                                     </a>
                                 </div>
                                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.theme') }}</p>
                                 <div class="mb-2 space-y-1 px-2">
                                     @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                                        <a href="{{ route('theme.switch', $value) }}" class="block rounded-lg border px-2 py-1.5 text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                        <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="block rounded-lg border px-2 py-1.5 text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
                                             {{ $label }}
                                         </a>
                                     @endforeach

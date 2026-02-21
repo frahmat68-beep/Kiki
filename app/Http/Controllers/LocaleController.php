@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 
 class LocaleController extends Controller
@@ -22,6 +23,21 @@ class LocaleController extends Controller
             ])->save();
         }
 
-        return redirect()->back()->withCookie(cookie('locale', $locale, 60 * 24 * 30));
+        $redirectTarget = $request->query('redirect');
+        $fallback = url()->previous() ?: route('home');
+        $target = $fallback;
+
+        if (is_string($redirectTarget) && trim($redirectTarget) !== '') {
+            $candidate = trim($redirectTarget);
+            $appUrl = rtrim(config('app.url') ?: $request->getSchemeAndHttpHost(), '/');
+            $sameHostAbsolute = Str::startsWith($candidate, $appUrl . '/');
+            $relativePath = Str::startsWith($candidate, '/');
+
+            if ($sameHostAbsolute || $relativePath) {
+                $target = $candidate;
+            }
+        }
+
+        return redirect()->to($target)->withCookie(cookie('locale', $locale, 60 * 24 * 30));
     }
 }
