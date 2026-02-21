@@ -48,6 +48,15 @@
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         };
 
+        const syncThemeAssets = (resolvedTheme) => {
+            const activeTheme = resolvedTheme || (document.documentElement.dataset.themeResolved || 'light');
+            document.querySelectorAll('link[data-theme-favicon]').forEach((faviconLink) => {
+                const lightHref = faviconLink.getAttribute('data-light') || faviconLink.getAttribute('href');
+                const darkHref = faviconLink.getAttribute('data-dark') || lightHref;
+                faviconLink.setAttribute('href', activeTheme === 'dark' ? darkHref : lightHref);
+            });
+        };
+
         const applyTheme = (themePreference) => {
             const resolvedTheme = resolveTheme(themePreference);
             const root = document.documentElement;
@@ -55,6 +64,7 @@
             root.dataset.theme = 'manake-brand';
             root.dataset.themePreference = themePreference;
             root.dataset.themeResolved = resolvedTheme;
+            syncThemeAssets(resolvedTheme);
         };
 
         applyTheme(preference);
@@ -71,6 +81,12 @@
             applyTheme,
             resolveTheme,
         };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => syncThemeAssets());
+        } else {
+            syncThemeAssets();
+        }
 
         if (typeof window.matchMedia === 'function') {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -142,6 +158,18 @@
         --gradient-brand: linear-gradient(135deg, #030818 0%, #173485 54%, #0c1f4e 100%);
     }
 
+    .brand-logo-dark {
+        display: none !important;
+    }
+
+    html[data-theme-resolved='dark'] .brand-logo-light {
+        display: none !important;
+    }
+
+    html[data-theme-resolved='dark'] .brand-logo-dark {
+        display: block !important;
+    }
+
     html {
         background: var(--bg);
     }
@@ -162,6 +190,22 @@
 
     * {
         transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+    }
+
+    @keyframes manake-fade-up {
+        0% {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card,
+    .manake-panel {
+        animation: manake-fade-up 320ms ease both;
     }
 
     .card,
@@ -412,8 +456,13 @@
         background: color-mix(in oklab, var(--surface-2) 45%, var(--surface));
     }
 
+    table tbody tr {
+        transition: background-color 140ms ease, transform 140ms ease;
+    }
+
     table tbody tr:hover {
         background: color-mix(in oklab, var(--surface-2) 72%, var(--surface));
+        transform: translateY(-1px);
     }
 
     table thead th:first-child {
@@ -590,6 +639,13 @@
         .py-6 {
             padding-top: 1rem !important;
             padding-bottom: 1rem !important;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition: none !important;
+            animation: none !important;
         }
     }
 </style>

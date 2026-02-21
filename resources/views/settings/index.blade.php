@@ -6,7 +6,7 @@
 @section('content')
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-blue-700">{{ __('ui.settings.title') }}</h1>
-        <p class="mt-1 text-sm text-slate-500">Atur bahasa dan tema agar pengalaman pakai dashboard lebih nyaman.</p>
+        <p class="mt-1 text-sm text-slate-500">{{ __('ui.settings.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr,0.8fr]">

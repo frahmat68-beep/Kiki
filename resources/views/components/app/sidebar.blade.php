@@ -24,12 +24,14 @@
 
     $items = [
         [
+            'key' => 'catalog',
             'label' => __('ui.nav.catalog'),
             'url' => route('catalog'),
             'active' => $isCatalogRoute,
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /></svg>',
         ],
         [
+            'key' => 'availability',
             'label' => __('ui.nav.check_availability'),
             'url' => route('availability.board'),
             'active' => $isAvailabilityRoute,
@@ -39,12 +41,14 @@
 
     if ($isAuthenticated) {
         $items[] = [
+            'key' => 'orders',
             'label' => __('ui.nav.my_orders'),
             'url' => route('booking.history'),
             'active' => request()->routeIs('booking.*') || request()->routeIs('overview') || request()->routeIs('dashboard') || request()->routeIs('account.orders.*'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" /></svg>',
         ];
         $items[] = [
+            'key' => 'settings',
             'label' => __('ui.nav.settings'),
             'url' => route('settings.index'),
             'active' => request()->routeIs('settings.*'),
@@ -52,6 +56,7 @@
         ];
     } else {
         $items[] = [
+            'key' => 'settings',
             'label' => __('ui.nav.settings'),
             'url' => '#',
             'active' => false,
@@ -61,11 +66,38 @@
     }
 
     $compactLogoUrl = $logoUrl ?: asset('MANAKE-FAV-M.png');
+    $compactLogoUrlDark = asset('MANAKE-FAV-M-white.png');
+    if ($logoUrl && ! str_contains((string) $logoUrl, 'MANAKE-FAV-M.png')) {
+        $compactLogoUrlDark = $logoUrl;
+    }
     $brandLogoPath = site_setting('brand.logo_path');
     $expandedLogoUrl = $brandLogoPath ? asset('storage/' . $brandLogoPath) : asset('manake-logo-blue.png');
+    $expandedLogoUrlDark = $brandLogoPath ? asset('storage/' . $brandLogoPath) : asset('manake-logo-white.png');
+    $activeCategorySlug = (string) request()->query('category', request()->route('slug', ''));
+    $submenuEnabledRaw = strtolower(trim((string) setting('catalog.sidebar_submenu_enabled', '1')));
+    $submenuEnabled = ! in_array($submenuEnabledRaw, ['0', 'false', 'off', 'no', 'tidak'], true);
+    $submenuDurationMs = max(120, min(1200, (int) setting('catalog.sidebar_submenu_duration_ms', 220)));
 @endphp
 
 <aside
+    x-data="{
+        catalogSubmenuOpen: false,
+        catalogSubmenuPinned: false,
+        catalogSubmenuEnabled: {{ $submenuEnabled ? 'true' : 'false' }},
+        catalogToggle() {
+            if (!this.catalogSubmenuEnabled) return;
+            this.catalogSubmenuPinned = !this.catalogSubmenuPinned;
+            this.catalogSubmenuOpen = this.catalogSubmenuPinned || !this.catalogSubmenuOpen;
+        },
+        catalogOpen() {
+            if (!this.catalogSubmenuEnabled) return;
+            this.catalogSubmenuOpen = true;
+        },
+        catalogClose() {
+            if (!this.catalogSubmenuEnabled || this.catalogSubmenuPinned) return;
+            this.catalogSubmenuOpen = false;
+        }
+    }"
     class="group/sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-visible border-r border-slate-200 bg-white px-2 py-5 shadow-sm transition-[width,transform,box-shadow] duration-200 ease-out lg:w-16 lg:translate-x-0 lg:hover:w-72 lg:focus-within:w-72 lg:hover:shadow-2xl lg:focus-within:shadow-2xl"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
 >
@@ -79,12 +111,22 @@
             <img
                 src="{{ $compactLogoUrl }}"
                 alt="{{ $brandName }}"
-                class="hidden h-9 w-9 shrink-0 rounded-xl object-contain lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
+                class="brand-logo-light hidden h-9 w-9 shrink-0 rounded-xl object-contain lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
+            >
+            <img
+                src="{{ $compactLogoUrlDark }}"
+                alt="{{ $brandName }}"
+                class="brand-logo-dark hidden h-9 w-9 shrink-0 rounded-xl object-contain lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
             >
             <img
                 src="{{ $expandedLogoUrl }}"
                 alt="{{ $brandName }}"
-                class="h-9 w-auto shrink-0 object-contain lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
+                class="brand-logo-light h-9 w-auto shrink-0 object-contain lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
+            >
+            <img
+                src="{{ $expandedLogoUrlDark }}"
+                alt="{{ $brandName }}"
+                class="brand-logo-dark h-9 w-auto shrink-0 object-contain lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
             >
         </a>
         <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
@@ -97,21 +139,82 @@
 
     <nav class="mt-6 space-y-1 px-1">
         @foreach ($items as $item)
-            <a
-                href="{{ $item['url'] }}"
-                title="{{ $item['label'] }}"
-                aria-label="{{ $item['label'] }}"
-                @if (isset($item['modal']))
-                    @click.prevent="openAuthModal('{{ $item['modal'] }}')"
-                @endif
-                @if (isset($item['prefs']) && $item['prefs'])
-                    @click.prevent="guestPrefsOpen = !guestPrefsOpen"
-                @endif
-                class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}"
-            >
-                <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
-                <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
-            </a>
+            @php
+                $isCatalogMenu = ($item['key'] ?? '') === 'catalog';
+            @endphp
+            @if ($isCatalogMenu && $categories->isNotEmpty())
+                <div class="space-y-1" @mouseenter="catalogOpen()" @mouseleave="catalogClose()">
+                    <div class="flex items-center gap-1">
+                        <a
+                            href="{{ $item['url'] }}"
+                            title="{{ $item['label'] }}"
+                            aria-label="{{ $item['label'] }}"
+                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}"
+                        >
+                            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
+                            <span class="truncate text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
+                        </a>
+                        <button
+                            type="button"
+                            x-cloak
+                            x-show="catalogSubmenuEnabled"
+                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-blue-200 hover:text-blue-600 lg:opacity-0 lg:group-hover/sidebar:opacity-100 lg:group-focus-within/sidebar:opacity-100"
+                            @click.prevent="catalogToggle()"
+                            :aria-expanded="catalogSubmenuOpen.toString()"
+                            aria-label="{{ __('ui.nav.category') }}"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" :class="catalogSubmenuOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div
+                        x-cloak
+                        x-show="catalogSubmenuEnabled && catalogSubmenuOpen"
+                        x-transition:enter="transition ease-out"
+                        x-transition:enter-start="opacity-0 -translate-y-1 max-h-0"
+                        x-transition:enter-end="opacity-100 translate-y-0 max-h-80"
+                        x-transition:leave="transition ease-in"
+                        x-transition:leave-start="opacity-100 translate-y-0 max-h-80"
+                        x-transition:leave-end="opacity-0 -translate-y-1 max-h-0"
+                        class="overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50/90 p-2 lg:ml-10"
+                        style="transition-duration: {{ $submenuDurationMs }}ms;"
+                    >
+                        <p class="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">{{ __('ui.nav.category') }}</p>
+                        <div class="space-y-1">
+                            @foreach ($categories as $category)
+                                @php
+                                    $isCategoryActive = $activeCategorySlug !== '' && $activeCategorySlug === (string) $category->slug;
+                                @endphp
+                                <a
+                                    href="{{ route('catalog', ['category' => $category->slug]) }}"
+                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-transparent text-slate-600 hover:border-blue-200 hover:bg-white hover:text-blue-600' }}"
+                                >
+                                    <span class="truncate">{{ $category->name }}</span>
+                                    <span class="ml-2 inline-flex h-1.5 w-1.5 rounded-full {{ $isCategoryActive ? 'bg-blue-600' : 'bg-slate-300' }}"></span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @else
+                <a
+                    href="{{ $item['url'] }}"
+                    title="{{ $item['label'] }}"
+                    aria-label="{{ $item['label'] }}"
+                    @if (isset($item['modal']))
+                        @click.prevent="openAuthModal('{{ $item['modal'] }}')"
+                    @endif
+                    @if (isset($item['prefs']) && $item['prefs'])
+                        @click.prevent="guestPrefsOpen = !guestPrefsOpen"
+                    @endif
+                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}"
+                >
+                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
+                    <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
+                </a>
+            @endif
         @endforeach
     </nav>
 
@@ -137,22 +240,6 @@
                 @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
                     <a href="{{ route('theme.switch', $value) }}" data-theme-option="{{ $value }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
                         {{ $label }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    @endif
-
-    @if ($categories->isNotEmpty())
-        <div class="mt-6 border-t border-slate-200 pt-4 transition-all duration-200 lg:max-h-0 lg:overflow-hidden lg:opacity-0 lg:group-hover/sidebar:max-h-48 lg:group-hover/sidebar:opacity-100 lg:group-focus-within/sidebar:max-h-48 lg:group-focus-within/sidebar:opacity-100">
-            <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.category') }}</p>
-            <div class="mt-2 flex flex-wrap gap-2 px-2">
-                @foreach ($categories as $category)
-                    <a
-                        href="{{ route('catalog', ['category' => $category->slug]) }}"
-                        class="rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
-                    >
-                        {{ $category->name }}
                     </a>
                 @endforeach
             </div>

@@ -1,7 +1,8 @@
 @php
     $brandLogo = site_setting('brand.logo_path');
     $brandName = site_setting('brand.name', 'Manake');
-    $logoUrl = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-blue.png');
+    $logoUrlLight = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-blue.png');
+    $logoUrlDark = $brandLogo ? asset('storage/' . $brandLogo) : asset('manake-logo-white.png');
     $locale = app()->getLocale();
     $currentTheme = $themePreference ?? request()->attributes->get('theme_preference', 'light');
     if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
@@ -36,7 +37,8 @@
         <div class="flex h-16 items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-6">
                 <a href="/" class="shrink-0">
-                    <img src="{{ $logoUrl }}" alt="{{ $brandName }}" class="h-8 w-auto">
+                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto">
+                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-8 w-auto">
                 </a>
 
                 <div class="hidden items-center gap-5 text-sm font-semibold text-slate-600 lg:flex">
@@ -151,7 +153,7 @@
                                         <p class="mt-1 text-xs text-slate-600">{{ $notification['body'] }}</p>
                                     </article>
                                 @empty
-                                    <p class="rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-500">Belum ada notifikasi.</p>
+                                    <p class="rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-500">{{ __('app.notifications.empty') }}</p>
                                 @endforelse
                             </div>
                         </div>
@@ -191,7 +193,7 @@
                             <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
                                 {{ strtoupper(substr(auth()->user()->display_name ?? 'U', 0, 1)) }}
                             </span>
-                            <span class="max-w-[120px] truncate text-sm font-semibold text-slate-700">{{ auth()->user()->display_name ?? 'User' }}</span>
+                            <span class="max-w-[120px] truncate text-sm font-semibold text-slate-700">{{ auth()->user()->display_name ?? __('app.user.generic') }}</span>
                         </button>
                         <div x-cloak x-show="userOpen" x-transition.origin.top.right class="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white py-2 shadow-lg">
                             <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.cart') }}</a>
@@ -207,7 +209,7 @@
                     </div>
                 @endauth
 
-                <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 lg:hidden" @click="mobileOpen = !mobileOpen" aria-label="Toggle menu">
+                <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 lg:hidden" @click="mobileOpen = !mobileOpen" aria-label="{{ __('ui.nav.toggle_menu') }}">
                     <svg x-show="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="4" y1="7" x2="20" y2="7" />
                         <line x1="4" y1="12" x2="20" y2="12" />

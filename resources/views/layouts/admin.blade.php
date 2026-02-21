@@ -7,9 +7,17 @@
     <title>@yield('title', __('ui.admin.panel_title') . ' | Manake')</title>
     @php
         $faviconPath = site_setting('brand.favicon_path');
-        $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
     @endphp
-    <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ $faviconLightUrl }}"
+        data-theme-favicon
+        data-light="{{ $faviconLightUrl }}"
+        data-dark="{{ $faviconDarkUrl }}"
+    >
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>

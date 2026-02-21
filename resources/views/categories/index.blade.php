@@ -7,8 +7,8 @@
         <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Jelajahi Kategori Rental</h1>
-                    <p class="mt-2 text-sm text-slate-500">Pilih kategori untuk melihat alat yang tersedia saat ini.</p>
+                    <h1 class="text-2xl font-semibold text-blue-700 sm:text-3xl">{{ __('ui.categories.title') }}</h1>
+                    <p class="mt-2 text-sm text-slate-500">{{ __('ui.categories.subtitle') }}</p>
                 </div>
                 <a href="{{ route('catalog') }}" class="btn-secondary inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition">
                     {{ __('app.actions.see_catalog') }}
@@ -24,10 +24,10 @@
                             <path d="M9 11h6" />
                         </svg>
                     </div>
-                    <p class="mt-4 text-base font-semibold text-slate-900">Belum ada kategori tersedia.</p>
-                    <p class="mt-2 text-sm text-slate-500">Admin bisa menambahkan kategori dari panel admin.</p>
+                    <p class="mt-4 text-base font-semibold text-slate-900">{{ __('ui.categories.empty_title') }}</p>
+                    <p class="mt-2 text-sm text-slate-500">{{ __('ui.categories.empty_subtitle') }}</p>
                     <a href="{{ route('catalog') }}" class="btn-primary mt-5 inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition">
-                        Buka Katalog
+                        {{ __('ui.categories.empty_cta') }}
                     </a>
                 </div>
             @else
@@ -37,9 +37,9 @@
                             <h2 class="text-lg font-semibold text-slate-900">{{ $category->name }}</h2>
                             <p class="mt-2 text-sm text-slate-500 line-clamp-2">{{ $category->description ?: __('app.category.all_subtitle') }}</p>
                             <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
-                                <span>{{ $category->equipments_count }} alat</span>
+                                <span>{{ $category->equipments_count }} {{ __('ui.categories.count_suffix') }}</span>
                                 <a href="{{ route('category.show', $category->slug) }}" class="text-blue-600 hover:text-blue-700 font-semibold">
-                                    Lihat kategori →
+                                    {{ __('ui.categories.view_category_cta') }} →
                                 </a>
                             </div>
                         </article>

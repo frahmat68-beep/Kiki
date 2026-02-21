@@ -23,9 +23,11 @@ if (! function_exists('site_setting')) {
             return $default;
         }
 
-        return Cache::remember("site_setting:{$key}", 3600, function () use ($key, $default) {
-            return SiteSetting::query()->where('key', $key)->value('value') ?? $default;
+        $value = Cache::remember("site_setting:{$key}", 3600, function () use ($key) {
+            return SiteSetting::query()->where('key', $key)->value('value');
         });
+
+        return $value ?? $default;
     }
 }
 

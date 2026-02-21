@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Pesanan')
+@section('title', )
 
 @php
     $formatIdr = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
@@ -22,56 +22,56 @@
     $grandTotal = $rentalGrandTotal + ($isDamageFeePaid ? $additionalFee : 0);
 
     $statusMeta = match ($paymentStatus) {
-        'paid' => ['label' => 'LUNAS', 'badge' => 'bg-blue-100 text-blue-700'],
-        'failed' => ['label' => 'GAGAL', 'badge' => 'bg-rose-100 text-rose-700'],
-        'expired' => ['label' => 'EXPIRED', 'badge' => 'bg-slate-200 text-slate-700'],
-        'refunded' => ['label' => 'REFUND', 'badge' => 'bg-indigo-100 text-indigo-700'],
-        default => ['label' => 'PENDING', 'badge' => 'bg-amber-100 text-amber-700'],
+        'paid' => ['label' => __('ui.invoice.status.paid'), 'badge' => 'bg-blue-100 text-blue-700'],
+        'failed' => ['label' => __('ui.invoice.status.failed'), 'badge' => 'bg-rose-100 text-rose-700'],
+        'expired' => ['label' => __('ui.invoice.status.expired'), 'badge' => 'bg-slate-200 text-slate-700'],
+        'refunded' => ['label' => __('ui.invoice.status.refunded'), 'badge' => 'bg-indigo-100 text-indigo-700'],
+        default => ['label' => __('ui.invoice.status.pending'), 'badge' => 'bg-amber-100 text-amber-700'],
     };
 
     $statusLabel = fn ($status) => match ($status) {
-        'menunggu_pembayaran' => 'Menunggu Pembayaran',
-        'diproses' => 'Diproses Admin',
-        'lunas' => 'Siap Diambil',
-        'barang_diambil' => 'Barang Diambil',
-        'barang_kembali' => 'Barang Dikembalikan',
-        'barang_rusak' => 'Barang Rusak',
-        'barang_hilang' => 'Barang Hilang',
-        'overdue_denda' => 'Denda Overdue',
-        'selesai' => 'Selesai',
-        'expired' => 'Expired',
-        'dibatalkan' => 'Dibatalkan',
-        'refund' => 'Refund',
+        'menunggu_pembayaran' => __('ui.orders.statuses.waiting_payment'),
+        'diproses' => __('ui.orders.statuses.processed'),
+        'lunas' => __('ui.orders.statuses.ready_pickup'),
+        'barang_diambil' => __('ui.orders.statuses.picked_up'),
+        'barang_kembali' => __('ui.orders.statuses.returned'),
+        'barang_rusak' => __('ui.orders.statuses.damaged'),
+        'barang_hilang' => __('ui.orders.statuses.lost'),
+        'overdue_denda' => __('ui.orders.statuses.overdue'),
+        'selesai' => __('ui.orders.statuses.completed'),
+        'expired' => __('ui.orders.statuses.expired'),
+        'dibatalkan' => __('ui.orders.statuses.canceled'),
+        'refund' => __('ui.orders.statuses.refunded'),
         default => strtoupper((string) $status),
     };
 
     $timeline = [
         [
-            'title' => 'Menunggu Pembayaran',
+            'title' => __('ui.orders.timeline.waiting_payment'),
             'done' => $paymentStatus !== 'pending',
             'active' => $paymentStatus === 'pending',
             'time' => null,
         ],
         [
-            'title' => 'Pembayaran Terkonfirmasi',
+            'title' => __('ui.orders.timeline.payment_confirmed'),
             'done' => $paymentStatus === 'paid',
             'active' => $paymentStatus === 'paid' && $orderStatus === 'lunas',
             'time' => $order->paid_at,
         ],
         [
-            'title' => 'Pesanan Diproses',
+            'title' => __('ui.orders.timeline.order_processed'),
             'done' => in_array($orderStatus, ['diproses', 'lunas', 'barang_diambil', 'barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda', 'selesai'], true),
             'active' => in_array($orderStatus, ['diproses', 'lunas'], true),
             'time' => null,
         ],
         [
-            'title' => 'Barang Diambil',
+            'title' => __('ui.orders.timeline.picked_up'),
             'done' => in_array($orderStatus, ['barang_diambil', 'barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda', 'selesai'], true),
             'active' => $orderStatus === 'barang_diambil',
             'time' => $order->picked_up_at,
         ],
         [
-            'title' => 'Barang Dikembalikan',
+            'title' => __('ui.orders.timeline.returned'),
             'done' => in_array($orderStatus, ['barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda', 'selesai'], true),
             'active' => in_array($orderStatus, ['barang_kembali', 'barang_rusak', 'barang_hilang'], true),
             'time' => $order->returned_at,
@@ -88,13 +88,77 @@
     $rescheduleConflictPopupMessage = (session('error') && (old('rental_start_date') || old('rental_end_date')))
         ? session('error')
         : null;
-    $orderDetailTitle = setting('copy.order_detail.title', 'Detail Pesanan');
-    $orderDetailSubtitle = setting('copy.order_detail.subtitle', 'Pantau status pembayaran dan progres rental di sini.');
-    $orderDetailBackLabel = setting('copy.order_detail.back_label', 'Kembali ke Riwayat');
-    $orderNumberLabel = setting('copy.order_detail.order_number_label', 'Nomor Order');
-    $orderProgressTitle = setting('copy.order_detail.progress_title', 'Progress Pesanan');
-    $orderItemsTitle = setting('copy.order_detail.items_title', 'Item Disewa');
-    $orderPaymentTitle = setting('copy.order_detail.payment_title', 'Pembayaran');
+    $orderDetailTitle = setting('copy.order_detail.title', __('ui.orders.detail_title'));
+    $orderDetailSubtitle = setting('copy.order_detail.subtitle', __('ui.orders.page_subtitle'));
+    $orderDetailBackLabel = setting('copy.order_detail.back_label', __('ui.orders.back_to_history'));
+    $orderNumberLabel = setting('copy.order_detail.order_number_label', __('ui.orders.order_number'));
+    $orderProgressTitle = setting('copy.order_detail.progress_title', __('ui.orders.progress_title'));
+    $orderItemsTitle = setting('copy.order_detail.items_title', __('ui.orders.items_title'));
+    $orderPaymentTitle = setting('copy.order_detail.payment_title', __('ui.orders.payment_title'));
+    $orderScheduleUnavailableTitle = __('ui.orders.schedule_unavailable_title');
+    $orderScheduleUnavailableSubtitle = __('ui.orders.schedule_unavailable_subtitle');
+    $orderPopupCloseAria = __('ui.actions.close');
+    $orderPopupCloseButton = __('ui.actions.close');
+    $orderAdditionalFeeRequiredTitle = __('ui.orders.additional_fee_required_title');
+    $orderAdditionalFeeRequiredDesc = __('ui.orders.additional_fee_required_desc');
+    $orderAdditionalFeeRequiredTaxNote = __('ui.orders.additional_fee_required_tax_note');
+    $orderCopyReceipt = __('ui.orders.copy_receipt_button');
+    $orderCopySuccess = __('ui.orders.copy_receipt_success');
+    $orderCopyFailed = __('ui.orders.copy_receipt_failed');
+    $orderOrderIdLabel = __('ui.orders.order_id');
+    $orderRentalPeriodLabel = __('ui.orders.rental_period');
+    $orderRentalStatusLabel = __('ui.orders.rental_status');
+    $orderItemLineTemplate = __('ui.orders.item_line_template');
+    $orderItemsEmpty = __('ui.orders.items_empty');
+    $orderNotificationsTitle = __('ui.orders.notifications_title');
+    $orderMidtransOrderIdLabel = __('ui.orders.midtrans_order_id');
+    $orderStatusPesananLabel = __('ui.orders.order_status');
+    $orderSubtotalLabel = __('ui.orders.subtotal_rental');
+    $orderTaxLabel = __('ui.orders.tax_label');
+    $orderTotalRentalLabel = __('ui.orders.total_rental');
+    $orderAdditionalFeeSectionTitle = __('ui.orders.additional_fee_section_title');
+    $orderAdditionalFeePaidLabel = __('ui.orders.additional_fee_paid_label');
+    $orderAdditionalFeeUnpaidLabel = __('ui.orders.additional_fee_unpaid_label');
+    $orderAdditionalFeeLabel = __('ui.orders.additional_fee_label');
+    $orderAdditionalFeeNoTaxLabel = __('ui.orders.additional_fee_no_tax_label');
+    $orderFinalTotalLabel = __('ui.orders.final_total');
+    $orderAdminNoteLabel = __('ui.orders.admin_note');
+    $orderPaidAtLabel = __('ui.orders.paid_at');
+    $orderRescheduleTitle = __('ui.orders.reschedule_title');
+    $orderRescheduleDescTemplate = __('ui.orders.reschedule_desc_template');
+    $orderRescheduleStartLabel = __('ui.orders.reschedule_start_label');
+    $orderRescheduleEndLabel = __('ui.orders.reschedule_end_label');
+    $orderRescheduleEndNoteTemplate = __('ui.orders.reschedule_end_note_template');
+    $orderRescheduleSaveButton = __('ui.orders.reschedule_save_button');
+    $orderRescheduleLocked = __('ui.orders.reschedule_locked');
+    $orderPayNowButton = __('ui.orders.pay_now_button');
+    $orderRefreshPaymentButton = __('ui.orders.refresh_payment_button');
+    $orderPaymentNote = __('ui.orders.payment_note');
+    $orderPayAdditionalButton = __('ui.orders.pay_additional_button');
+    $orderRefreshAdditionalButton = __('ui.orders.refresh_additional_button');
+    $orderViewInvoiceButton = __('ui.orders.view_invoice_button');
+    $orderDownloadPdfButton = __('ui.orders.download_pdf_button');
+    $orderInvoiceLockedNote = __('ui.orders.invoice_locked_note');
+    $orderPaymentSyncFailed = __('ui.orders.messages.payment_sync_failed');
+    $orderPaymentConfirmedInvoice = __('ui.orders.messages.payment_confirmed_invoice');
+    $orderPaymentNeedAdditional = __('ui.orders.messages.payment_need_additional');
+    $orderAdditionalSyncFailed = __('ui.orders.messages.additional_sync_failed');
+    $orderAdditionalPaid = __('ui.orders.messages.additional_paid');
+    $orderProcessing = __('ui.orders.messages.processing');
+    $orderCreatingSession = __('ui.orders.messages.creating_session');
+    $orderSessionFailed = __('ui.orders.messages.session_failed');
+    $orderSnapNotReady = __('ui.orders.messages.snap_not_ready');
+    $orderPaymentSuccessSync = __('ui.orders.messages.payment_success_sync');
+    $orderPaymentSuccessSyncFailed = __('ui.orders.messages.payment_success_sync_failed');
+    $orderPaymentPending = __('ui.orders.messages.payment_pending');
+    $orderPaymentFailed = __('ui.orders.messages.payment_failed');
+    $orderPopupClosed = __('ui.orders.messages.popup_closed');
+    $orderPaymentOpenError = __('ui.orders.messages.payment_open_error');
+    $orderChecking = __('ui.orders.messages.checking');
+    $orderStatusUnpaid = __('ui.orders.messages.status_unpaid');
+    $orderStatusCheckFailed = __('ui.orders.messages.status_check_failed');
+    $orderAdditionalUnpaid = __('ui.orders.messages.additional_unpaid');
+    $orderAdditionalCheckFailed = __('ui.orders.messages.additional_check_failed');
 @endphp
 
 @section('content')
@@ -131,14 +195,14 @@
                     <div class="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-5 shadow-2xl">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">Jadwal Tidak Tersedia</p>
-                                <p class="mt-2 text-sm font-semibold text-slate-900">Reschedule perlu tanggal lain.</p>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-600">{{ $orderScheduleUnavailableTitle }}</p>
+                                <p class="mt-2 text-sm font-semibold text-slate-900">{{ $orderScheduleUnavailableSubtitle }}</p>
                             </div>
                             <button
                                 type="button"
                                 data-close-reschedule-popup
                                 class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-rose-200 hover:text-rose-600"
-                                aria-label="Tutup popup"
+                                aria-label="{{ $orderPopupCloseAria }}"
                             >
                                 ×
                             </button>
@@ -152,7 +216,7 @@
                                 data-close-reschedule-popup
                                 class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600"
                             >
-                                Tutup
+                                {{ $orderPopupCloseButton }}
                             </button>
                         </div>
                     </div>
@@ -161,9 +225,9 @@
 
             @if ($hasDamageFeeOutstanding)
                 <div class="mt-4 rounded-2xl border-2 border-rose-300 bg-rose-50 px-5 py-4">
-                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">Tagihan Tambahan Wajib</p>
-                    <p class="mt-1 text-lg font-semibold text-rose-800">Barang terdeteksi bermasalah. Biaya tambahan {{ $formatIdr($additionalFee) }} wajib dibayar via Midtrans.</p>
-                    <p class="mt-1 text-sm text-rose-700">Biaya tambahan ini tidak dikenakan PPN.</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">{{ $orderAdditionalFeeRequiredTitle }}</p>
+                    <p class="mt-1 text-lg font-semibold text-rose-800">{{ strtr($orderAdditionalFeeRequiredDesc, [':fee' => $formatIdr($additionalFee)]) }}</p>
+                    <p class="mt-1 text-sm text-rose-700">{{ $orderAdditionalFeeRequiredTaxNote }}</p>
                     @if ($order->additional_fee_note)
                         <p class="mt-2 rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs text-rose-700">{{ $order->additional_fee_note }}</p>
                     @endif
@@ -183,7 +247,7 @@
                                         id="copy-order-number"
                                         class="inline-flex items-center rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
                                     >
-                                        Copy Resi
+                                        {{ $orderCopyReceipt }}
                                     </button>
                                 </div>
                             </div>
@@ -194,17 +258,17 @@
 
                         <div class="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
                             <div class="rounded-xl bg-slate-50 px-4 py-3">
-                                <p class="text-xs text-slate-500">Order ID</p>
+                                <p class="text-xs text-slate-500">{{ $orderOrderIdLabel }}</p>
                                 <p class="mt-1 font-semibold text-slate-800">#{{ $order->id }}</p>
                             </div>
                             <div class="rounded-xl bg-slate-50 px-4 py-3">
-                                <p class="text-xs text-slate-500">Periode Sewa</p>
+                                <p class="text-xs text-slate-500">{{ $orderRentalPeriodLabel }}</p>
                                 <p class="mt-1 font-semibold text-slate-800">
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>
                             </div>
                             <div class="rounded-xl bg-slate-50 px-4 py-3">
-                                <p class="text-xs text-slate-500">Status Rental</p>
+                                <p class="text-xs text-slate-500">{{ $orderRentalStatusLabel }}</p>
                                 <p class="mt-1 font-semibold text-slate-800">{{ $statusLabel($orderStatus) }}</p>
                             </div>
                         </div>
@@ -236,11 +300,11 @@
 
                         @if ($orderStatus === 'barang_rusak')
                             <p class="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                                Barang tercatat mengalami kerusakan.
+                                {{ __('ui.orders.damage_note_intro') }}
                                 @if ($hasDamageFeeOutstanding)
-                                    Silakan lanjutkan pembayaran tagihan tambahan.
+                                    {{ __('ui.orders.damage_note_with_fee') }}
                                 @else
-                                    Tim admin akan memproses tindak lanjut biaya/konfirmasi.
+                                    {{ __('ui.orders.damage_note_without_fee') }}
                                 @endif
                             </p>
                         @endif
@@ -253,21 +317,26 @@
                                 <div class="rounded-xl border border-slate-100 p-4">
                                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                         <div>
-                                            <p class="text-sm font-semibold text-blue-700">{{ $item->equipment->name ?? 'Equipment' }}</p>
-                                            <p class="text-xs text-slate-500">Qty {{ $item->qty }} x {{ $formatIdr($item->price) }} / hari</p>
+                                            <p class="text-sm font-semibold text-blue-700">{{ $item->equipment->name ?? __('app.product.generic') }}</p>
+                                            <p class="text-xs text-slate-500">
+                                                {{ strtr($orderItemLineTemplate, [
+                                                    ':qty' => (string) $item->qty,
+                                                    ':price' => $formatIdr($item->price),
+                                                ]) }}
+                                            </p>
                                         </div>
                                         <p class="text-sm font-semibold text-slate-800">{{ $formatIdr($item->subtotal) }}</p>
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-sm text-slate-500">Belum ada item pada order ini.</p>
+                                <p class="text-sm text-slate-500">{{ $orderItemsEmpty }}</p>
                             @endforelse
                         </div>
                     </article>
 
                     @if (\Illuminate\Support\Facades\Schema::hasTable('order_notifications') && $order->relationLoaded('notifications') && $order->notifications->isNotEmpty())
                         <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                            <h2 class="text-lg font-semibold text-slate-900">Notifikasi Pesanan</h2>
+                            <h2 class="text-lg font-semibold text-slate-900">{{ $orderNotificationsTitle }}</h2>
                             <div class="mt-4 space-y-3">
                                 @foreach ($order->notifications as $notification)
                                     <div class="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
@@ -285,38 +354,38 @@
                     <h2 class="text-lg font-semibold text-blue-700">{{ $orderPaymentTitle }}</h2>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between text-slate-600">
-                            <span>Midtrans Order ID</span>
+                            <span>{{ $orderMidtransOrderIdLabel }}</span>
                             <span class="font-semibold text-slate-800">{{ $order->midtrans_order_id ?? '-' }}</span>
                         </div>
                         <div class="flex justify-between text-slate-600">
-                            <span>Status Pesanan</span>
+                            <span>{{ $orderStatusPesananLabel }}</span>
                             <span class="font-semibold text-slate-800">{{ strtoupper($order->status_pesanan ?? 'pending') }}</span>
                         </div>
                         <div class="flex justify-between text-slate-600">
-                            <span>Subtotal Sewa</span>
+                            <span>{{ $orderSubtotalLabel }}</span>
                             <span class="font-semibold text-slate-800">{{ $formatIdr($baseTotal) }}</span>
                         </div>
                         <div class="flex justify-between text-slate-600">
-                            <span>PPN 11%</span>
+                            <span>{{ $orderTaxLabel }}</span>
                             <span class="font-semibold text-slate-800">{{ $formatIdr($taxAmount) }}</span>
                         </div>
                         <div class="flex justify-between border-t border-slate-200 pt-2 text-slate-700">
-                            <span class="font-semibold">Total Sewa</span>
+                            <span class="font-semibold">{{ $orderTotalRentalLabel }}</span>
                             <span class="font-semibold text-slate-900">{{ $formatIdr($rentalGrandTotal) }}</span>
                         </div>
                         @if ($additionalFee > 0)
                             <div class="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
                                 <div class="flex items-center justify-between gap-3">
-                                    <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Tagihan Tambahan</p>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">{{ $orderAdditionalFeeSectionTitle }}</p>
                                     <span class="rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $isDamageFeePaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">
-                                        {{ $isDamageFeePaid ? 'LUNAS' : 'BELUM LUNAS' }}
+                                        {{ $isDamageFeePaid ? $orderAdditionalFeePaidLabel : $orderAdditionalFeeUnpaidLabel }}
                                     </span>
                                 </div>
                                 <div class="mt-1 flex items-center justify-between text-sm text-amber-700">
-                                    <span>Biaya kerusakan / penalti</span>
+                                    <span>{{ $orderAdditionalFeeLabel }}</span>
                                     <span class="font-semibold">{{ $formatIdr($additionalFee) }}</span>
                                 </div>
-                                <p class="mt-1 text-xs text-amber-700">Tanpa PPN.</p>
+                                <p class="mt-1 text-xs text-amber-700">{{ $orderAdditionalFeeNoTaxLabel }}</p>
                             </div>
                             @if ($order->additional_fee_note)
                                 <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">{{ $order->additional_fee_note }}</p>
@@ -324,19 +393,19 @@
                         @endif
                         @if ($isDamageFeePaid && $additionalFee > 0)
                             <div class="flex justify-between border-t border-slate-200 pt-2 text-slate-700">
-                                <span class="font-semibold">Total Akhir</span>
+                                <span class="font-semibold">{{ $orderFinalTotalLabel }}</span>
                                 <span class="font-semibold text-slate-900">{{ $formatIdr($grandTotal) }}</span>
                             </div>
                         @endif
                         @if ($order->admin_note)
                             <div class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
-                                <p class="font-semibold">Catatan Admin</p>
+                                <p class="font-semibold">{{ $orderAdminNoteLabel }}</p>
                                 <p class="mt-1">{{ $order->admin_note }}</p>
                             </div>
                         @endif
                         @if ($order->paid_at)
                             <div class="flex justify-between text-slate-600">
-                                <span>Dibayar Pada</span>
+                                <span>{{ $orderPaidAtLabel }}</span>
                                 <span class="font-semibold text-slate-800">{{ $order->paid_at->format('d M Y H:i') }}</span>
                             </div>
                         @endif
@@ -344,13 +413,13 @@
 
                     @if ($canReschedule)
                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                            <h3 class="text-sm font-semibold text-slate-900">Butuh Reschedule?</h3>
-                            <p class="mt-1 text-xs text-slate-600">Jadwal masih bisa diubah selama barang belum diambil. Durasi tetap {{ $rescheduleDurationDays }} hari, jumlah barang tetap sama, dan ada buffer 1 hari sebelum/sesudah sewa.</p>
+                            <h3 class="text-sm font-semibold text-slate-900">{{ $orderRescheduleTitle }}</h3>
+                            <p class="mt-1 text-xs text-slate-600">{{ strtr($orderRescheduleDescTemplate, [':days' => (string) $rescheduleDurationDays]) }}</p>
                             <form method="POST" action="{{ route('account.orders.reschedule', $order) }}" class="mt-3 space-y-2">
                                 @csrf
                                 @method('PATCH')
                                 <div>
-                                    <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Tanggal Sewa Baru</label>
+                                    <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{{ $orderRescheduleStartLabel }}</label>
                                     <input
                                         type="date"
                                         name="rental_start_date"
@@ -362,7 +431,7 @@
                                     >
                                 </div>
                                 <div>
-                                    <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Tanggal Kembali Baru</label>
+                                    <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{{ $orderRescheduleEndLabel }}</label>
                                     <input
                                         type="date"
                                         name="rental_end_date"
@@ -374,50 +443,50 @@
                                         required
                                         class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                                     >
-                                    <p class="mt-1 text-[11px] text-slate-500">Tanggal kembali otomatis mengikuti durasi {{ $rescheduleDurationDays }} hari.</p>
+                                    <p class="mt-1 text-[11px] text-slate-500">{{ strtr($orderRescheduleEndNoteTemplate, [':days' => (string) $rescheduleDurationDays]) }}</p>
                                 </div>
                                 <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50">
-                                    Simpan Reschedule
+                                    {{ $orderRescheduleSaveButton }}
                                 </button>
                             </form>
                         </div>
                     @elseif ($hasPickedUp)
                         <p class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                            Jadwal tidak dapat diubah karena barang sudah diambil.
+                            {{ $orderRescheduleLocked }}
                         </p>
                     @endif
 
                     @if ($isPrimaryPayable)
                         <button id="pay-now-button" class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition">
-                            Bayar Sekarang
+                            {{ $orderPayNowButton }}
                         </button>
                         <button id="refresh-status-button" class="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600 transition">
-                            Cek Status Pembayaran
+                            {{ $orderRefreshPaymentButton }}
                         </button>
-                        <p class="text-xs text-slate-500">Pembayaran diproses via Midtrans Snap.</p>
+                        <p class="text-xs text-slate-500">{{ $orderPaymentNote }}</p>
                     @endif
 
                     @if ($hasDamageFeeOutstanding)
                         <button id="pay-damage-fee-button" class="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700">
-                            Bayar Tagihan Tambahan
+                            {{ $orderPayAdditionalButton }}
                         </button>
                         <button id="refresh-damage-status-button" class="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-50">
-                            Cek Status Tagihan Tambahan
+                            {{ $orderRefreshAdditionalButton }}
                         </button>
                     @endif
 
                     @if ($canAccessInvoice)
                         <div class="space-y-2">
                             <a href="{{ route('account.orders.receipt', $order) }}" class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">
-                                Lihat Invoice
+                                {{ $orderViewInvoiceButton }}
                             </a>
                             <a href="{{ route('account.orders.receipt.pdf', $order) }}" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
-                                Download PDF
+                                {{ $orderDownloadPdfButton }}
                             </a>
                         </div>
                     @elseif ($isPaid && $hasDamageFeeOutstanding)
                         <p class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                            Invoice dibuka setelah tagihan tambahan lunas.
+                            {{ $orderInvoiceLockedNote }}
                         </p>
                     @endif
                 </aside>
@@ -440,14 +509,14 @@
 
                 try {
                     await navigator.clipboard.writeText(orderNumber);
-                    copyButton.textContent = 'Tersalin';
+                    copyButton.textContent = @json($orderCopySuccess);
                     setTimeout(() => {
-                        copyButton.textContent = 'Copy Resi';
+                        copyButton.textContent = @json($orderCopyReceipt);
                     }, 1500);
                 } catch (error) {
-                    copyButton.textContent = 'Gagal';
+                    copyButton.textContent = @json($orderCopyFailed);
                     setTimeout(() => {
-                        copyButton.textContent = 'Copy Resi';
+                        copyButton.textContent = @json($orderCopyReceipt);
                     }, 1500);
                 }
             });
@@ -550,16 +619,16 @@
                     const data = await response.json();
 
                     if (!response.ok) {
-                        throw new Error(data.message || 'Gagal sinkron status pembayaran.');
+                        throw new Error(data.message || @json($orderPaymentSyncFailed));
                     }
 
                     if (data.is_paid && data.invoice_url) {
-                        showAlert('Pembayaran terkonfirmasi. Mengalihkan ke invoice...', 'success');
+                        showAlert(@json($orderPaymentConfirmedInvoice), 'success');
                         if (redirectWhenPaid) {
                             window.location.href = data.invoice_url;
                         }
                     } else if (data.is_paid && data.has_damage_fee_outstanding) {
-                        showAlert('Pembayaran sewa sudah lunas. Lunasi tagihan tambahan untuk membuka invoice.', 'info');
+                        showAlert(@json($orderPaymentNeedAdditional), 'info');
                     }
 
                     return data;
@@ -575,11 +644,11 @@
                     const data = await response.json();
 
                     if (!response.ok) {
-                        throw new Error(data.message || 'Gagal sinkron status tagihan tambahan.');
+                        throw new Error(data.message || @json($orderAdditionalSyncFailed));
                     }
 
                     if (data.is_paid) {
-                        showAlert('Tagihan tambahan terkonfirmasi lunas.', 'success');
+                        showAlert(@json($orderAdditionalPaid), 'success');
                     }
 
                     return data;
@@ -588,8 +657,8 @@
                 const processPayment = async (config) => {
                     if (!config.button) return;
                     config.button.disabled = true;
-                    config.button.textContent = 'Memproses...';
-                    showAlert('Membuat sesi pembayaran...', 'info');
+                    config.button.textContent = @json($orderProcessing);
+                    showAlert(@json($orderCreatingSession), 'info');
 
                     try {
                         const response = await fetchWithCsrf(config.tokenEndpoint, {
@@ -601,28 +670,28 @@
                         const data = await response.json();
 
                         if (!response.ok || !data.snap_token) {
-                            throw new Error(data.message || 'Gagal membuat sesi pembayaran.');
+                            throw new Error(data.message || @json($orderSessionFailed));
                         }
 
                         if (!window.snap) {
-                            throw new Error('Midtrans Snap belum siap. Coba refresh halaman.');
+                            throw new Error(@json($orderSnapNotReady));
                         }
 
                         window.snap.pay(data.snap_token, {
                             onSuccess: async function () {
-                                showAlert('Pembayaran berhasil. Sinkron status...', 'success');
+                                showAlert(@json($orderPaymentSuccessSync), 'success');
                                 try {
                                     const status = await config.refreshStatus();
                                     if (!status.is_paid || config.forceReloadAfterPaid) {
                                         setTimeout(() => window.location.reload(), 900);
                                     }
                                 } catch (error) {
-                                    showAlert(error.message || 'Pembayaran berhasil, tapi sinkronisasi gagal.', 'info');
+                                    showAlert(error.message || @json($orderPaymentSuccessSyncFailed), 'info');
                                     setTimeout(() => window.location.reload(), 900);
                                 }
                             },
                             onPending: async function () {
-                                showAlert('Pembayaran pending. Silakan selesaikan di Midtrans.', 'info');
+                                showAlert(@json($orderPaymentPending), 'info');
                                 try {
                                     await config.refreshStatus();
                                 } catch (error) {
@@ -631,14 +700,14 @@
                                 setTimeout(() => window.location.reload(), 900);
                             },
                             onError: function () {
-                                showAlert('Pembayaran gagal. Coba lagi.', 'error');
+                                showAlert(@json($orderPaymentFailed), 'error');
                             },
                             onClose: function () {
-                                showAlert('Popup pembayaran ditutup.', 'info');
+                                showAlert(@json($orderPopupClosed), 'info');
                             },
                         });
                     } catch (error) {
-                        showAlert(error.message || 'Terjadi kesalahan saat membuka pembayaran.', 'error');
+                        showAlert(error.message || @json($orderPaymentOpenError), 'error');
                     } finally {
                         config.button.disabled = false;
                         config.button.textContent = config.defaultLabel;
@@ -649,7 +718,7 @@
                     button: payButton,
                     tokenEndpoint: @json(route('payments.snap-token', $order)),
                     refreshStatus: () => syncRentalPaymentStatus(true),
-                    defaultLabel: 'Bayar Sekarang',
+                    defaultLabel: @json($orderPayNowButton),
                     forceReloadAfterPaid: false,
                 }));
 
@@ -657,22 +726,22 @@
                     button: damagePayButton,
                     tokenEndpoint: @json(route('payments.damage-fee.snap-token', $order)),
                     refreshStatus: () => syncDamagePaymentStatus(),
-                    defaultLabel: 'Bayar Tagihan Tambahan',
+                    defaultLabel: @json($orderPayAdditionalButton),
                     forceReloadAfterPaid: true,
                 }));
 
                 refreshButton?.addEventListener('click', async () => {
                     refreshButton.disabled = true;
                     const defaultText = refreshButton.textContent;
-                    refreshButton.textContent = 'Memeriksa...';
+                    refreshButton.textContent = @json($orderChecking);
 
                     try {
                         const status = await syncRentalPaymentStatus(true);
                         if (!status.is_paid) {
-                            showAlert('Status terbaru: belum lunas. Silakan selesaikan pembayaran.', 'info');
+                            showAlert(@json($orderStatusUnpaid), 'info');
                         }
                     } catch (error) {
-                        showAlert(error.message || 'Gagal cek status pembayaran.', 'error');
+                        showAlert(error.message || @json($orderStatusCheckFailed), 'error');
                     } finally {
                         refreshButton.disabled = false;
                         refreshButton.textContent = defaultText;
@@ -682,17 +751,17 @@
                 refreshDamageButton?.addEventListener('click', async () => {
                     refreshDamageButton.disabled = true;
                     const defaultText = refreshDamageButton.textContent;
-                    refreshDamageButton.textContent = 'Memeriksa...';
+                    refreshDamageButton.textContent = @json($orderChecking);
 
                     try {
                         const status = await syncDamagePaymentStatus();
                         if (!status.is_paid) {
-                            showAlert('Tagihan tambahan belum lunas. Silakan lanjutkan pembayaran.', 'info');
+                            showAlert(@json($orderAdditionalUnpaid), 'info');
                         } else {
                             setTimeout(() => window.location.reload(), 800);
                         }
                     } catch (error) {
-                        showAlert(error.message || 'Gagal cek status tagihan tambahan.', 'error');
+                        showAlert(error.message || @json($orderAdditionalCheckFailed), 'error');
                     } finally {
                         refreshDamageButton.disabled = false;
                         refreshDamageButton.textContent = defaultText;

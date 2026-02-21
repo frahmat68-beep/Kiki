@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Models\OrderNotification;
+use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Services\CartService;
 use App\Services\OrderReminderService;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -29,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadRuntimeTranslationOverrides();
+
         User::observe(UserObserver::class);
 
         View::composer(['partials.navbar', 'layouts.app', 'layouts.user', 'layouts.app-dashboard', 'welcome'], function ($view) {
@@ -92,5 +96,77 @@ class AppServiceProvider extends ServiceProvider
                 'navCategories' => $navCategoriesCache,
             ]);
         });
+    }
+
+    private function loadRuntimeTranslationOverrides(): void
+    {
+        if (! Schema::hasTable('site_settings')) {
+            return;
+        }
+
+        $overrides = Cache::remember('copy.translation_overrides.lines', 600, function () {
+            $explicitOverrides = SiteSetting::query()
+                ->where('key', 'like', 'copy.trans.%')
+                ->whereNotNull('value')
+                ->pluck('value', 'key')
+                ->all();
+
+            $lines = [];
+
+            foreach ($explicitOverrides as $settingKey => $value) {
+                $translationKey = Str::after((string) $settingKey, 'copy.trans.');
+                $translationKey = trim($translationKey);
+                $translationValue = trim((string) $value);
+
+                if ($translationKey === '' || $translationValue === '' || ! str_contains($translationKey, '.')) {
+                    continue;
+                }
+
+                $lines[$translationKey] = $translationValue;
+            }
+
+            $rawMap = SiteSetting::query()->where('key', 'copy.translation_overrides')->value('value');
+            if (is_string($rawMap) && trim($rawMap) !== '') {
+                foreach (preg_split('/\r\n|\r|\n/', $rawMap) as $line) {
+                    $rawLine = trim((string) $line);
+                    if ($rawLine === '' || str_starts_with($rawLine, '#') || str_starts_with($rawLine, '//')) {
+                        continue;
+                    }
+
+                    $separator = str_contains($rawLine, '=') ? '=' : (str_contains($rawLine, ':') ? ':' : null);
+                    if (! $separator) {
+                        continue;
+                    }
+
+                    [$rawKey, $rawValue] = array_pad(explode($separator, $rawLine, 2), 2, '');
+                    $translationKey = trim((string) $rawKey);
+                    $translationValue = trim((string) $rawValue);
+
+                    if ($translationKey === '' || $translationValue === '' || ! str_contains($translationKey, '.')) {
+                        continue;
+                    }
+
+                    $lines[$translationKey] = $translationValue;
+                }
+            }
+
+            return $lines;
+        });
+
+        if (! is_array($overrides) || $overrides === []) {
+            return;
+        }
+
+        $locales = array_values(array_unique(array_filter([
+            app()->getLocale(),
+            (string) config('app.locale'),
+            (string) config('app.fallback_locale'),
+            'id',
+            'en',
+        ])));
+
+        foreach ($locales as $locale) {
+            app('translator')->addLines($overrides, $locale);
+        }
     }
 }

@@ -8,9 +8,17 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
         @php
             $faviconPath = site_setting('brand.favicon_path');
-            $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+            $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+            $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
         @endphp
-        <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
+        <link
+            rel="icon"
+            type="image/png"
+            href="{{ $faviconLightUrl }}"
+            data-theme-favicon
+            data-light="{{ $faviconLightUrl }}"
+            data-dark="{{ $faviconDarkUrl }}"
+        >
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
         @include('partials.theme-init')
 
@@ -91,7 +99,8 @@
         <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-10">
             <div>
                 <a href="/">
-                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto rounded-xl bg-white p-2">
+                    <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2">
+                    <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark h-12 w-auto rounded-xl bg-white p-2">
                 </a>
             </div>
 

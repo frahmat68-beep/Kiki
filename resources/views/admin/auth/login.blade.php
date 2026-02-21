@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('ui.admin.admin_login') }} | Manake.Id</title>
-    <link rel="icon" type="image/png" href="{{ asset('MANAKE-FAV-M.png') }}">
+    @php
+        $faviconPath = site_setting('brand.favicon_path');
+        $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
+    @endphp
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ $faviconLightUrl }}"
+        data-theme-favicon
+        data-light="{{ $faviconLightUrl }}"
+        data-dark="{{ $faviconDarkUrl }}"
+    >
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -66,7 +78,8 @@
                 </form>
             </div>
             <div class="hidden p-8 text-slate-100 lg:block lg:p-10 bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900">
-                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto bg-white rounded-xl p-2">
+                <img src="{{ asset('manake-logo-blue.png') }}" alt="Manake" class="brand-logo-light h-12 w-auto bg-white rounded-xl p-2">
+                <img src="{{ asset('manake-logo-white.png') }}" alt="Manake" class="brand-logo-dark h-12 w-auto bg-white rounded-xl p-2">
                 <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                     {{ __('ui.admin.login_heading') }}
                 </h1>

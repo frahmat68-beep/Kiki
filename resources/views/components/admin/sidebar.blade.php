@@ -17,7 +17,7 @@
         ],
         [
             'key' => 'orders',
-            'label' => 'Orders',
+            'label' => __('ui.admin.orders'),
             'url' => route('admin.orders.index'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" /></svg>',
         ],
@@ -35,7 +35,7 @@
         ],
         [
             'key' => 'users',
-            'label' => 'Users',
+            'label' => __('ui.admin.users'),
             'url' => route('admin.users.index'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M20 8v6" /><path d="M23 11h-6" /></svg>',
         ],
@@ -44,7 +44,7 @@
     $settingsItems = [
         [
             'key' => 'copy',
-            'label' => 'Teks Website',
+            'label' => __('ui.admin.copywriting'),
             'url' => route('admin.copy.edit', 'landing'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>',
         ],
@@ -56,7 +56,7 @@
         ],
         [
             'key' => 'content',
-            'label' => 'Konten Legacy',
+            'label' => __('ui.admin.legacy_content'),
             'url' => route('admin.content.index'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>',
         ],
@@ -65,14 +65,19 @@
     if ($isSuperAdmin) {
         $settingsItems[] = [
             'key' => 'db',
-            'label' => 'Data Database',
+            'label' => __('ui.admin.db_explorer'),
             'url' => route('admin.db.index'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5" /><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3" /></svg>',
         ];
     }
 
     $expandedLogoUrl = asset('manake-logo-blue.png');
+    $expandedLogoUrlDark = asset('manake-logo-white.png');
     $compactLogoUrl = $logoUrl ?: asset('MANAKE-FAV-M.png');
+    $compactLogoUrlDark = asset('MANAKE-FAV-M-white.png');
+    if ($logoUrl && ! str_contains((string) $logoUrl, 'MANAKE-FAV-M.png')) {
+        $compactLogoUrlDark = $logoUrl;
+    }
     $adminInitial = strtoupper(substr((string) ($adminName ?: 'A'), 0, 1));
 @endphp
 
@@ -82,8 +87,10 @@
 >
     <div class="flex h-16 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img src="{{ $compactLogoUrl }}" alt="{{ $brandName }}" class="h-9 w-9 rounded-lg object-contain">
-            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="h-8 w-auto object-contain">
+            <img src="{{ $compactLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-9 w-9 rounded-lg object-contain">
+            <img src="{{ $compactLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-9 w-9 rounded-lg object-contain">
+            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto object-contain">
+            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark h-8 w-auto object-contain">
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,7 +101,7 @@
     </div>
 
     <div class="flex-1 overflow-y-auto px-3 py-4">
-        <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Operasional</p>
+        <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_operational') }}</p>
         <nav class="mt-2 space-y-1">
             @foreach ($primaryItems as $item)
                 <a
@@ -107,7 +114,7 @@
             @endforeach
         </nav>
 
-        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Pengaturan</p>
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_settings') }}</p>
         <nav class="mt-2 space-y-1">
             @foreach ($settingsItems as $item)
                 <a

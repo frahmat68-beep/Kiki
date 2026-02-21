@@ -7,8 +7,11 @@
         $categoryName = $category->name ?? __('app.category.title');
         $categoryDescription = $category->description ?: setting('copy.category.subtitle', 'Daftar alat pada kategori ini.');
         $totalLabel = setting('copy.category.total_label', 'Total alat');
+        $readyLabel = __('ui.category.ready_label');
         $emptyTitle = setting('copy.category.empty_title', 'Belum ada alat di kategori ini.');
         $emptySubtitle = setting('copy.category.empty_subtitle', 'Silakan cek kategori lain atau hubungi admin.');
+        $availabilityLineTemplate = __('ui.category.available_line');
+        $availabilityNote = __('ui.category.availability_note');
         $items = collect($products ?? [])->values();
         $readyCount = $items->filter(fn ($product) => (($product->status ?? 'ready') === 'ready') && (int) ($product->stock ?? 0) > 0)->count();
     @endphp
@@ -33,7 +36,7 @@
                         {{ $totalLabel }}: {{ $items->count() }}
                     </span>
                     <span class="badge-status badge-status-success inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold">
-                        Ready: {{ $readyCount }}
+                        {{ $readyLabel }}: {{ $readyCount }}
                     </span>
                 </div>
             </div>
@@ -54,7 +57,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($items as $product)
                         @php
-                            $name = data_get($product, 'name', 'Equipment');
+                            $name = data_get($product, 'name', __('app.product.generic'));
                             $slug = data_get($product, 'slug') ?? \Illuminate\Support\Str::slug($name);
                             $imagePath = data_get($product, 'image_path') ?? data_get($product, 'image');
                             $image = $imagePath
@@ -87,9 +90,12 @@
                                 <p class="text-lg font-semibold text-slate-900">Rp {{ number_format($price, 0, ',', '.') }}</p>
 
                                 <p class="mt-2 text-xs text-slate-500">
-                                    Tersedia {{ $availableUnits }} unit dari {{ (int) data_get($product, 'stock', 0) }} stok.
+                                    {{ strtr($availabilityLineTemplate, [
+                                        ':available' => (string) $availableUnits,
+                                        ':stock' => (string) ((int) data_get($product, 'stock', 0)),
+                                    ]) }}
                                 </p>
-                                <p class="mt-1 text-[11px] text-slate-500">Ketersediaan final dicek berdasarkan tanggal sewa saat checkout.</p>
+                                <p class="mt-1 text-[11px] text-slate-500">{{ $availabilityNote }}</p>
 
                                 <a href="{{ route('product.show', $slug) }}" class="btn-primary mt-4 mt-auto inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition">
                                     {{ __('app.actions.view_detail') }}
