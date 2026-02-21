@@ -7,7 +7,7 @@
     <title>@yield('title', __('ui.overview.title') . ' | Manake')</title>
     @php
         $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconLightUrl = asset('MANAKE-FAV-M.png');
         $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
     @endphp
     <link
@@ -111,11 +111,9 @@
             @php
                 $brandLogo = site_setting('brand.logo_path');
                 $brandName = site_setting('brand.name', 'Manake');
-                $brandLogoFilename = strtolower((string) pathinfo((string) $brandLogo, PATHINFO_BASENAME));
-                $logoLooksWhite = str_contains($brandLogoFilename, 'white') || str_contains($brandLogoFilename, 'putih');
                 $storedLogoUrl = $brandLogo ? asset('storage/' . $brandLogo) : null;
-                $logoUrlLight = ($storedLogoUrl && ! $logoLooksWhite) ? $storedLogoUrl : asset('manake-logo-blue.png');
-                $logoUrlDark = ($storedLogoUrl && $logoLooksWhite) ? $storedLogoUrl : asset('manake-logo-white.png');
+                $logoUrlLight = asset('manake-logo-blue.png');
+                $logoUrlDark = $storedLogoUrl ?: asset('manake-logo-white.png');
             @endphp
             <div class="flex items-center justify-between">
                 <a href="/" class="flex items-center gap-3 text-slate-900">

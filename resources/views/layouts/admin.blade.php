@@ -7,7 +7,7 @@
     <title>@yield('title', __('ui.admin.panel_title') . ' | Manake')</title>
     @php
         $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconLightUrl = asset('MANAKE-FAV-M.png');
         $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
     @endphp
     <link
@@ -108,6 +108,11 @@
         $adminName = auth('admin')->user()->name ?? 'Admin';
         $adminRole = auth('admin')->user()->role ?? 'admin';
         $isSuperAdmin = auth('admin')->check() && $adminRole === 'super_admin';
+        $locale = app()->getLocale();
+        $currentTheme = $themePreference ?? request()->attributes->get('theme_preference', 'light');
+        if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
+            $currentTheme = 'light';
+        }
         $adminCmsMenu = [
             [
                 'key' => 'copy',
@@ -178,7 +183,25 @@
                                     <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
                                 </svg>
                             </button>
-                            <div x-cloak x-show="adminSettingsOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-56 rounded-xl p-2 shadow-lg">
+                            <div x-cloak x-show="adminSettingsOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-64 rounded-xl p-2 shadow-lg">
+                                <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.language') }}</p>
+                                <div class="mb-2 grid grid-cols-2 gap-2 px-2">
+                                    <a href="{{ route('lang.switch', 'id') }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                        {{ __('ui.languages.id') }}
+                                    </a>
+                                    <a href="{{ route('lang.switch', 'en') }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                        {{ __('ui.languages.en') }}
+                                    </a>
+                                </div>
+                                <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.theme') }}</p>
+                                <div class="mb-2 space-y-1 px-2">
+                                    @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
+                                        <a href="{{ route('theme.switch', $value) }}" class="block rounded-lg border px-2 py-1.5 text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                            {{ $label }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                                <div class="mx-2 mb-2 border-t border-slate-200"></div>
                                 @foreach ($adminCmsMenu as $menu)
                                     <a
                                         href="{{ $menu['url'] }}"

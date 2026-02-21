@@ -8,7 +8,7 @@
     <title>@yield('title', site_setting('seo.meta_title', setting('meta_title', setting('site_name', 'Manake.Id'))))</title>
     @php
         $faviconPath = site_setting('brand.favicon_path');
-        $faviconLightUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M.png');
+        $faviconLightUrl = asset('MANAKE-FAV-M.png');
         $faviconDarkUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('MANAKE-FAV-M-white.png');
     @endphp
     <link
