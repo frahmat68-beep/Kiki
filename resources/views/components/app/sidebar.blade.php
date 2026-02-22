@@ -113,25 +113,17 @@
             <div class="hidden lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
                 <img
                     src="{{ $compactLogoUrl }}"
+                    x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $compactLogoUrlDark }}' : '{{ $compactLogoUrl }}'"
                     alt="{{ $brandName }}"
-                    class="h-9 w-9 shrink-0 rounded-xl object-contain dark:hidden"
-                >
-                <img
-                    src="{{ $compactLogoUrlDark }}"
-                    alt="{{ $brandName }}"
-                    class="hidden h-9 w-9 shrink-0 rounded-xl object-contain dark:block"
+                    class="h-9 w-9 shrink-0 rounded-xl object-contain"
                 >
             </div>
             <div class="lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block">
                 <img
                     src="{{ $expandedLogoUrl }}"
+                    x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                     alt="{{ $brandName }}"
-                    class="h-auto w-40 shrink-0 object-contain object-left dark:hidden"
-                >
-                <img
-                    src="{{ $expandedLogoUrlDark }}"
-                    alt="{{ $brandName }}"
-                    class="hidden h-auto w-40 shrink-0 object-contain object-left dark:block"
+                    class="h-auto w-40 shrink-0 object-contain object-left"
                 >
             </div>
         </a>

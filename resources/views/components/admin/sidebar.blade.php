@@ -89,13 +89,9 @@
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
             <img
                 src="{{ $expandedLogoUrl }}"
+                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                 alt="{{ $brandName }}"
-                class="h-auto w-40 object-contain object-left dark:hidden"
-            >
-            <img
-                src="{{ $expandedLogoUrlDark }}"
-                alt="{{ $brandName }}"
-                class="hidden h-auto w-40 object-contain object-left dark:block"
+                class="h-auto w-40 object-contain object-left"
             >
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
