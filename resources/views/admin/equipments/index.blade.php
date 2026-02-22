@@ -27,7 +27,7 @@
         <section class="card rounded-2xl shadow-sm p-6">
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Daftar Alat</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">Daftar Alat</h2>
                     <p class="text-xs text-slate-500">Kelola nama alat, harga, stok, dan status sewa.</p>
                 </div>
                 <div class="flex w-full gap-2 sm:w-auto">
@@ -139,8 +139,8 @@
                                 $statusValue = $item->status ?? 'ready';
                                 $statusLabel = $statusValue === 'ready' ? 'Ready' : ($statusValue === 'maintenance' ? 'Maintenance' : 'Unavailable');
                                 $statusClass = $statusValue === 'ready'
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : ($statusValue === 'maintenance' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700');
+                                    ? 'status-chip-success'
+                                    : ($statusValue === 'maintenance' ? 'status-chip-warning' : 'status-chip-danger');
                                 $reservedUnits = (int) ($item->reserved_units ?? 0);
                                 $availableUnits = (int) $item->available_units;
                             @endphp
@@ -161,7 +161,7 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-center align-top">
-                                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">
+                                    <span class="status-chip {{ $statusClass }}">
                                         {{ $statusLabel }}
                                     </span>
                                 </td>

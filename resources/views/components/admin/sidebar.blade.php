@@ -87,8 +87,12 @@
 >
     <div class="flex h-20 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-auto w-40 object-contain object-left dark:hidden">
-            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-auto w-40 object-contain object-left dark:block">
+            <img
+                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
+                src="{{ $expandedLogoUrl }}"
+                alt="{{ $brandName }}"
+                class="h-auto w-40 object-contain object-left"
+            >
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

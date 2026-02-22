@@ -12,7 +12,7 @@
         @endif
 
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-slate-900">Data User</h2>
+            <h2 class="text-lg font-semibold text-blue-700">Data User</h2>
             <p class="text-xs text-slate-500">Admin hanya bisa lihat profil user dan kirim reset password. Password asli tetap hash.</p>
 
             <form method="GET" action="{{ route('admin.users.index') }}" class="mt-4 flex flex-col gap-3 md:flex-row">
@@ -44,31 +44,31 @@
                             <tr class="hover:bg-slate-50/70">
                                 <td class="px-5 py-4">
                                     <p class="font-semibold text-slate-900">{{ $user->name }}</p>
-                                    <p class="text-xs text-slate-500">{{ $user->email }}</p>
+                                    <p class="text-sm text-slate-600">{{ $user->email }}</p>
                                 </td>
                                 <td class="px-5 py-4">
                                     @if ($user->email_verified_at)
-                                        <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Verified</span>
+                                        <span class="status-chip status-chip-success">Verified</span>
                                     @else
-                                        <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Unverified</span>
+                                        <span class="status-chip status-chip-warning">Unverified</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4">
                                     @if ($user->profile?->phone_verified_at)
-                                        <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Verified</span>
+                                        <span class="status-chip status-chip-success">Verified</span>
                                     @else
-                                        <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Unverified</span>
+                                        <span class="status-chip status-chip-warning">Unverified</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4">
                                     @if ($user->profileIsComplete())
-                                        <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">Completed</span>
+                                        <span class="status-chip status-chip-info">Completed</span>
                                     @else
-                                        <span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">Incomplete</span>
+                                        <span class="status-chip status-chip-muted">Incomplete</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <a href="{{ route('admin.users.show', $user) }}" class="inline-flex rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
+                                    <a href="{{ route('admin.users.show', $user) }}" class="inline-flex rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
                                         Detail
                                     </a>
                                 </td>

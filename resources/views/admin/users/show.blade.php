@@ -8,8 +8,11 @@
         $profile = $user->profile;
         $addressText = $profile?->address_text ?? '-';
         $formatStatus = fn (bool $ok, string $okText = 'Verified', string $noText = 'Unverified') => $ok
-            ? '<span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">' . $okText . '</span>'
-            : '<span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">' . $noText . '</span>';
+            ? '<span class="status-chip status-chip-success">' . $okText . '</span>'
+            : '<span class="status-chip status-chip-warning">' . $noText . '</span>';
+        $formatProfileStatus = fn (bool $ok) => $ok
+            ? '<span class="status-chip status-chip-info">Completed</span>'
+            : '<span class="status-chip status-chip-muted">Incomplete</span>';
     @endphp
 
     <div class="mx-auto max-w-6xl space-y-6">
@@ -28,7 +31,7 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">User</p>
-                <h2 class="text-2xl font-semibold text-slate-900">{{ $user->name }}</h2>
+                <h2 class="text-2xl font-semibold text-blue-700">{{ $user->name }}</h2>
                 <p class="text-sm text-slate-500">{{ $user->email }}</p>
             </div>
             <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-slate-600 hover:text-blue-600">← Kembali ke Users</a>
@@ -36,7 +39,7 @@
 
         <section class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr,0.8fr]">
             <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-slate-900">Profil User</h3>
+                <h3 class="text-lg font-semibold text-blue-700">Profil User</h3>
                 <div class="mt-4 grid grid-cols-1 gap-3 text-sm text-slate-600 sm:grid-cols-2">
                     <p><span class="font-semibold text-slate-800">Nama Lengkap:</span> {{ $profile?->full_name ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">NIK:</span> {{ $profile?->nik ?? '-' }}</p>
@@ -52,7 +55,7 @@
                     <p><span class="font-semibold text-slate-800">No. Darurat:</span> {{ $profile?->emergency_phone ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">Email Status:</span> {!! $formatStatus((bool) $user->email_verified_at) !!}</p>
                     <p><span class="font-semibold text-slate-800">Phone Status:</span> {!! $formatStatus((bool) ($profile?->phone_verified_at), 'Verified', 'Unverified') !!}</p>
-                    <p><span class="font-semibold text-slate-800">Profile Status:</span> {!! $formatStatus($user->profileIsComplete(), 'Completed', 'Incomplete') !!}</p>
+                    <p><span class="font-semibold text-slate-800">Profile Status:</span> {!! $formatProfileStatus($user->profileIsComplete()) !!}</p>
                     <p><span class="font-semibold text-slate-800">Completed At:</span> {{ optional($profile?->completed_at)->format('d M Y H:i') ?? '-' }}</p>
                 </div>
 

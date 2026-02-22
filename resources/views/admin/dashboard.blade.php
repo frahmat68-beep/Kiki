@@ -6,11 +6,11 @@
 @section('content')
     @php
         $statusBadge = fn (?string $status) => match ($status) {
-            'lunas' => ['label' => 'Siap Diambil', 'class' => 'bg-blue-100 text-blue-700'],
-            'barang_diambil' => ['label' => 'Sedang Disewa', 'class' => 'bg-amber-100 text-amber-700'],
-            'barang_kembali' => ['label' => 'Sudah Kembali', 'class' => 'bg-emerald-100 text-emerald-700'],
-            'barang_rusak' => ['label' => 'Barang Rusak', 'class' => 'bg-rose-100 text-rose-700'],
-            default => ['label' => strtoupper((string) $status), 'class' => 'bg-slate-100 text-slate-700'],
+            'lunas' => ['label' => 'Siap Diambil', 'class' => 'status-chip-info'],
+            'barang_diambil' => ['label' => 'Sedang Disewa', 'class' => 'status-chip-warning'],
+            'barang_kembali' => ['label' => 'Sudah Kembali', 'class' => 'status-chip-success'],
+            'barang_rusak' => ['label' => 'Barang Rusak', 'class' => 'status-chip-danger'],
+            default => ['label' => strtoupper((string) $status), 'class' => 'status-chip-muted'],
         };
         $rentalCalendar = $rentalCalendar ?? [];
         $calendarDays = collect($rentalCalendar['days'] ?? []);
@@ -133,7 +133,7 @@
                                     <div class="min-w-0">
                                         <div class="flex flex-wrap items-center gap-2">
                                             <p class="text-base font-semibold text-slate-900">{{ $order->order_number ?? ('ORD-' . $order->id) }}</p>
-                                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $badge['class'] }}">{{ $badge['label'] }}</span>
+                                            <span class="status-chip {{ $badge['class'] }}">{{ $badge['label'] }}</span>
                                         </div>
                                         <p class="mt-1 text-sm text-slate-600">
                                             {{ $order->user?->name ?? '-' }} •

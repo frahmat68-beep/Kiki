@@ -314,21 +314,33 @@
     }
 
     .bg-emerald-50 { background-color: color-mix(in oklab, var(--success) 13%, var(--surface)) !important; }
+    .bg-emerald-100 { background-color: color-mix(in oklab, var(--success) 18%, var(--surface)) !important; }
+    .bg-emerald-200 { background-color: color-mix(in oklab, var(--success) 24%, var(--surface)) !important; }
     .border-emerald-100,
     .border-emerald-200 { border-color: color-mix(in oklab, var(--success) 30%, var(--border)) !important; }
-    .text-emerald-700 { color: color-mix(in oklab, var(--success) 84%, var(--text)) !important; }
+    .text-emerald-700,
+    .text-emerald-600 { color: color-mix(in oklab, var(--success) 84%, var(--text)) !important; }
 
     .bg-amber-50 { background-color: color-mix(in oklab, var(--warning) 15%, var(--surface)) !important; }
+    .bg-amber-100 { background-color: color-mix(in oklab, var(--warning) 20%, var(--surface)) !important; }
+    .bg-amber-200 { background-color: color-mix(in oklab, var(--warning) 26%, var(--surface)) !important; }
     .border-amber-100,
     .border-amber-200 { border-color: color-mix(in oklab, var(--warning) 33%, var(--border)) !important; }
-    .text-amber-700 { color: color-mix(in oklab, var(--warning) 85%, var(--text)) !important; }
+    .text-amber-700,
+    .text-amber-600 { color: color-mix(in oklab, var(--warning) 85%, var(--text)) !important; }
 
     .bg-rose-50,
     .bg-red-50 { background-color: color-mix(in oklab, var(--danger) 12%, var(--surface)) !important; }
+    .bg-rose-100,
+    .bg-red-100 { background-color: color-mix(in oklab, var(--danger) 18%, var(--surface)) !important; }
+    .bg-rose-200,
+    .bg-red-200 { background-color: color-mix(in oklab, var(--danger) 24%, var(--surface)) !important; }
     .border-rose-100,
     .border-rose-200,
     .border-red-200 { border-color: color-mix(in oklab, var(--danger) 30%, var(--border)) !important; }
     .text-rose-700,
+    .text-rose-600,
+    .text-red-700,
     .text-red-600 { color: color-mix(in oklab, var(--danger) 88%, var(--text)) !important; }
 
     .bg-white,
@@ -388,23 +400,23 @@
 
     html[data-theme-resolved='dark'] .text-slate-400,
     html[data-theme-resolved='dark'] .text-gray-400 {
-        color: #cedaf2 !important;
+        color: #d7e3f7 !important;
     }
 
     html[data-theme-resolved='dark'] [data-admin-panel='true'] table :is(.text-slate-600, .text-slate-500, .text-gray-600, .text-gray-500) {
-        color: #e6eefc !important;
+        color: #edf3ff !important;
     }
 
     html[data-theme-resolved='dark'] [data-admin-panel='true'] table :is(.text-slate-400, .text-gray-400) {
-        color: #cfdcf2 !important;
+        color: #dee9ff !important;
     }
 
-    html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
+    html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3, main h4) {
         color: #2563eb !important;
     }
 
-    html[data-theme-resolved='dark'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
-        color: #8fb2ff !important;
+    html[data-theme-resolved='dark'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3, main h4) {
+        color: #93c5fd !important;
     }
 
     .text-slate-300 {
@@ -418,12 +430,27 @@
 
     .bg-blue-50,
     .bg-blue-100 {
-        background-color: var(--primary-soft) !important;
+        background-color: #e6efff !important;
+    }
+
+    .text-blue-700,
+    .text-blue-600 {
+        color: #1d4ed8 !important;
     }
 
     .border-blue-200,
     .border-blue-100 {
         border-color: color-mix(in oklab, var(--primary) 28%, var(--border)) !important;
+    }
+
+    html[data-theme-resolved='dark'] .bg-blue-100,
+    html[data-theme-resolved='dark'] .bg-blue-50 {
+        background-color: #1e3a8a !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-blue-700,
+    html[data-theme-resolved='dark'] .text-blue-600 {
+        color: #dbeafe !important;
     }
 
     .from-blue-600,
@@ -564,6 +591,173 @@
         border-color: color-mix(in oklab, var(--danger) 35%, var(--border));
         background: color-mix(in oklab, var(--danger) 16%, var(--surface));
         color: color-mix(in oklab, var(--danger) 80%, var(--text));
+    }
+
+    .bg-emerald-100,
+    .bg-emerald-200 {
+        background-color: #dcfce7 !important;
+    }
+
+    .text-emerald-700,
+    .text-emerald-600 {
+        color: #065f46 !important;
+    }
+
+    .bg-amber-100,
+    .bg-amber-200 {
+        background-color: #fef3c7 !important;
+    }
+
+    .text-amber-700,
+    .text-amber-600 {
+        color: #92400e !important;
+    }
+
+    .bg-rose-100,
+    .bg-rose-200,
+    .bg-red-100,
+    .bg-red-200 {
+        background-color: #ffe4e6 !important;
+    }
+
+    .text-rose-700,
+    .text-rose-600,
+    .text-red-700,
+    .text-red-600 {
+        color: #9f1239 !important;
+    }
+
+    html[data-theme-resolved='dark'] .bg-emerald-100,
+    html[data-theme-resolved='dark'] .bg-emerald-200 {
+        background-color: #0f5136 !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-emerald-700,
+    html[data-theme-resolved='dark'] .text-emerald-600 {
+        color: #ecfdf5 !important;
+    }
+
+    html[data-theme-resolved='dark'] .bg-amber-100,
+    html[data-theme-resolved='dark'] .bg-amber-200 {
+        background-color: #5c3a02 !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-amber-700,
+    html[data-theme-resolved='dark'] .text-amber-600 {
+        color: #fffbeb !important;
+    }
+
+    html[data-theme-resolved='dark'] .bg-rose-100,
+    html[data-theme-resolved='dark'] .bg-rose-200,
+    html[data-theme-resolved='dark'] .bg-red-100,
+    html[data-theme-resolved='dark'] .bg-red-200 {
+        background-color: #5a1a2a !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-rose-700,
+    html[data-theme-resolved='dark'] .text-rose-600,
+    html[data-theme-resolved='dark'] .text-red-700,
+    html[data-theme-resolved='dark'] .text-red-600 {
+        color: #fff1f2 !important;
+    }
+
+    html[data-theme-resolved='dark'] .rounded-full.bg-slate-100 {
+        background-color: #334155 !important;
+    }
+
+    html[data-theme-resolved='dark'] .rounded-full.bg-slate-100.text-slate-700 {
+        color: #f8fafc !important;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        padding: 0.2rem 0.7rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+        border: 1px solid transparent;
+    }
+
+    .status-chip-success {
+        background: #dcfce7;
+        border-color: #86efac;
+        color: #065f46;
+    }
+
+    .status-chip-warning {
+        background: #fef3c7;
+        border-color: #fcd34d;
+        color: #92400e;
+    }
+
+    .status-chip-danger {
+        background: #ffe4e6;
+        border-color: #fda4af;
+        color: #9f1239;
+    }
+
+    .status-chip-info {
+        background: #e6efff;
+        border-color: #93c5fd;
+        color: #1d4ed8;
+    }
+
+    .status-chip-muted {
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+        color: #334155;
+    }
+
+    html[data-theme-resolved='dark'] .status-chip-success {
+        background: #0f5136;
+        border-color: #34d399;
+        color: #ecfdf5;
+    }
+
+    html[data-theme-resolved='dark'] .status-chip-warning {
+        background: #5c3a02;
+        border-color: #f59e0b;
+        color: #fffbeb;
+    }
+
+    html[data-theme-resolved='dark'] .status-chip-danger {
+        background: #5a1a2a;
+        border-color: #fb7185;
+        color: #fff1f2;
+    }
+
+    html[data-theme-resolved='dark'] .status-chip-info {
+        background: #1e3a8a;
+        border-color: #60a5fa;
+        color: #eff6ff;
+    }
+
+    html[data-theme-resolved='dark'] .status-chip-muted {
+        background: #334155;
+        border-color: #64748b;
+        color: #f8fafc;
+    }
+
+    html[data-theme-resolved='dark'] .badge-status-success {
+        border-color: rgba(110, 231, 183, 0.52);
+        background: rgba(16, 185, 129, 0.24);
+        color: #a7f3d0;
+    }
+
+    html[data-theme-resolved='dark'] .badge-status-warning {
+        border-color: rgba(251, 191, 36, 0.52);
+        background: rgba(245, 158, 11, 0.24);
+        color: #fde68a;
+    }
+
+    html[data-theme-resolved='dark'] .badge-status-danger {
+        border-color: rgba(251, 113, 133, 0.52);
+        background: rgba(244, 63, 94, 0.24);
+        color: #fecdd3;
     }
 
     a:focus-visible,

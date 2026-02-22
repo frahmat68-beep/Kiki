@@ -14,7 +14,7 @@
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Daftar Order</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">Daftar Order</h2>
                     <p class="text-xs text-slate-500">Monitoring transaksi, pembayaran, dan status pesanan.</p>
                 </div>
             </div>
@@ -54,9 +54,9 @@
                         @forelse ($orders as $order)
                             @php
                                 $paymentBadge = match($order->status_pembayaran) {
-                                    'paid' => 'bg-emerald-100 text-emerald-700',
-                                    'failed' => 'bg-rose-100 text-rose-700',
-                                    default => 'bg-amber-100 text-amber-700',
+                                    'paid' => 'status-chip-success',
+                                    'failed' => 'status-chip-danger',
+                                    default => 'status-chip-warning',
                                 };
                                 $orderStatusLabel = match($order->status_pesanan) {
                                     'menunggu_pembayaran' => 'Menunggu Bayar',
@@ -78,11 +78,11 @@
                                 </td>
                                 <td class="px-5 py-4">
                                     <p class="font-semibold text-slate-800">{{ $order->user?->name ?? '-' }}</p>
-                                    <p class="text-xs text-slate-500">{{ $order->user?->email ?? '-' }}</p>
+                                    <p class="text-sm text-slate-600">{{ $order->user?->email ?? '-' }}</p>
                                 </td>
                                 <td class="px-5 py-4 font-semibold text-slate-800">Rp {{ number_format((int) ($order->grand_total ?? $order->total_amount), 0, ',', '.') }}</td>
                                 <td class="px-5 py-4">
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $paymentBadge }}">
+                                    <span class="status-chip {{ $paymentBadge }}">
                                         {{ strtoupper($order->status_pembayaran ?? 'pending') }}
                                     </span>
                                 </td>
