@@ -391,6 +391,14 @@
         color: #cedaf2 !important;
     }
 
+    html[data-theme-resolved='dark'] [data-admin-panel='true'] table :is(.text-slate-600, .text-slate-500, .text-gray-600, .text-gray-500) {
+        color: #e6eefc !important;
+    }
+
+    html[data-theme-resolved='dark'] [data-admin-panel='true'] table :is(.text-slate-400, .text-gray-400) {
+        color: #cfdcf2 !important;
+    }
+
     html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
         color: #2563eb !important;
     }
