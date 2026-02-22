@@ -85,10 +85,10 @@
     class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:translate-x-0"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
 >
-    <div class="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+    <div class="flex h-20 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-10 w-auto object-contain dark:hidden">
-            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-10 w-auto object-contain dark:block">
+            <img src="{{ $expandedLogoUrl }}" alt="{{ $brandName }}" class="brand-logo-light h-auto w-[9.5rem] object-contain object-left dark:hidden">
+            <img src="{{ $expandedLogoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-auto w-[9.5rem] object-contain object-left dark:block">
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="Close sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -99,7 +99,7 @@
     </div>
 
     <div class="flex-1 overflow-y-auto px-3 py-4">
-        <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_operational') }}</p>
+        <p class="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600/80">{{ __('ui.admin.sidebar_operational') }}</p>
         <nav class="mt-2 space-y-1">
             @foreach ($primaryItems as $item)
                 <a
@@ -112,7 +112,7 @@
             @endforeach
         </nav>
 
-        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.admin.sidebar_settings') }}</p>
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-600/80">{{ __('ui.admin.sidebar_settings') }}</p>
         <nav class="mt-2 space-y-1">
             @foreach ($settingsItems as $item)
                 <a

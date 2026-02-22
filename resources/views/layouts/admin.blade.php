@@ -143,8 +143,8 @@
                             </svg>
                         </button>
                         <div class="min-w-0">
-                            <h1 class="truncate text-lg font-semibold text-slate-900">@yield('page_title', __('ui.admin.dashboard'))</h1>
-                            <p class="text-xs text-slate-500">{{ __('ui.admin.panel_title') }}</p>
+                            <h1 class="truncate text-lg font-semibold text-blue-700 dark:text-blue-300">@yield('page_title', __('ui.admin.dashboard'))</h1>
+                            <p class="text-xs text-blue-500/90 dark:text-blue-200/90">{{ __('ui.admin.panel_title') }}</p>
                         </div>
                     </div>
 

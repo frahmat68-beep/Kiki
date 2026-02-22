@@ -144,8 +144,8 @@
         --surface-3: #223656;
         --border: #304666;
         --text: #edf2ff;
-        --text-muted: #d2def3;
-        --text-soft: #b6c6e2;
+        --text-muted: #e1e9fb;
+        --text-soft: #cedaf2;
         --primary: #5b84ff;
         --primary-strong: #4570e6;
         --primary-soft: rgba(91, 132, 255, 0.2);
@@ -377,6 +377,18 @@
     .text-gray-500,
     .text-gray-400 {
         color: var(--text-muted) !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-slate-600,
+    html[data-theme-resolved='dark'] .text-slate-500,
+    html[data-theme-resolved='dark'] .text-gray-600,
+    html[data-theme-resolved='dark'] .text-gray-500 {
+        color: #e1e9fb !important;
+    }
+
+    html[data-theme-resolved='dark'] .text-slate-400,
+    html[data-theme-resolved='dark'] .text-gray-400 {
+        color: #cedaf2 !important;
     }
 
     html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
