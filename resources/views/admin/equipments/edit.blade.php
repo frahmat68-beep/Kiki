@@ -8,7 +8,7 @@
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Edit Alat</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">Edit Alat</h2>
                     <p class="text-xs text-slate-500">Perbarui detail, slug, dan status alat.</p>
                 </div>
                 <a href="{{ route('admin.equipments.index') }}" class="text-sm text-slate-600 hover:text-blue-600">← Kembali ke List</a>
@@ -52,28 +52,32 @@
                     </div>
                 </div>
 
-                <div class="mt-3 grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    <span>Sen</span>
-                    <span>Sel</span>
-                    <span>Rab</span>
-                    <span>Kam</span>
-                    <span>Jum</span>
-                    <span>Sab</span>
-                    <span>Min</span>
-                </div>
-                <div class="mt-2 grid grid-cols-7 gap-2">
-                    @foreach ($bookingCalendar['days'] as $day)
-                        <div class="min-h-[68px] rounded-lg border px-2 py-2 {{ $day['in_month'] ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-100 text-slate-400' }}">
-                            <p class="text-xs font-semibold">{{ $day['day'] }}</p>
-                            @if ($day['booked_qty'] > 0)
-                                <p class="mt-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
-                                    Disewa {{ $day['booked_qty'] }}
-                                </p>
-                            @else
-                                <p class="mt-1 text-[10px] text-slate-400">-</p>
-                            @endif
+                <div class="mt-3 -mx-1 overflow-x-auto px-1 pb-1 sm:mx-0 sm:overflow-visible sm:px-0">
+                    <div class="min-w-[640px]">
+                        <div class="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                            <span>Sen</span>
+                            <span>Sel</span>
+                            <span>Rab</span>
+                            <span>Kam</span>
+                            <span>Jum</span>
+                            <span>Sab</span>
+                            <span>Min</span>
                         </div>
-                    @endforeach
+                        <div class="mt-2 grid grid-cols-7 gap-2">
+                            @foreach ($bookingCalendar['days'] as $day)
+                                <div class="min-h-[68px] rounded-lg border px-2 py-2 {{ $day['in_month'] ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-100 text-slate-400' }}">
+                                    <p class="text-xs font-semibold">{{ $day['day'] }}</p>
+                                    @if ($day['booked_qty'] > 0)
+                                        <p class="mt-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                                            Disewa {{ $day['booked_qty'] }}
+                                        </p>
+                                    @else
+                                        <p class="mt-1 text-[10px] text-slate-400">-</p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-3 space-y-2">

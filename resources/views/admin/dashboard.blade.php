@@ -263,23 +263,27 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 grid grid-cols-7 gap-2">
-                            @foreach (['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'] as $weekday)
-                                <p class="text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ $weekday }}</p>
-                            @endforeach
-                        </div>
-                        <div class="mt-2 grid grid-cols-7 gap-2">
-                            @foreach ($calendarDays as $day)
-                                @php
-                                    $hasRental = (int) ($day['total_qty'] ?? 0) > 0;
-                                @endphp
-                                <div class="rounded-xl border px-2 py-2 {{ ($day['in_month'] ?? false) ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50 text-slate-300' }}">
-                                    <p class="text-xs font-semibold">{{ $day['day'] }}</p>
-                                    <p class="mt-1 text-xs {{ $hasRental ? 'font-semibold text-blue-600' : 'text-slate-400' }}">
-                                        {{ $hasRental ? ($day['total_qty'] . ' unit') : '-' }}
-                                    </p>
+                        <div class="mt-4 -mx-1 overflow-x-auto px-1 pb-1 sm:mx-0 sm:overflow-visible sm:px-0">
+                            <div class="min-w-[640px]">
+                                <div class="grid grid-cols-7 gap-2">
+                                    @foreach (['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'] as $weekday)
+                                        <p class="text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ $weekday }}</p>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                                <div class="mt-2 grid grid-cols-7 gap-2">
+                                    @foreach ($calendarDays as $day)
+                                        @php
+                                            $hasRental = (int) ($day['total_qty'] ?? 0) > 0;
+                                        @endphp
+                                        <div class="rounded-xl border px-2 py-2 {{ ($day['in_month'] ?? false) ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50 text-slate-300' }}">
+                                            <p class="text-xs font-semibold">{{ $day['day'] }}</p>
+                                            <p class="mt-1 text-xs {{ $hasRental ? 'font-semibold text-blue-600' : 'text-slate-400' }}">
+                                                {{ $hasRental ? ($day['total_qty'] . ' unit') : '-' }}
+                                            </p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </details>

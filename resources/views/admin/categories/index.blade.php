@@ -14,7 +14,7 @@
         <section class="card rounded-2xl shadow-sm p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Category List</h2>
+                    <h2 class="text-lg font-semibold text-blue-700">Category List</h2>
                     <p class="text-xs text-slate-500">Kelola kategori dan slug untuk katalog.</p>
                 </div>
                 <a
@@ -41,7 +41,7 @@
 
         <section class="card rounded-2xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
+                <table class="min-w-[680px] w-full text-sm">
                     <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-5 py-3">Category</th>

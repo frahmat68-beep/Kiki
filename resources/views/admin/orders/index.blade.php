@@ -39,7 +39,7 @@
 
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
+                <table class="min-w-[860px] w-full text-sm">
                     <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-5 py-3">Order</th>
