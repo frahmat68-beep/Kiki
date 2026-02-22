@@ -89,7 +89,7 @@
                                 @else
                                     <p class="mt-1 text-xs text-amber-600">{{ __('ui.cart.missing_dates_note') }}</p>
                                 @endif
-                                <div class="mt-3 flex items-center gap-3">
+                                <div class="mt-3 flex flex-wrap items-center gap-3">
                                     <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
                                         <form method="POST" action="{{ route('cart.decrement', $key) }}" class="js-cart-decrement-form" data-item-qty="{{ (int) ($item['qty'] ?? 1) }}" data-confirm-message="{{ __('ui.dialog.remove_cart_zero_qty') }}" data-confirm-title="{{ __('ui.dialog.title') }}" data-confirm-button="{{ __('ui.dialog.remove_cart_item_confirm') }}" data-cancel-button="{{ __('ui.dialog.cancel') }}">
                                             @csrf

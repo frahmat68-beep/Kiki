@@ -110,16 +110,30 @@
             aria-label="{{ $brandName }}"
             class="flex min-w-0 items-center gap-3 rounded-xl px-1 py-1 text-slate-900 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
         >
-            <img
-                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $compactLogoUrlDark }}' : '{{ $compactLogoUrl }}'"
-                alt="{{ $brandName }}"
-                class="h-9 w-9 shrink-0 rounded-xl object-contain hidden lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden"
-            >
-            <img
-                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
-                alt="{{ $brandName }}"
-                class="h-auto w-40 shrink-0 object-contain object-left lg:hidden lg:w-36 lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block"
-            >
+            <div class="hidden lg:block lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
+                <img
+                    src="{{ $compactLogoUrl }}"
+                    alt="{{ $brandName }}"
+                    class="h-9 w-9 shrink-0 rounded-xl object-contain dark:hidden"
+                >
+                <img
+                    src="{{ $compactLogoUrlDark }}"
+                    alt="{{ $brandName }}"
+                    class="hidden h-9 w-9 shrink-0 rounded-xl object-contain dark:block"
+                >
+            </div>
+            <div class="lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block">
+                <img
+                    src="{{ $expandedLogoUrl }}"
+                    alt="{{ $brandName }}"
+                    class="h-auto w-40 shrink-0 object-contain object-left dark:hidden"
+                >
+                <img
+                    src="{{ $expandedLogoUrlDark }}"
+                    alt="{{ $brandName }}"
+                    class="hidden h-auto w-40 shrink-0 object-contain object-left dark:block"
+                >
+            </div>
         </a>
         <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

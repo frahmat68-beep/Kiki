@@ -78,7 +78,7 @@
                     <article class="rounded-xl border border-slate-100 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <p class="text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
+                                <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
                                 <p class="text-xs text-slate-500">
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>
@@ -90,7 +90,7 @@
                                     {{ $canReschedule ? 'Bisa reschedule sebelum barang diambil.' : 'Reschedule ditutup karena barang sudah diambil.' }}
                                 </p>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
                                     {{ $meta['label'] }}
                                 </span>
@@ -132,7 +132,7 @@
                     <div class="py-4">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
+                                <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
                                 <p class="text-xs text-slate-500">
                                     {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                 </p>

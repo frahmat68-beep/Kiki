@@ -492,7 +492,7 @@
                         >
                             ←
                         </a>
-                        <span class="min-w-[9rem] text-center text-sm font-semibold text-slate-700">{{ $monthLabel }}</span>
+                        <span class="min-w-[7.5rem] text-center text-sm font-semibold text-slate-700 sm:min-w-[9rem]">{{ $monthLabel }}</span>
                         <a
                             href="{{ route('availability.board', ['month' => $nextMonth, 'date' => $monthDate->copy()->addMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
                             class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
@@ -505,7 +505,7 @@
 
                 <div class="px-3 py-3 sm:px-5 sm:py-4">
                     <div class="-mx-1 overflow-x-auto pb-1 px-1 sm:mx-0 sm:overflow-visible sm:px-0">
-                        <div class="min-w-[38rem] sm:min-w-0">
+                        <div class="min-w-[26rem] sm:min-w-0">
                             <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
                                 @foreach ($weekdayLabels as $weekday)
                                     <p class="text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-[11px]">{{ $weekday }}</p>
@@ -521,7 +521,7 @@
                                     @endphp
                                     <button
                                         type="button"
-                                        class="board-cell group flex h-[4.75rem] w-full flex-col rounded-lg border px-1.5 py-2 text-left sm:h-[8.75rem] sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
+                                        class="board-cell group flex h-[4.5rem] w-full flex-col rounded-lg border px-1.5 py-2 text-left sm:h-[8.75rem] sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
                                         @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
                                         @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
                                         @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
@@ -542,7 +542,10 @@
 
                                         @if ($hasUsage)
                                             <div class="mt-auto">
-                                                <p class="text-[10px] font-semibold leading-tight sm:text-[11px]">
+                                                <p class="text-[10px] font-semibold leading-tight sm:hidden">
+                                                    {{ $day['busy_equipments'] }} alat
+                                                </p>
+                                                <p class="hidden text-[11px] font-semibold leading-tight sm:block">
                                                     {{ $day['busy_equipments'] }} alat terpakai
                                                 </p>
                                                 <p class="mt-0.5 hidden text-[10px] leading-tight sm:block">

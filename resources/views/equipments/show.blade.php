@@ -112,7 +112,7 @@
 
             <div class="space-y-6">
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h2 class="text-2xl font-semibold text-slate-900">{{ $equipment->name }}</h2>
                             <p class="text-sm text-slate-500">{{ $equipment->category?->name ?? __('app.category.title') }}</p>

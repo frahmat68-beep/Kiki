@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', )
+@section('title', __('ui.orders.detail_title'))
 
 @php
     $formatIdr = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
