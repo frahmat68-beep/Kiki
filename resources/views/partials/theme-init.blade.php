@@ -144,8 +144,8 @@
         --surface-3: #223656;
         --border: #304666;
         --text: #edf2ff;
-        --text-muted: #c1cfe6;
-        --text-soft: #97abc9;
+        --text-muted: #d2def3;
+        --text-soft: #b6c6e2;
         --primary: #5b84ff;
         --primary-strong: #4570e6;
         --primary-soft: rgba(91, 132, 255, 0.2);
@@ -377,6 +377,14 @@
     .text-gray-500,
     .text-gray-400 {
         color: var(--text-muted) !important;
+    }
+
+    html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
+        color: #2563eb !important;
+    }
+
+    html[data-theme-resolved='dark'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3) {
+        color: #8fb2ff !important;
     }
 
     .text-slate-300 {

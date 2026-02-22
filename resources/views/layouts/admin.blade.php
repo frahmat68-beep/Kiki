@@ -104,7 +104,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen" data-admin-panel="true">
     @php
         $activePage = $activePage ?? '';
         $brandName = site_setting('brand.name', 'Manake');
