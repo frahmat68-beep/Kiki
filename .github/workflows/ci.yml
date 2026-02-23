@@ -1,0 +1,84 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    quality:
+        runs-on: ubuntu-latest
+        env:
+            APP_ENV: testing
+            APP_KEY: base64:Q2hhbmdlTWVJbkNJJTJGQXBwS2V5SW5Mb2NhbA==
+            APP_LOCALE: id
+            APP_FALLBACK_LOCALE: id
+            DB_CONNECTION: sqlite
+            DB_DATABASE: ':memory:'
+            CACHE_STORE: array
+            SESSION_DRIVER: array
+            QUEUE_CONNECTION: sync
+            MAIL_MAILER: array
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+                  extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, fileinfo
+                  coverage: none
+
+            - name: Cache Composer
+              uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
+
+            - name: Install PHP Dependencies
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Cache npm
+              uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-npm-
+
+            - name: Install Node Dependencies
+              run: npm ci
+
+            - name: Prepare Environment
+              run: |
+                  cp .env.example .env
+                  php artisan key:generate --force
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Test (script)
+              run: npm run test
+
+            - name: Test (Laravel)
+              run: php artisan test
+
+            - name: Build
+              run: npm run build
+
+            - name: Upload Build Artifact
+              if: success()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: frontend-build
+                  path: public/build
