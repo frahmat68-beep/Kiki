@@ -32,6 +32,11 @@ class PageController extends Controller
         return view('contact');
     }
 
+    public function about(): View
+    {
+        return view('about');
+    }
+
     public function rentalRules(): View
     {
         return view('pages.rental-rules');

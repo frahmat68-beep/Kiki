@@ -6,6 +6,8 @@
     $isEditing = request()->query('edit') === '1';
     $isCompleted = (bool) ($profile?->is_completed ?? false);
     $addressText = $profile?->address_text ?? ($profile?->address ?? '-');
+    $hasLockedFullName = trim((string) ($profile?->full_name ?? '')) !== '';
+    $hasLockedNik = preg_match('/^\d{16}$/', preg_replace('/[^0-9]/', '', (string) ($profile?->nik ?? ''))) === 1;
 @endphp
 
 @section('content')
@@ -53,7 +55,6 @@
                     $genderLabel = match ($profile?->gender) {
                         'male' => __('Laki-laki'),
                         'female' => __('Perempuan'),
-                        'other' => __('Lainnya'),
                         default => '-',
                     };
                 @endphp
@@ -154,12 +155,18 @@
                             <div class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2">
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500">{{ __('Nama Lengkap') }}</label>
-                                    <input type="text" name="full_name" value="{{ old('full_name', $profile->full_name ?? $user?->name) }}" required class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none @error('full_name') border-rose-400 @enderror">
+                                    <input type="text" name="full_name" value="{{ old('full_name', $profile->full_name ?? $user?->name) }}" @if ($hasLockedFullName) readonly @endif required class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none @if($hasLockedFullName) bg-slate-100 text-slate-500 cursor-not-allowed @endif @error('full_name') border-rose-400 @enderror">
+                                    @if ($hasLockedFullName)
+                                        <p class="mt-1 text-xs text-slate-500">{{ __('Nama sudah dikunci untuk keamanan data identitas.') }}</p>
+                                    @endif
                                     @error('full_name')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500">{{ __('NIK (16 digit)') }}</label>
-                                    <input type="text" name="nik" value="{{ old('nik', $profile->nik ?? $profile->identity_number) }}" required class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none @error('nik') border-rose-400 @enderror">
+                                    <input type="text" name="nik" value="{{ old('nik', $profile->nik ?? $profile->identity_number) }}" @if ($hasLockedNik) readonly @endif required class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none @if($hasLockedNik) bg-slate-100 text-slate-500 cursor-not-allowed @endif @error('nik') border-rose-400 @enderror">
+                                    @if ($hasLockedNik)
+                                        <p class="mt-1 text-xs text-slate-500">{{ __('NIK sudah dikunci dan tidak dapat diubah.') }}</p>
+                                    @endif
                                     @error('nik')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
@@ -168,12 +175,11 @@
                                     @error('date_of_birth')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
-                                    <label class="text-xs font-semibold text-slate-500">{{ __('Gender (opsional)') }}</label>
+                                    <label class="text-xs font-semibold text-slate-500">{{ __('Gender') }}</label>
                                     <select name="gender" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none @error('gender') border-rose-400 @enderror">
-                                        <option value="">{{ __('Pilih') }}</option>
+                                        <option value="" disabled @selected(! in_array(old('gender', $profile->gender ?? ''), ['male', 'female'], true))>{{ __('Pilih') }}</option>
                                         <option value="male" @selected(old('gender', $profile->gender ?? '') === 'male')>{{ __('Laki-laki') }}</option>
                                         <option value="female" @selected(old('gender', $profile->gender ?? '') === 'female')>{{ __('Perempuan') }}</option>
-                                        <option value="other" @selected(old('gender', $profile->gender ?? '') === 'other')>{{ __('Lainnya') }}</option>
                                     </select>
                                     @error('gender')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                                 </div>

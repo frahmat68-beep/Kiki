@@ -10,6 +10,12 @@
     $selectedDateLabel = $selectedDate->translatedFormat('d M Y');
     $prevMonth = $monthDate->copy()->subMonth()->format('Y-m');
     $nextMonth = $monthDate->copy()->addMonth()->format('Y-m');
+    $windowStartValue = $windowStartDate->toDateString();
+    $windowEndValue = $windowEndDate->toDateString();
+    $windowStartMonthValue = $windowStartDate->format('Y-m');
+    $windowEndMonthValue = $windowEndDate->format('Y-m');
+    $canGoPrev = $prevMonth >= $windowStartMonthValue;
+    $canGoNext = $nextMonth <= $windowEndMonthValue;
     $weekdayLabels = trans('ui.availability_board.weekdays');
     if (! is_array($weekdayLabels) || count($weekdayLabels) !== 7) {
         $weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -144,6 +150,16 @@
             transform: translateY(-1px) scale(1.01);
         }
 
+        .board-cell--locked {
+            opacity: 0.45;
+            cursor: not-allowed !important;
+            border-style: dashed !important;
+            box-shadow: none !important;
+            transform: none !important;
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+        }
+
         .board-item {
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
@@ -236,14 +252,20 @@
             isDateInSelection(date) {
                 return this.selectedRangeDates.includes(date);
             },
-            beginDateSelection(date) {
+            beginDateSelection(date, isSelectable = true) {
+                if (!isSelectable) {
+                    return;
+                }
                 this.isSelectingRange = true;
                 this.selectionAnchorDate = date;
                 this.rangeDragged = false;
                 this.selectedRangeDates = [date];
             },
-            hoverDateSelection(date) {
+            hoverDateSelection(date, isSelectable = true) {
                 if (!this.isSelectingRange) {
+                    return;
+                }
+                if (!isSelectable) {
                     return;
                 }
 
@@ -253,8 +275,14 @@
                 }
                 this.selectedRangeDates = nextRange;
             },
-            finishDateSelection(date) {
+            finishDateSelection(date, isSelectable = true) {
                 if (!this.isSelectingRange) {
+                    return;
+                }
+                if (!isSelectable) {
+                    this.isSelectingRange = false;
+                    this.selectionAnchorDate = '';
+                    this.selectedRangeDates = [];
                     return;
                 }
 
@@ -283,7 +311,10 @@
                     this.openRangeSelectionModal();
                 }
             },
-            handleDayClick(date, busyEquipments, reservedUnits, availableEquipments) {
+            handleDayClick(date, busyEquipments, reservedUnits, availableEquipments, isSelectable = true) {
+                if (!isSelectable) {
+                    return;
+                }
                 if (this.skipNextClick) {
                     this.skipNextClick = false;
                     return;
@@ -461,12 +492,16 @@
                         type="month"
                         name="month"
                         value="{{ $monthValue }}"
+                        min="{{ $windowStartMonthValue }}"
+                        max="{{ $windowEndMonthValue }}"
                         class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                     <input
                         type="date"
                         name="date"
                         value="{{ $selectedDateValue }}"
+                        min="{{ $windowStartValue }}"
+                        max="{{ $windowEndValue }}"
                         class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                     <div class="sm:col-span-3 flex flex-wrap items-center gap-2">
@@ -479,6 +514,9 @@
                             </a>
                         @endif
                     </div>
+                    <p class="sm:col-span-3 text-[11px] text-slate-500">
+                        {{ __('Pilih tanggal dari') }} {{ \Carbon\Carbon::parse($windowStartValue)->translatedFormat('d M Y') }} {{ __('sampai') }} {{ \Carbon\Carbon::parse($windowEndValue)->translatedFormat('d M Y') }}.
+                    </p>
                 </form>
             </div>
         </section>
@@ -492,21 +530,29 @@
                         <p class="mt-1 text-[11px] text-slate-500 sm:hidden">{{ $availabilityDragHint }}</p>
                     </div>
                     <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
-                        <a
-                            href="{{ route('availability.board', ['month' => $prevMonth, 'date' => $monthDate->copy()->subMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                            aria-label="Bulan sebelumnya"
-                        >
-                            ←
-                        </a>
+                        @if ($canGoPrev)
+                            <a
+                                href="{{ route('availability.board', ['month' => $prevMonth, 'date' => $monthDate->copy()->subMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                                aria-label="Bulan sebelumnya"
+                            >
+                                ←
+                            </a>
+                        @else
+                            <span class="inline-flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-lg text-slate-300">←</span>
+                        @endif
                         <span class="min-w-[7.5rem] text-center text-sm font-semibold text-slate-700 sm:min-w-[9rem]">{{ $monthLabel }}</span>
-                        <a
-                            href="{{ route('availability.board', ['month' => $nextMonth, 'date' => $monthDate->copy()->addMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
-                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                            aria-label="Bulan berikutnya"
-                        >
-                            →
-                        </a>
+                        @if ($canGoNext)
+                            <a
+                                href="{{ route('availability.board', ['month' => $nextMonth, 'date' => $monthDate->copy()->addMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                                aria-label="Bulan berikutnya"
+                            >
+                                →
+                            </a>
+                        @else
+                            <span class="inline-flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-lg text-slate-300">→</span>
+                        @endif
                     </div>
                 </div>
 
@@ -524,15 +570,23 @@
                                         $toneClass = $toneClasses[$day['tone']] ?? $toneClasses['calm'];
                                         $selectedClass = $day['is_selected'] ? 'ring-2 ring-blue-500 shadow-md shadow-blue-100' : '';
                                         $todayClass = $day['is_today'] ? 'text-blue-700 font-bold' : '';
+                                        $isSelectable = (bool) ($day['is_selectable'] ?? false);
+                                        $lockedClass = $isSelectable ? '' : 'board-cell--locked';
                                         $hasUsage = (int) $day['busy_equipments'] > 0 || (int) $day['reserved_units'] > 0;
                                     @endphp
                                     <button
                                         type="button"
-                                        class="board-cell group flex h-[4.5rem] w-full flex-col rounded-lg border px-1.5 py-2 text-left sm:h-[8.75rem] sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
-                                        @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}')"
-                                        @pointerenter="hoverDateSelection('{{ $day['date'] }}')"
-                                        @pointerup.prevent="finishDateSelection('{{ $day['date'] }}')"
-                                        @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }})"
+                                        class="board-cell group flex h-[4.5rem] w-full flex-col rounded-lg border px-1.5 py-2 text-left sm:h-[8.75rem] sm:rounded-xl sm:px-2 sm:py-2.5 {{ $toneClass }} {{ $selectedClass }} {{ $lockedClass }} {{ $day['in_month'] ? '' : 'opacity-55' }}"
+                                        @if ($isSelectable)
+                                            @pointerdown.prevent="beginDateSelection('{{ $day['date'] }}', true)"
+                                            @pointerenter="hoverDateSelection('{{ $day['date'] }}', true)"
+                                            @pointerup.prevent="finishDateSelection('{{ $day['date'] }}', true)"
+                                            @click.prevent="handleDayClick('{{ $day['date'] }}', {{ (int) $day['busy_equipments'] }}, {{ (int) $day['reserved_units'] }}, {{ (int) $day['available_equipments'] }}, true)"
+                                        @endif
+                                        @unless ($isSelectable)
+                                            disabled
+                                            aria-disabled="true"
+                                        @endunless
                                         x-bind:class="{
                                             'board-cell--range': isDateInSelection('{{ $day['date'] }}'),
                                             'board-cell--range-dragging': isSelectingRange && isDateInSelection('{{ $day['date'] }}')

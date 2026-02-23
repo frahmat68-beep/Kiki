@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class OrderReceiptTest extends TestCase
@@ -28,7 +29,7 @@ class OrderReceiptTest extends TestCase
             'midtrans_order_id' => 'MNK-UNPAID-1',
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptUrl($order));
 
         $response->assertRedirect(route('account.orders.show', $order));
         $response->assertSessionHas('error');
@@ -51,7 +52,7 @@ class OrderReceiptTest extends TestCase
             'paid_at' => now(),
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptUrl($order));
 
         $response->assertOk();
         $response->assertSee('Invoice');
@@ -86,7 +87,7 @@ class OrderReceiptTest extends TestCase
             'snap_token' => 'snap-damage-pending',
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptUrl($order));
 
         $response->assertRedirect(route('account.orders.show', $order));
         $response->assertSessionHas('error', 'Invoice tersedia setelah tagihan tambahan lunas.');
@@ -120,7 +121,7 @@ class OrderReceiptTest extends TestCase
             'paid_at' => now()->subDay(),
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptUrl($order));
 
         $response->assertOk();
         $response->assertSee('Invoice');
@@ -155,7 +156,7 @@ class OrderReceiptTest extends TestCase
             'snap_token' => 'snap-pdf-damage-pending',
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt.pdf', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptPdfUrl($order));
 
         $response->assertRedirect(route('account.orders.show', $order));
         $response->assertSessionHas('error', 'Invoice PDF tersedia setelah tagihan tambahan lunas.');
@@ -178,7 +179,7 @@ class OrderReceiptTest extends TestCase
             'paid_at' => now()->subHours(3),
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt.pdf', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptPdfUrl($order));
 
         $response->assertOk();
         $response->assertHeader('content-type', 'application/pdf');
@@ -201,7 +202,7 @@ class OrderReceiptTest extends TestCase
             'paid_at' => now()->subHours(4),
         ]);
 
-        $response = $this->actingAs($user)->get(route('account.orders.receipt', $order));
+        $response = $this->actingAs($user)->get($this->signedReceiptUrl($order));
 
         $response->assertOk();
         $response->assertSee(__('ui.invoice.meta.invoice_order_id'));
@@ -209,5 +210,23 @@ class OrderReceiptTest extends TestCase
         $response->assertDontSee('<span>' . __('ui.invoice.meta.order_id') . '</span>', false);
         $response->assertDontSee(__('ui.invoice.totals.shipping'));
         $response->assertDontSee(__('ui.invoice.totals.penalty'));
+    }
+
+    private function signedReceiptUrl(Order $order): string
+    {
+        $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: $order->id);
+
+        return URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), [
+            'order' => $orderRouteKey,
+        ]);
+    }
+
+    private function signedReceiptPdfUrl(Order $order): string
+    {
+        $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: $order->id);
+
+        return URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), [
+            'order' => $orderRouteKey,
+        ]);
     }
 }

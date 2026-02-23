@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
@@ -39,6 +40,7 @@ class CheckoutController extends Controller
     public function store(Request $request, CartService $cart, MidtransService $midtrans, AvailabilityService $availability, PricingService $pricing)
     {
         $cartItems = $this->hydrateCartItems($cart->getItems());
+        $maxAllowedDate = $this->bookingWindowEnd()->toDateString();
 
         if (empty($cartItems)) {
             return response()->json([
@@ -62,8 +64,8 @@ class CheckoutController extends Controller
 
         $request->validate([
             'confirm_profile' => ['accepted'],
-            'rental_start_date' => ['nullable', 'date'],
-            'rental_end_date' => ['nullable', 'date', 'after_or_equal:rental_start_date'],
+            'rental_start_date' => ['nullable', 'date', 'after_or_equal:today', 'before_or_equal:' . $maxAllowedDate],
+            'rental_end_date' => ['nullable', 'date', 'after_or_equal:rental_start_date', 'before_or_equal:' . $maxAllowedDate],
         ]);
 
         $fallbackStartDate = null;
@@ -115,6 +117,24 @@ class CheckoutController extends Controller
             return response()->json([
                 'message' => __('Tanggal sewa belum diisi untuk: :items. Update tanggal di katalog/detail lalu tambahkan ulang ke keranjang.', [
                     'items' => $itemsWithoutDates->implode(', '),
+                ]),
+            ], 422);
+        }
+
+        $itemsOutsideWindow = collect($cartItems)
+            ->filter(function (array $item): bool {
+                return ! $this->isDateWithinBookingWindow(data_get($item, 'rental_start_date'))
+                    || ! $this->isDateWithinBookingWindow(data_get($item, 'rental_end_date'));
+            })
+            ->pluck('name')
+            ->filter()
+            ->unique()
+            ->values();
+        if ($itemsOutsideWindow->isNotEmpty()) {
+            return response()->json([
+                'message' => __('Tanggal sewa hanya bisa dipilih dari hari ini sampai :date untuk: :items.', [
+                    'date' => $this->bookingWindowEnd()->translatedFormat('d M Y'),
+                    'items' => $itemsOutsideWindow->implode(', '),
                 ]),
             ], 422);
         }
@@ -322,12 +342,18 @@ class CheckoutController extends Controller
 
         $cart->clear();
 
+        $signedInvoiceUrl = URL::temporarySignedRoute(
+            'account.orders.receipt',
+            now()->addMinutes(30),
+            ['order' => $order->order_number]
+        );
+
         return response()->json([
             'order_id' => $order->id,
             'midtrans_order_id' => $order->midtrans_order_id,
             'snap_token' => $order->snap_token,
             'redirect_url_to_order_detail' => route('account.orders.show', $order),
-            'redirect_url_to_invoice' => route('account.orders.receipt', $order),
+            'redirect_url_to_invoice' => $signedInvoiceUrl,
             'refresh_status_url' => route('payments.refresh-status', $order),
             'fallback_to_order_detail' => $fallbackToOrderDetail,
             'message' => $checkoutMessage,
@@ -354,7 +380,11 @@ class CheckoutController extends Controller
                     if (! empty($item['rental_start_date']) && ! empty($item['rental_end_date'])) {
                         $start = Carbon::parse($item['rental_start_date'])->startOfDay();
                         $end = Carbon::parse($item['rental_end_date'])->startOfDay();
-                        if ($end->gte($start)) {
+                        if (
+                            $end->gte($start)
+                            && $this->isDateWithinBookingWindow($start->toDateString())
+                            && $this->isDateWithinBookingWindow($end->toDateString())
+                        ) {
                             $startDate = $start->toDateString();
                             $endDate = $end->toDateString();
                             $days = $start->diffInDays($end) + 1;
@@ -415,5 +445,30 @@ class CheckoutController extends Controller
         }
 
         return $dailyDemand;
+    }
+
+    private function bookingWindowStart(): Carbon
+    {
+        return now()->startOfDay();
+    }
+
+    private function bookingWindowEnd(): Carbon
+    {
+        return now()->addMonthsNoOverflow(3)->startOfDay();
+    }
+
+    private function isDateWithinBookingWindow(?string $value): bool
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return false;
+        }
+
+        try {
+            $date = Carbon::parse($value)->startOfDay();
+        } catch (\Throwable $exception) {
+            return false;
+        }
+
+        return $date->betweenIncluded($this->bookingWindowStart(), $this->bookingWindowEnd());
     }
 }

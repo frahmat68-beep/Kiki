@@ -58,6 +58,7 @@ Route::get('/equipment/{slug}', [PageController::class, 'equipmentRedirect'])->n
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
 
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/rental-rules', [PageController::class, 'rentalRules'])->name('rental.rules');
 Route::post('/payment/callback', [PaymentController::class, 'handleNotification'])->name('payment.callback');
 Route::post('/midtrans/callback', [PaymentController::class, 'handleNotification'])->name('midtrans.callback');
@@ -106,8 +107,12 @@ Route::middleware(['auth', 'otp'])->group(function () {
 
     Route::get('/account/orders/{order:order_number}', [OrderController::class, 'show'])->name('account.orders.show');
     Route::patch('/account/orders/{order:order_number}/reschedule', [OrderController::class, 'reschedule'])->name('account.orders.reschedule');
-    Route::get('/account/orders/{order:order_number}/receipt', [OrderController::class, 'receipt'])->name('account.orders.receipt');
-    Route::get('/account/orders/{order:order_number}/invoice.pdf', [OrderController::class, 'receiptPdf'])->name('account.orders.receipt.pdf');
+    Route::get('/account/orders/{order:order_number}/receipt', [OrderController::class, 'receipt'])
+        ->middleware('signed')
+        ->name('account.orders.receipt');
+    Route::get('/account/orders/{order:order_number}/invoice.pdf', [OrderController::class, 'receiptPdf'])
+        ->middleware('signed')
+        ->name('account.orders.receipt.pdf');
 });
 
 /*

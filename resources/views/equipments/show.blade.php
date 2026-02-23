@@ -22,6 +22,9 @@
         ->filter()
         ->values();
     $availabilityEndpoint = route('product.availability', $equipment->slug);
+    $bookingMinDate = now()->toDateString();
+    $bookingMaxDate = now()->addMonthsNoOverflow(3)->toDateString();
+    $lockDates = request()->boolean('lock_dates');
     $prefillStartDate = trim((string) (old('rental_start_date') ?: request('rental_start_date', request('start_date', ''))));
     $prefillEndDate = trim((string) (old('rental_end_date') ?: request('rental_end_date', request('end_date', ''))));
     if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillStartDate)) {
@@ -29,6 +32,15 @@
     }
     if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillEndDate)) {
         $prefillEndDate = '';
+    }
+    if ($prefillStartDate !== '' && ($prefillStartDate < $bookingMinDate || $prefillStartDate > $bookingMaxDate)) {
+        $prefillStartDate = '';
+    }
+    if ($prefillEndDate !== '' && ($prefillEndDate < $bookingMinDate || $prefillEndDate > $bookingMaxDate)) {
+        $prefillEndDate = '';
+    }
+    if ($lockDates && ($prefillStartDate === '' || $prefillEndDate === '')) {
+        $lockDates = false;
     }
 @endphp
 
@@ -192,7 +204,17 @@
 
                 </div>
 
-                <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" id="rental-summary" data-price="{{ $equipment->price_per_day }}" data-availability-url="{{ $availabilityEndpoint }}">
+                <div
+                    class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                    id="rental-summary"
+                    data-price="{{ $equipment->price_per_day }}"
+                    data-availability-url="{{ $availabilityEndpoint }}"
+                    data-min-date="{{ $bookingMinDate }}"
+                    data-max-date="{{ $bookingMaxDate }}"
+                    data-lock-dates="{{ $lockDates ? '1' : '0' }}"
+                    data-locked-start="{{ $prefillStartDate }}"
+                    data-locked-end="{{ $prefillEndDate }}"
+                >
                     <h3 class="text-lg font-semibold text-slate-900">{{ __('app.product.rental_date') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -202,10 +224,12 @@
                                 type="date"
                                 name="rental_start_date"
                                 form="rent-form"
-                                min="{{ now()->toDateString() }}"
+                                min="{{ $bookingMinDate }}"
+                                max="{{ $bookingMaxDate }}"
                                 value="{{ $prefillStartDate }}"
                                 required
-                                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                                @readonly($lockDates)
+                                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none {{ $lockDates ? 'cursor-not-allowed bg-slate-100 text-slate-500' : '' }}"
                             >
                         </div>
                         <div>
@@ -215,13 +239,20 @@
                                 type="date"
                                 name="rental_end_date"
                                 form="rent-form"
-                                min="{{ now()->toDateString() }}"
+                                min="{{ $bookingMinDate }}"
+                                max="{{ $bookingMaxDate }}"
                                 value="{{ $prefillEndDate }}"
                                 required
-                                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+                                @readonly($lockDates)
+                                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none {{ $lockDates ? 'cursor-not-allowed bg-slate-100 text-slate-500' : '' }}"
                             >
                         </div>
                     </div>
+                    @if ($lockDates)
+                        <p class="text-xs text-blue-700">
+                            {{ __('Tanggal sewa dikunci mengikuti pesanan di cart. Untuk ubah tanggal, edit dulu item di cart.') }}
+                        </p>
+                    @endif
 
                     <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
                         <span>{{ __('app.product.duration') }}</span>
@@ -294,6 +325,11 @@
 
             const price = Number(summary.dataset.price || 0);
             const availabilityUrl = summary.dataset.availabilityUrl || '';
+            const minDate = summary.dataset.minDate || '';
+            const maxDate = summary.dataset.maxDate || '';
+            const isLockedDates = summary.dataset.lockDates === '1';
+            const lockedStartDate = summary.dataset.lockedStart || '';
+            const lockedEndDate = summary.dataset.lockedEnd || '';
             const startInput = document.getElementById('start-date');
             const endInput = document.getElementById('end-date');
             const qtyInput = document.getElementById('rent-qty');
@@ -318,6 +354,21 @@
                     month: 'short',
                     year: 'numeric',
                 }).format(parsed);
+            };
+            const isDateInAllowedWindow = (value) => {
+                if (!value) {
+                    return false;
+                }
+
+                if (minDate && value < minDate) {
+                    return false;
+                }
+
+                if (maxDate && value > maxDate) {
+                    return false;
+                }
+
+                return true;
             };
 
             const setAddToCartState = (enabled) => {
@@ -363,6 +414,15 @@
                     availabilityState = 'unknown';
                     clearAvailabilityMessage();
                     setAddToCartState(true);
+                    return;
+                }
+
+                if (!isDateInAllowedWindow(startInput.value) || !isDateInAllowedWindow(endInput.value)) {
+                    totalDays.textContent = '-';
+                    totalPrice.textContent = 'Rp -';
+                    availabilityState = 'invalid';
+                    setAddToCartState(false);
+                    setAvailabilityMessage(@json(__('Tanggal sewa hanya bisa dipilih dari hari ini sampai 3 bulan ke depan.')), 'error');
                     return;
                 }
 
@@ -453,12 +513,65 @@
                 }, 260);
             };
 
+            const applyDateInputLimits = () => {
+                if (!startInput || !endInput) {
+                    return;
+                }
+
+                if (minDate) {
+                    startInput.min = minDate;
+                    endInput.min = minDate;
+                }
+                if (maxDate) {
+                    startInput.max = maxDate;
+                    endInput.max = maxDate;
+                }
+
+                if (startInput.value) {
+                    endInput.min = startInput.value > minDate ? startInput.value : minDate;
+                }
+            };
+
+            const enforceLockedDates = () => {
+                if (!isLockedDates || !startInput || !endInput) {
+                    return;
+                }
+
+                if (lockedStartDate) {
+                    startInput.value = lockedStartDate;
+                }
+                if (lockedEndDate) {
+                    endInput.value = lockedEndDate;
+                }
+
+                const keepLockedValue = (input, expected) => {
+                    if (!input) return;
+                    input.addEventListener('input', () => {
+                        if (expected) {
+                            input.value = expected;
+                        }
+                    });
+                    input.addEventListener('change', () => {
+                        if (expected) {
+                            input.value = expected;
+                        }
+                    });
+                    input.addEventListener('keydown', (event) => {
+                        event.preventDefault();
+                    });
+                    input.setAttribute('aria-readonly', 'true');
+                };
+
+                keepLockedValue(startInput, lockedStartDate);
+                keepLockedValue(endInput, lockedEndDate);
+            };
+
             if (startInput && endInput) {
                 startInput.addEventListener('change', () => {
                     if (startInput.value) {
-                        endInput.min = startInput.value;
+                        endInput.min = startInput.value > minDate ? startInput.value : minDate;
                     } else {
-                        endInput.min = "{{ now()->toDateString() }}";
+                        endInput.min = minDate;
                     }
                     updateTotal();
                     scheduleAvailabilityCheck();
@@ -476,9 +589,9 @@
             }
 
             if (startInput && endInput) {
-                if (startInput.value) {
-                    endInput.min = startInput.value;
-                }
+                applyDateInputLimits();
+                enforceLockedDates();
+                applyDateInputLimits();
                 updateTotal();
                 if (startInput.value && endInput.value) {
                     scheduleAvailabilityCheck();
@@ -498,6 +611,11 @@
                     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate < startDate) {
                         event.preventDefault();
                         alert(@json(__('app.product.invalid_range')));
+                        return;
+                    }
+                    if (!isDateInAllowedWindow(startInput.value) || !isDateInAllowedWindow(endInput.value)) {
+                        event.preventDefault();
+                        alert(@json(__('Tanggal sewa hanya bisa dipilih dari hari ini sampai 3 bulan ke depan.')));
                         return;
                     }
 

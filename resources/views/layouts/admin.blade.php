@@ -102,6 +102,14 @@
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
         }
+        table tbody tr:hover td {
+            background-color: #eaf2ff;
+            color: #0f172a;
+        }
+        table tbody tr:focus-within td {
+            background-color: #eaf2ff;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body class="min-h-screen" data-admin-panel="true">

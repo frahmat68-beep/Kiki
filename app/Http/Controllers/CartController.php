@@ -19,6 +19,7 @@ class CartController extends Controller
         $subtotal = $cart->subtotalPerDay();
         $estimatedSubtotal = collect($cartItems)->sum(fn (array $item) => $this->estimatedLineSubtotal($item));
         $pricingSummary = $pricing->calculateOrderTotals([], $estimatedSubtotal);
+        $cartDateRange = $this->resolveCartDateLockRange($cartItems);
         $suggestedEquipments = collect();
 
         if (Schema::hasTable('equipments')) {
@@ -61,11 +62,14 @@ class CartController extends Controller
             'taxAmount' => $pricingSummary['tax'],
             'grandTotal' => $pricingSummary['total'],
             'suggestedEquipments' => $suggestedEquipments,
+            'cartSuggestedStartDate' => $cartDateRange['start_date'] ?? null,
+            'cartSuggestedEndDate' => $cartDateRange['end_date'] ?? null,
         ]);
     }
 
     public function add(Request $request, CartService $cart, AvailabilityService $availability)
     {
+        $maxAllowedDate = $this->maxBookingDateString();
         $data = $request->validate([
             'equipment_id' => ['nullable', 'integer'],
             'product_id' => ['nullable', 'integer'],
@@ -75,8 +79,8 @@ class CartController extends Controller
             'image' => ['nullable', 'string', 'max:255'],
             'price' => ['nullable', 'integer', 'min:0'],
             'qty' => ['nullable', 'integer', 'min:1', 'max:99'],
-            'rental_start_date' => ['nullable', 'date', 'required_with:rental_end_date'],
-            'rental_end_date' => ['nullable', 'date', 'required_with:rental_start_date', 'after_or_equal:rental_start_date'],
+            'rental_start_date' => ['nullable', 'date', 'required_with:rental_end_date', 'after_or_equal:today', 'before_or_equal:' . $maxAllowedDate],
+            'rental_end_date' => ['nullable', 'date', 'required_with:rental_start_date', 'after_or_equal:rental_start_date', 'before_or_equal:' . $maxAllowedDate],
         ]);
 
         if (empty($data['equipment_id']) && ! empty($data['product_id'])) {
@@ -100,6 +104,13 @@ class CartController extends Controller
         $qty = max(1, min((int) ($data['qty'] ?? 1), 99));
         $startDate = $this->normalizeDateString($data['rental_start_date'] ?? null);
         $endDate = $this->normalizeDateString($data['rental_end_date'] ?? null);
+        if (($startDate && ! $this->isDateWithinBookingWindow($startDate)) || ($endDate && ! $this->isDateWithinBookingWindow($endDate))) {
+            return redirect()
+                ->route('cart')
+                ->with('error', __('Tanggal sewa hanya bisa dipilih dari hari ini sampai :date.', [
+                    'date' => $this->formatBookingWindowEndDate(),
+                ]));
+        }
 
         $payload = [
             'equipment_id' => (int) $equipment->id,
@@ -277,6 +288,11 @@ class CartController extends Controller
                 $demandByEquipment[$equipmentId]['without_dates'] = (int) ($demandByEquipment[$equipmentId]['without_dates'] ?? 0) + $qty;
                 continue;
             }
+            if (! $this->isDateWithinBookingWindow($startDate) || ! $this->isDateWithinBookingWindow($endDate)) {
+                return __('Tanggal sewa hanya bisa dipilih dari hari ini sampai :date.', [
+                    'date' => $this->formatBookingWindowEndDate(),
+                ]);
+            }
 
             $start = Carbon::parse($startDate)->startOfDay();
             $end = Carbon::parse($endDate)->startOfDay();
@@ -403,5 +419,84 @@ class CartController extends Controller
         }
 
         return $result;
+    }
+
+    private function bookingWindowStart(): Carbon
+    {
+        return now()->startOfDay();
+    }
+
+    private function bookingWindowEnd(): Carbon
+    {
+        return now()->addMonthsNoOverflow(3)->startOfDay();
+    }
+
+    private function maxBookingDateString(): string
+    {
+        return $this->bookingWindowEnd()->toDateString();
+    }
+
+    private function isDateWithinBookingWindow(?string $date): bool
+    {
+        if (! $date) {
+            return false;
+        }
+
+        try {
+            $parsed = Carbon::parse($date)->startOfDay();
+        } catch (\Throwable $exception) {
+            return false;
+        }
+
+        return $parsed->betweenIncluded($this->bookingWindowStart(), $this->bookingWindowEnd());
+    }
+
+    private function formatBookingWindowEndDate(): string
+    {
+        return $this->bookingWindowEnd()->translatedFormat('d M Y');
+    }
+
+    private function resolveCartDateLockRange(array $cartItems): array
+    {
+        $validRanges = collect($cartItems)
+            ->map(function (array $item): ?array {
+                $startDate = $this->normalizeDateString($item['rental_start_date'] ?? null);
+                $endDate = $this->normalizeDateString($item['rental_end_date'] ?? null);
+                if (! $startDate || ! $endDate) {
+                    return null;
+                }
+                if (! $this->isDateWithinBookingWindow($startDate) || ! $this->isDateWithinBookingWindow($endDate)) {
+                    return null;
+                }
+
+                return [
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                ];
+            })
+            ->filter()
+            ->values();
+
+        if ($validRanges->isEmpty()) {
+            return [];
+        }
+
+        $startDate = $validRanges
+            ->pluck('start_date')
+            ->sort()
+            ->first();
+        $endDate = $validRanges
+            ->pluck('end_date')
+            ->sortDesc()
+            ->first();
+
+        if (! is_string($startDate) || ! is_string($endDate)) {
+            return [];
+        }
+
+        return [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ];
     }
 }

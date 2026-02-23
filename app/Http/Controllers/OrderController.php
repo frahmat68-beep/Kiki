@@ -79,8 +79,8 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate([
-            'rental_start_date' => ['required', 'date', 'after_or_equal:today'],
-            'rental_end_date' => ['required', 'date', 'after_or_equal:rental_start_date'],
+            'rental_start_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:' . $this->bookingWindowEnd()->toDateString()],
+            'rental_end_date' => ['required', 'date', 'after_or_equal:rental_start_date', 'before_or_equal:' . $this->bookingWindowEnd()->toDateString()],
         ]);
 
         try {
@@ -298,11 +298,20 @@ class OrderController extends Controller
         }
 
         $order->load(['items.equipment', 'user.profile', 'payment']);
+        $paper = strtolower((string) $request->query('paper', 'a4'));
+        $orientation = strtolower((string) $request->query('orientation', 'portrait'));
+        $allowedPaper = ['a4', 'a5', 'a3', 'letter', 'legal'];
+        if (! in_array($paper, $allowedPaper, true)) {
+            $paper = 'a4';
+        }
+        if (! in_array($orientation, ['portrait', 'landscape'], true)) {
+            $orientation = 'portrait';
+        }
 
         $pdf = Pdf::loadView('account.orders.receipt-pdf', [
             'order' => $order,
             'generatedAt' => now(),
-        ])->setPaper('a4');
+        ])->setPaper($paper, $orientation);
 
         $filename = 'Invoice-' . ($order->order_number ?: ('ORD-' . $order->id)) . '.pdf';
 
@@ -344,5 +353,10 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             return 0;
         }
+    }
+
+    private function bookingWindowEnd(): Carbon
+    {
+        return now()->addMonthsNoOverflow(3)->startOfDay();
     }
 }

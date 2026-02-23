@@ -67,6 +67,8 @@
         $catalogQuickAddButton = __('ui.catalog.quick_add_button');
         $catalogLoginToOrderButton = __('ui.catalog.login_to_order_button');
         $catalogOutOfStockButton = __('ui.catalog.out_of_stock_button');
+        $bookingMinDate = now()->toDateString();
+        $bookingMaxDate = now()->addMonthsNoOverflow(3)->toDateString();
         $idleHamburgerEnabledRaw = strtolower(trim((string) setting('catalog.idle_hamburger_enabled', '1')));
         $idleHamburgerEnabled = ! in_array($idleHamburgerEnabledRaw, ['0', 'false', 'off', 'no', 'tidak'], true);
         $idleHamburgerDelayMs = max(1000, min(12000, (int) setting('catalog.idle_hamburger_delay_ms', 2200)));
@@ -195,6 +197,8 @@
                                     quickQty: 1,
                                     quickStart: '',
                                     quickEnd: '',
+                                    minDate: '{{ $bookingMinDate }}',
+                                    maxDate: '{{ $bookingMaxDate }}',
                                     maxQty: {{ max((int) $item->stock, 1) }},
                                     calcDays() {
                                         if (!this.quickStart || !this.quickEnd) return 0;
@@ -338,7 +342,8 @@
                                                                     type="date"
                                                                     name="rental_start_date"
                                                                     x-model="quickStart"
-                                                                    min="{{ now()->toDateString() }}"
+                                                                    min="{{ $bookingMinDate }}"
+                                                                    max="{{ $bookingMaxDate }}"
                                                                     class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
                                                                     required
                                                                 >
@@ -349,7 +354,8 @@
                                                                     type="date"
                                                                     name="rental_end_date"
                                                                     x-model="quickEnd"
-                                                                    :min="quickStart || '{{ now()->toDateString() }}'"
+                                                                    :min="quickStart || minDate"
+                                                                    :max="maxDate"
                                                                     class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
                                                                     required
                                                                 >

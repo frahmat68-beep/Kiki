@@ -14,6 +14,13 @@
     $damageFeeStatuses = ['barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda'];
     $hasDamageFeeOutstanding = in_array($orderStatus, $damageFeeStatuses, true) && $additionalFee > 0 && $damagePaymentStatus !== 'paid';
     $canAccessInvoice = $isPaid && ! $hasDamageFeeOutstanding;
+    $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: '');
+    $signedInvoiceUrl = ($canAccessInvoice && $orderRouteKey !== '')
+        ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), ['order' => $orderRouteKey])
+        : null;
+    $signedInvoicePdfUrl = ($canAccessInvoice && $orderRouteKey !== '')
+        ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), ['order' => $orderRouteKey])
+        : null;
     $isDamageFeePaid = $additionalFee > 0 && $damagePaymentStatus === 'paid';
     $loadSnapPaymentScript = $isPrimaryPayable || $hasDamageFeeOutstanding;
     $baseTotal = (int) ($order->total_amount ?? 0);
@@ -81,6 +88,7 @@
     $hasPickedUp = in_array($orderStatus, ['barang_diambil', 'barang_kembali', 'barang_rusak', 'barang_hilang', 'overdue_denda', 'selesai'], true);
     $rescheduleStartDate = $order->rental_start_date;
     $rescheduleEndDate = $order->rental_end_date;
+    $rescheduleMaxDate = now()->addMonthsNoOverflow(3)->toDateString();
     $rescheduleDurationDays = 1;
     if ($rescheduleStartDate && $rescheduleEndDate && $rescheduleEndDate->gte($rescheduleStartDate)) {
         $rescheduleDurationDays = $rescheduleStartDate->diffInDays($rescheduleEndDate) + 1;
@@ -425,6 +433,7 @@
                                         name="rental_start_date"
                                         data-reschedule-start
                                         min="{{ now()->toDateString() }}"
+                                        max="{{ $rescheduleMaxDate }}"
                                         value="{{ old('rental_start_date', optional($order->rental_start_date)->format('Y-m-d')) }}"
                                         required
                                         class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
@@ -438,6 +447,7 @@
                                         data-reschedule-end
                                         data-duration-days="{{ $rescheduleDurationDays }}"
                                         min="{{ now()->toDateString() }}"
+                                        max="{{ $rescheduleMaxDate }}"
                                         value="{{ old('rental_end_date', optional($order->rental_end_date)->format('Y-m-d')) }}"
                                         readonly
                                         required
@@ -475,12 +485,19 @@
                         </button>
                     @endif
 
-                    @if ($canAccessInvoice)
+                    @if ($canAccessInvoice && $signedInvoiceUrl)
                         <div class="space-y-2">
-                            <a href="{{ route('account.orders.receipt', $order) }}" class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">
+                            <button
+                                type="button"
+                                data-open-invoice-modal
+                                data-invoice-url="{{ $signedInvoiceUrl }}"
+                                data-invoice-pdf-url="{{ $signedInvoicePdfUrl }}"
+                                data-order-number="{{ $order->order_number ?? ('ORD-' . $order->id) }}"
+                                class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600"
+                            >
                                 {{ $orderViewInvoiceButton }}
-                            </a>
-                            <a href="{{ route('account.orders.receipt.pdf', $order) }}" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                            </button>
+                            <a href="{{ $signedInvoicePdfUrl }}" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
                                 {{ $orderDownloadPdfButton }}
                             </a>
                         </div>
@@ -490,6 +507,96 @@
                         </p>
                     @endif
                 </aside>
+            </div>
+        </div>
+
+        <div
+            id="order-detail-invoice-modal"
+            class="fixed inset-0 z-[95] hidden items-center justify-center p-3 sm:p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="order-detail-invoice-title"
+        >
+            <div class="absolute inset-0 bg-slate-950/55" data-close-invoice-modal></div>
+
+            <div class="relative z-10 flex h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-2xl">
+                <div class="flex items-center justify-between bg-blue-600 px-4 py-3 text-white sm:px-5">
+                    <div>
+                        <h3 id="order-detail-invoice-title" class="text-base font-semibold sm:text-lg">
+                            {{ __('ui.overview.invoice_detail_title') }}
+                        </h3>
+                        <p class="text-xs text-blue-100">{{ __('ui.invoice.title') }}</p>
+                    </div>
+                    <button
+                        type="button"
+                        data-close-invoice-modal
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-blue-300/80 bg-blue-500/60 p-0 text-white transition hover:bg-blue-500"
+                        aria-label="{{ __('ui.overview.close_modal') }}"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 bg-slate-100 p-2 sm:p-3">
+                    <iframe
+                        id="order-detail-invoice-frame"
+                        title="{{ __('ui.invoice.title') }}"
+                        loading="lazy"
+                        class="h-full w-full rounded-xl border border-slate-200 bg-white"
+                    ></iframe>
+                </div>
+
+                <div class="border-t border-slate-200 bg-white px-4 py-3">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div class="grid grid-cols-2 gap-2 sm:w-auto">
+                            <label class="text-xs font-semibold text-slate-500">
+                                {{ __('Ukuran Kertas') }}
+                                <select id="invoice-print-paper" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700">
+                                    <option value="auto">{{ __('Auto') }}</option>
+                                    <option value="a4">A4</option>
+                                    <option value="a5">A5</option>
+                                    <option value="a3">A3</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="legal">Legal</option>
+                                </select>
+                            </label>
+                            <label class="text-xs font-semibold text-slate-500">
+                                {{ __('Orientasi') }}
+                                <select id="invoice-print-orientation" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700">
+                                    <option value="portrait">{{ __('Portrait') }}</option>
+                                    <option value="landscape">{{ __('Landscape') }}</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+                            <a
+                                id="order-detail-invoice-download"
+                                href="{{ $signedInvoicePdfUrl }}"
+                                class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600"
+                            >
+                                {{ $orderDownloadPdfButton }}
+                            </a>
+                            <button
+                                type="button"
+                                id="order-detail-invoice-print"
+                                class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                            >
+                                {{ __('Print') }}
+                            </button>
+                            <button
+                                type="button"
+                                data-close-invoice-modal
+                                class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600"
+                            >
+                                {{ __('ui.overview.close_modal') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -539,6 +646,11 @@
                 return `${year}-${month}-${day}`;
             };
 
+            const maxAllowed = startInput.getAttribute('max') || '';
+            if (maxAllowed) {
+                endInput.setAttribute('max', maxAllowed);
+            }
+
             const syncEndDate = () => {
                 if (!startInput.value) return;
 
@@ -547,7 +659,14 @@
 
                 const endDate = new Date(startDate);
                 endDate.setDate(endDate.getDate() + (durationDays - 1));
-                endInput.value = formatDate(endDate);
+                const computedEnd = formatDate(endDate);
+                endInput.value = computedEnd;
+
+                if (maxAllowed && computedEnd > maxAllowed) {
+                    startInput.setCustomValidity(@json(__('Tanggal sewa maksimal 3 bulan dari hari ini.')));
+                } else {
+                    startInput.setCustomValidity('');
+                }
             };
 
             startInput.addEventListener('change', syncEndDate);
@@ -576,6 +695,106 @@
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') {
                     closePopup();
+                }
+            });
+        })();
+
+        (function () {
+            const modal = document.getElementById('order-detail-invoice-modal');
+            const frame = document.getElementById('order-detail-invoice-frame');
+            const title = document.getElementById('order-detail-invoice-title');
+            const openButtons = document.querySelectorAll('[data-open-invoice-modal]');
+            const closeButtons = modal?.querySelectorAll('[data-close-invoice-modal]');
+            const paperSelect = document.getElementById('invoice-print-paper');
+            const orientationSelect = document.getElementById('invoice-print-orientation');
+            const printButton = document.getElementById('order-detail-invoice-print');
+            const downloadButton = document.getElementById('order-detail-invoice-download');
+            const defaultTitle = @json(__('ui.overview.invoice_detail_title'));
+            let activePdfBaseUrl = '';
+
+            if (!modal || !frame || !title || !openButtons.length) {
+                return;
+            }
+
+            const buildPdfUrl = () => {
+                if (!activePdfBaseUrl) {
+                    return '';
+                }
+                return activePdfBaseUrl;
+            };
+
+            const syncDownloadUrl = () => {
+                if (!downloadButton) {
+                    return;
+                }
+                const nextUrl = buildPdfUrl();
+                if (nextUrl) {
+                    downloadButton.href = nextUrl;
+                    downloadButton.classList.remove('pointer-events-none', 'opacity-50');
+                } else {
+                    downloadButton.href = '#';
+                    downloadButton.classList.add('pointer-events-none', 'opacity-50');
+                }
+            };
+
+            const openModal = (invoiceUrl, pdfUrl, orderNumber = '') => {
+                if (!invoiceUrl) {
+                    return;
+                }
+
+                frame.src = invoiceUrl;
+                activePdfBaseUrl = typeof pdfUrl === 'string' ? pdfUrl : '';
+                syncDownloadUrl();
+                title.textContent = orderNumber ? `Invoice ${orderNumber}` : defaultTitle;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                title.textContent = defaultTitle;
+                document.body.classList.remove('overflow-hidden');
+                frame.src = 'about:blank';
+                activePdfBaseUrl = '';
+                syncDownloadUrl();
+            };
+
+            window.openOrderInvoiceModal = ({ invoiceUrl = '', pdfUrl = '', orderNumber = '' } = {}) => {
+                openModal(invoiceUrl, pdfUrl, orderNumber);
+            };
+
+            openButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    openModal(button.dataset.invoiceUrl, button.dataset.invoicePdfUrl, button.dataset.orderNumber || '');
+                });
+            });
+
+            closeButtons?.forEach((button) => {
+                button.addEventListener('click', closeModal);
+            });
+
+            paperSelect?.addEventListener('change', syncDownloadUrl);
+            orientationSelect?.addEventListener('change', syncDownloadUrl);
+
+            printButton?.addEventListener('click', () => {
+                const paper = paperSelect?.value || 'auto';
+                const orientation = orientationSelect?.value || 'portrait';
+
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage({
+                        type: 'manake-print-receipt',
+                        paper,
+                        orientation,
+                    }, '*');
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.classList.contains('flex')) {
+                    closeModal();
                 }
             });
         })();
@@ -625,7 +844,15 @@
                     if (data.is_paid && data.invoice_url) {
                         showAlert(@json($orderPaymentConfirmedInvoice), 'success');
                         if (redirectWhenPaid) {
-                            window.location.href = data.invoice_url;
+                            if (typeof window.openOrderInvoiceModal === 'function') {
+                                window.openOrderInvoiceModal({
+                                    invoiceUrl: data.invoice_url,
+                                    pdfUrl: data.invoice_pdf_url || '',
+                                    orderNumber: data.receipt_number || '',
+                                });
+                            } else {
+                                window.location.href = data.invoice_url;
+                            }
                         }
                     } else if (data.is_paid && data.has_damage_fee_outstanding) {
                         showAlert(@json($orderPaymentNeedAdditional), 'info');

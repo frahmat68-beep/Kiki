@@ -16,12 +16,21 @@ class AvailabilityBoardController extends Controller
 {
     public function index(Request $request, AvailabilityService $availability): \Illuminate\View\View
     {
+        $windowStartDate = $this->bookingWindowStart();
+        $windowEndDate = $this->bookingWindowEnd();
         $monthDate = $this->resolveMonthDate((string) $request->query('month', ''));
+        $monthDate = $this->clampMonthDate($monthDate, $windowStartDate, $windowEndDate);
         $monthStart = $monthDate->copy()->startOfMonth();
         $monthEnd = $monthDate->copy()->endOfMonth();
         $calendarStart = $monthStart->copy()->startOfWeek(Carbon::MONDAY);
         $calendarEnd = $monthEnd->copy()->endOfWeek(Carbon::SUNDAY);
-        $selectedDate = $this->resolveSelectedDate((string) $request->query('date', ''), $calendarStart, $calendarEnd);
+        $selectedDate = $this->resolveSelectedDate(
+            (string) $request->query('date', ''),
+            $calendarStart,
+            $calendarEnd,
+            $windowStartDate,
+            $windowEndDate
+        );
         $search = trim((string) $request->query('q', ''));
 
         if (! Schema::hasTable('equipments')) {
@@ -33,6 +42,8 @@ class AvailabilityBoardController extends Controller
                 'calendarStart' => $calendarStart,
                 'calendarEnd' => $calendarEnd,
                 'selectedDate' => $selectedDate,
+                'windowStartDate' => $windowStartDate,
+                'windowEndDate' => $windowEndDate,
                 'dateKeys' => [],
                 'calendarDays' => collect(),
                 'equipmentRows' => collect(),
@@ -180,12 +191,13 @@ class AvailabilityBoardController extends Controller
         $selectedBusyCount = $selectedBusyRows->count();
         $selectedReservedUnits = (int) $selectedBusyRows->sum('selected_reserved');
 
-        $calendarDays = collect($dateKeys)->map(function (string $dateKey) use ($calendarTotals, $calendarStart, $monthStart, $selectedDateKey, $totalEquipments) {
+        $calendarDays = collect($dateKeys)->map(function (string $dateKey) use ($calendarTotals, $calendarStart, $monthStart, $selectedDateKey, $totalEquipments, $windowStartDate, $windowEndDate) {
             $date = Carbon::parse($dateKey)->startOfDay();
             $busyEquipments = (int) data_get($calendarTotals, $dateKey . '.busy_equipments', 0);
             $reservedUnits = (int) data_get($calendarTotals, $dateKey . '.reserved_units', 0);
             $bookingEquipments = (int) data_get($calendarTotals, $dateKey . '.booking_equipments', 0);
             $bufferEquipments = (int) data_get($calendarTotals, $dateKey . '.buffer_equipments', 0);
+            $isSelectable = $date->betweenIncluded($windowStartDate, $windowEndDate);
 
             $tone = 'calm';
             if ($bookingEquipments > 0) {
@@ -200,6 +212,7 @@ class AvailabilityBoardController extends Controller
                 'in_month' => $date->month === $monthStart->month,
                 'is_today' => $date->isSameDay(now()),
                 'is_selected' => $dateKey === $selectedDateKey,
+                'is_selectable' => $isSelectable,
                 'reserved_units' => $reservedUnits,
                 'busy_equipments' => $busyEquipments,
                 'booking_equipments' => $bookingEquipments,
@@ -225,6 +238,8 @@ class AvailabilityBoardController extends Controller
             'calendarStart' => $calendarStart,
             'calendarEnd' => $calendarEnd,
             'selectedDate' => $selectedDate,
+            'windowStartDate' => $windowStartDate,
+            'windowEndDate' => $windowEndDate,
             'dateKeys' => $dateKeys,
             'calendarDays' => $calendarDays,
             'equipmentRows' => $equipmentRows,
@@ -361,9 +376,15 @@ class AvailabilityBoardController extends Controller
         return now()->startOfMonth();
     }
 
-    private function resolveSelectedDate(string $selectedValue, Carbon $calendarStart, Carbon $calendarEnd): Carbon
+    private function resolveSelectedDate(
+        string $selectedValue,
+        Carbon $calendarStart,
+        Carbon $calendarEnd,
+        Carbon $windowStartDate,
+        Carbon $windowEndDate
+    ): Carbon
     {
-        $defaultDate = now()->startOfDay();
+        $defaultDate = $windowStartDate->copy();
         $selectedDate = null;
 
         if ($selectedValue !== '') {
@@ -378,11 +399,49 @@ class AvailabilityBoardController extends Controller
             $selectedDate = $defaultDate;
         }
 
+        if ($selectedDate->lt($windowStartDate)) {
+            $selectedDate = $windowStartDate->copy();
+        }
+
+        if ($selectedDate->gt($windowEndDate)) {
+            $selectedDate = $windowEndDate->copy();
+        }
+
         if ($selectedDate->lt($calendarStart) || $selectedDate->gt($calendarEnd)) {
+            if ($windowStartDate->gt($calendarStart) && $windowStartDate->lt($calendarEnd)) {
+                return $windowStartDate->copy()->startOfDay();
+            }
+
             return $calendarStart->copy()->startOfDay();
         }
 
         return $selectedDate;
+    }
+
+    private function clampMonthDate(Carbon $monthDate, Carbon $windowStartDate, Carbon $windowEndDate): Carbon
+    {
+        $minMonth = $windowStartDate->copy()->startOfMonth();
+        $maxMonth = $windowEndDate->copy()->startOfMonth();
+
+        if ($monthDate->lt($minMonth)) {
+            return $minMonth;
+        }
+
+        if ($monthDate->gt($maxMonth)) {
+            return $maxMonth;
+        }
+
+        return $monthDate;
+    }
+
+    private function bookingWindowStart(): Carbon
+    {
+        return now()->startOfDay();
+    }
+
+    private function bookingWindowEnd(): Carbon
+    {
+        return now()->addMonthsNoOverflow(3)->startOfDay();
     }
 
     private function resolveEquipmentStatusLabel(string $status): string

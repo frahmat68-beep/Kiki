@@ -11,6 +11,7 @@ use App\Services\PricingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Midtrans\Config;
 use Midtrans\Transaction;
@@ -218,6 +219,18 @@ class PaymentController extends Controller
             $isPaid = ($order->status_pembayaran ?? 'pending') === 'paid';
             $hasOutstandingDamageFee = $order->hasOutstandingDamageFee();
             $canViewInvoice = $order->canAccessInvoice();
+            if (! $order->order_number && $order->midtrans_order_id) {
+                $order->order_number = $order->midtrans_order_id;
+                $order->save();
+            }
+
+            $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id);
+            $signedInvoiceUrl = $canViewInvoice
+                ? URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), ['order' => $orderRouteKey])
+                : null;
+            $signedInvoicePdfUrl = $canViewInvoice
+                ? URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), ['order' => $orderRouteKey])
+                : null;
 
             return response()->json([
                 'status' => 'ok',
@@ -228,8 +241,8 @@ class PaymentController extends Controller
                 'detail_url' => route('account.orders.show', $order),
                 'can_view_invoice' => $canViewInvoice,
                 'has_damage_fee_outstanding' => $hasOutstandingDamageFee,
-                'invoice_url' => $canViewInvoice ? route('account.orders.receipt', $order) : null,
-                'invoice_pdf_url' => $canViewInvoice ? route('account.orders.receipt.pdf', $order) : null,
+                'invoice_url' => $signedInvoiceUrl,
+                'invoice_pdf_url' => $signedInvoicePdfUrl,
                 'receipt_number' => $order->order_number,
             ]);
         } catch (\Throwable $exception) {

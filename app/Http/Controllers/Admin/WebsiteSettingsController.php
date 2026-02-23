@@ -40,16 +40,35 @@ class WebsiteSettingsController extends Controller
 
         $adminId = auth('admin')->id();
         $mapping = $this->settingsKeys();
+        $existingValues = SiteSetting::query()
+            ->whereIn('key', array_values($mapping))
+            ->pluck('value', 'key');
 
         $values = [
-            'brand_name' => $data['brand_name'] ?? null,
-            'brand_tagline' => $data['brand_tagline'] ?? null,
-            'seo_meta_title' => $data['seo_meta_title'] ?? null,
-            'seo_meta_description' => $data['seo_meta_description'] ?? null,
-            'contact_whatsapp' => $data['contact_whatsapp'] ?? null,
-            'social_instagram' => $data['social_instagram'] ?? null,
-            'social_tiktok' => $data['social_tiktok'] ?? null,
-            'maintenance_enabled' => $request->boolean('maintenance_enabled') ? '1' : '0',
+            'brand_name' => array_key_exists('brand_name', $data)
+                ? $data['brand_name']
+                : $existingValues->get($mapping['brand_name']),
+            'brand_tagline' => array_key_exists('brand_tagline', $data)
+                ? $data['brand_tagline']
+                : $existingValues->get($mapping['brand_tagline']),
+            'seo_meta_title' => array_key_exists('seo_meta_title', $data)
+                ? $data['seo_meta_title']
+                : $existingValues->get($mapping['seo_meta_title']),
+            'seo_meta_description' => array_key_exists('seo_meta_description', $data)
+                ? $data['seo_meta_description']
+                : $existingValues->get($mapping['seo_meta_description']),
+            'contact_whatsapp' => array_key_exists('contact_whatsapp', $data)
+                ? $data['contact_whatsapp']
+                : $existingValues->get($mapping['contact_whatsapp']),
+            'social_instagram' => array_key_exists('social_instagram', $data)
+                ? $data['social_instagram']
+                : $existingValues->get($mapping['social_instagram']),
+            'social_tiktok' => array_key_exists('social_tiktok', $data)
+                ? $data['social_tiktok']
+                : $existingValues->get($mapping['social_tiktok']),
+            'maintenance_enabled' => array_key_exists('maintenance_enabled', $data)
+                ? ($request->boolean('maintenance_enabled') ? '1' : '0')
+                : ($existingValues->get($mapping['maintenance_enabled']) ?? '0'),
         ];
 
         if ($request->hasFile('brand_logo')) {

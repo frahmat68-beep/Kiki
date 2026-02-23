@@ -11,6 +11,8 @@
         $taxAmount = (int) ($taxAmount ?? 0);
         $estimatedTotal = (int) ($grandTotal ?? ($estimatedSubtotal + $taxAmount));
         $suggestedEquipments = collect($suggestedEquipments ?? []);
+        $cartSuggestedStartDate = is_string($cartSuggestedStartDate ?? null) ? $cartSuggestedStartDate : null;
+        $cartSuggestedEndDate = is_string($cartSuggestedEndDate ?? null) ? $cartSuggestedEndDate : null;
         $hasMissingRentalDate = collect($cartItems ?? [])->contains(function ($item) {
             return empty($item['rental_start_date']) || empty($item['rental_end_date']);
         });
@@ -148,6 +150,13 @@
                                     : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
                                 $suggestionAvailable = (int) ($suggestion->available_units ?? $suggestion->stock);
                                 $suggestionUrl = ! empty($suggestion->slug) ? route('product.show', $suggestion->slug) : route('catalog');
+                                if ($cartSuggestedStartDate && $cartSuggestedEndDate && ! empty($suggestion->slug)) {
+                                    $suggestionUrl = route('product.show', $suggestion->slug) . '?' . http_build_query([
+                                        'rental_start_date' => $cartSuggestedStartDate,
+                                        'rental_end_date' => $cartSuggestedEndDate,
+                                        'lock_dates' => 1,
+                                    ]);
+                                }
                             @endphp
                             <article class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
                                 <img src="{{ $suggestionImage }}" alt="{{ $suggestion->name }}" class="h-16 w-16 rounded-lg bg-white object-cover">
@@ -157,9 +166,14 @@
                                     <div class="mt-2 flex items-center justify-between gap-2">
                                         <p class="text-xs font-semibold text-slate-800">{{ $formatIdr((int) $suggestion->price_per_day) }}/hari</p>
                                         <a href="{{ $suggestionUrl }}" class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
-                                            {{ __('ui.cart.pick_dates') }}
+                                            {{ __('ui.actions.detail') }}
                                         </a>
                                     </div>
+                                    @if ($cartSuggestedStartDate && $cartSuggestedEndDate)
+                                        <p class="mt-1 text-[11px] text-blue-700">
+                                            {{ __('Tanggal otomatis ikut pesanan:') }} {{ \Carbon\Carbon::parse($cartSuggestedStartDate)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($cartSuggestedEndDate)->translatedFormat('d M Y') }}
+                                        </p>
+                                    @endif
                                 </div>
                             </article>
                         @endforeach

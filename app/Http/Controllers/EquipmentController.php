@@ -219,9 +219,10 @@ class EquipmentController extends Controller
             ], 404);
         }
 
+        $maxAllowedDate = $this->bookingWindowEnd()->toDateString();
         $validated = $request->validate([
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'start_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:' . $maxAllowedDate],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date', 'before_or_equal:' . $maxAllowedDate],
             'qty' => ['nullable', 'integer', 'min:1', 'max:99'],
         ]);
 
@@ -291,10 +292,21 @@ class EquipmentController extends Controller
         $suggestions = [];
 
         $cursor = $fromDate->copy()->addDay()->startOfDay();
+        if ($cursor->lt($this->bookingWindowStart())) {
+            $cursor = $this->bookingWindowStart()->copy();
+        }
+
         $deadline = $fromDate->copy()->addDays($searchLimitDays)->startOfDay();
+        $windowEnd = $this->bookingWindowEnd();
+        if ($deadline->gt($windowEnd)) {
+            $deadline = $windowEnd;
+        }
 
         while ($cursor->lte($deadline) && count($suggestions) < $maxSuggestions) {
             $candidateEnd = $cursor->copy()->addDays(max($durationDays - 1, 0));
+            if ($candidateEnd->gt($windowEnd)) {
+                break;
+            }
             $result = $availabilityService->evaluateRange($equipment, $cursor, $candidateEnd, $qty);
 
             if ($result['ok']) {
@@ -308,5 +320,15 @@ class EquipmentController extends Controller
         }
 
         return $suggestions;
+    }
+
+    private function bookingWindowStart(): Carbon
+    {
+        return now()->startOfDay();
+    }
+
+    private function bookingWindowEnd(): Carbon
+    {
+        return now()->addMonthsNoOverflow(3)->startOfDay();
     }
 }

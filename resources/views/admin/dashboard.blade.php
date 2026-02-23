@@ -148,7 +148,11 @@
 
                                     <div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-3 xl:max-w-[560px]">
                                         @if ($isReadyPickup && $canConfirmPickupNow)
-                                            <form method="POST" action="{{ route('admin.dashboard.orders.operational-status', $order) }}">
+                                            <form
+                                                method="POST"
+                                                action="{{ route('admin.dashboard.orders.operational-status', $order) }}"
+                                                data-operational-confirm="{{ __('Konfirmasi bahwa order :order sudah diambil oleh penyewa?', ['order' => $order->order_number ?? ('ORD-' . $order->id)]) }}"
+                                            >
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status_pesanan" value="barang_diambil">
@@ -167,7 +171,11 @@
                                         @endif
 
                                         @if ($isOnRent)
-                                            <form method="POST" action="{{ route('admin.dashboard.orders.operational-status', $order) }}">
+                                            <form
+                                                method="POST"
+                                                action="{{ route('admin.dashboard.orders.operational-status', $order) }}"
+                                                data-operational-confirm="{{ __('Konfirmasi penerimaan alat untuk order :order?', ['order' => $order->order_number ?? ('ORD-' . $order->id)]) }}"
+                                            >
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status_pesanan" value="barang_kembali">
@@ -188,7 +196,11 @@
                                         @endif
 
                                         @if ($isOnRent)
-                                            <form method="POST" action="{{ route('admin.dashboard.orders.operational-status', $order) }}">
+                                            <form
+                                                method="POST"
+                                                action="{{ route('admin.dashboard.orders.operational-status', $order) }}"
+                                                data-operational-confirm="{{ __('Tandai order :order sebagai pengembalian rusak?', ['order' => $order->order_number ?? ('ORD-' . $order->id)]) }}"
+                                            >
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status_pesanan" value="barang_rusak">
@@ -297,3 +309,18 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            document.querySelectorAll('form[data-operational-confirm]').forEach((form) => {
+                form.addEventListener('submit', (event) => {
+                    const message = form.dataset.operationalConfirm || '';
+                    if (message && !window.confirm(message)) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        })();
+    </script>
+@endpush

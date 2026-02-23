@@ -62,6 +62,8 @@
             background: radial-gradient(980px 420px at -15% -10%, rgba(47, 95, 245, 0.14), transparent 60%), var(--invoice-bg);
             color: var(--invoice-text);
             font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .invoice-shell {
@@ -519,6 +521,12 @@
             color: #fff;
         }
 
+        .action-btn[aria-disabled='true'] {
+            opacity: .55;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         .toast {
             position: fixed;
             right: 18px;
@@ -582,6 +590,11 @@
         }
 
         @media print {
+            @page {
+                size: auto;
+                margin: 10mm;
+            }
+
             :root,
             html.dark,
             html[data-theme-resolved='dark'] {
@@ -674,6 +687,10 @@
 
         $profile = $order->user->profile;
         $invoiceId = $order->order_number ?: ('ORD-' . $order->id);
+        $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: '');
+        $signedPdfUrl = $orderRouteKey !== ''
+            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), ['order' => $orderRouteKey])
+            : null;
         $orderReference = trim((string) ($order->midtrans_order_id ?: $invoiceId));
         $showSeparateOrderReference = $orderReference !== '' && $orderReference !== $invoiceId;
 
@@ -946,9 +963,9 @@
     </main>
 
     <div class="actions" aria-label="Invoice Actions">
-        <a href="{{ route('account.orders.receipt.pdf', $order) }}" class="action-btn">{{ __('ui.invoice.actions.download_pdf') }}</a>
+        <a href="{{ $signedPdfUrl ?: '#' }}" class="action-btn" @if (! $signedPdfUrl) aria-disabled="true" @endif>{{ __('ui.invoice.actions.download_pdf') }}</a>
         <button type="button" class="action-btn" id="share-invoice-btn">{{ __('ui.invoice.actions.share') }}</button>
-        <button type="button" class="action-btn primary" onclick="window.print()">{{ __('ui.invoice.actions.print') }}</button>
+        <button type="button" class="action-btn primary" id="print-invoice-btn">{{ __('ui.invoice.actions.print') }}</button>
     </div>
 
     <div class="toast" id="invoice-toast"></div>
@@ -957,7 +974,44 @@
         (function () {
             const toast = document.getElementById('invoice-toast');
             const shareButton = document.getElementById('share-invoice-btn');
+            const printButton = document.getElementById('print-invoice-btn');
             const invoiceId = @json($invoiceId);
+            const printStyleId = 'receipt-print-style';
+            const allowedPapers = new Set(['auto', 'a3', 'a4', 'a5', 'letter', 'legal']);
+            const allowedOrientations = new Set(['portrait', 'landscape']);
+
+            const ensurePrintStyleNode = () => {
+                let styleNode = document.getElementById(printStyleId);
+                if (styleNode) {
+                    return styleNode;
+                }
+
+                styleNode = document.createElement('style');
+                styleNode.id = printStyleId;
+                document.head.appendChild(styleNode);
+
+                return styleNode;
+            };
+
+            const applyPrintPreset = (paper = 'auto', orientation = 'portrait') => {
+                const resolvedPaper = allowedPapers.has(String(paper).toLowerCase())
+                    ? String(paper).toLowerCase()
+                    : 'auto';
+                const resolvedOrientation = allowedOrientations.has(String(orientation).toLowerCase())
+                    ? String(orientation).toLowerCase()
+                    : 'portrait';
+
+                const pageSize = resolvedPaper === 'auto'
+                    ? 'auto'
+                    : `${resolvedPaper.toUpperCase()} ${resolvedOrientation}`;
+
+                ensurePrintStyleNode().textContent = `@media print{@page{size:${pageSize};margin:10mm;}body.invoice-page{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}`;
+            };
+
+            const printInvoice = (paper = 'auto', orientation = 'portrait') => {
+                applyPrintPreset(paper, orientation);
+                window.setTimeout(() => window.print(), 80);
+            };
 
             const showToast = (message) => {
                 if (!toast) return;
@@ -985,6 +1039,23 @@
                 } catch (error) {
                     showToast(@json(__('ui.invoice.toast.failed')));
                 }
+            });
+
+            printButton?.addEventListener('click', () => {
+                const params = new URLSearchParams(window.location.search);
+                const paper = params.get('paper') || 'auto';
+                const orientation = params.get('orientation') || 'portrait';
+                printInvoice(paper, orientation);
+            });
+
+            window.addEventListener('message', (event) => {
+                if (!event || !event.data || event.data.type !== 'manake-print-receipt') {
+                    return;
+                }
+
+                const paper = typeof event.data.paper === 'string' ? event.data.paper : 'auto';
+                const orientation = typeof event.data.orientation === 'string' ? event.data.orientation : 'portrait';
+                printInvoice(paper, orientation);
             });
         })();
     </script>

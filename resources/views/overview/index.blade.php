@@ -128,6 +128,10 @@
                         $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
                         $canOpenInvoice = $canViewInvoice($order);
                         $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
+                        $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: '');
+                        $signedInvoiceUrl = ($canOpenInvoice && $orderRouteKey !== '')
+                            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), ['order' => $orderRouteKey])
+                            : null;
                     @endphp
                     <div class="py-4">
                         <div class="flex items-start justify-between gap-3">
@@ -143,11 +147,11 @@
                         </div>
                         <div class="mt-3 flex items-center justify-between">
                             <p class="text-xs font-semibold text-slate-700">{{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
-                            @if ($canOpenInvoice)
+                            @if ($canOpenInvoice && $signedInvoiceUrl)
                                 <button
                                     type="button"
                                     data-open-invoice-modal
-                                    data-invoice-url="{{ route('account.orders.receipt', $order) }}"
+                                    data-invoice-url="{{ $signedInvoiceUrl }}"
                                     data-order-number="{{ $orderNumber }}"
                                     class="text-xs font-semibold text-blue-600 hover:text-blue-700"
                                 >

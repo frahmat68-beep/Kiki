@@ -54,12 +54,6 @@
             'url' => route('admin.website.edit'),
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" /></svg>',
         ],
-        [
-            'key' => 'content',
-            'label' => __('ui.admin.legacy_content'),
-            'url' => route('admin.content.index'),
-            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>',
-        ],
     ];
 
     if ($isSuperAdmin) {
@@ -108,7 +102,7 @@
             @foreach ($primaryItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
                 >
                     <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>
@@ -121,7 +115,7 @@
             @foreach ($settingsItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
                 >
                     <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>
