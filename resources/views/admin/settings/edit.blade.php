@@ -104,6 +104,7 @@
                     <div>
                         <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">{{ __('Embed Peta Kontak') }}</label>
                         <textarea name="contact_map_embed" rows="4" class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">{{ old('contact_map_embed', $settings['contact_map_embed'] ?? '') }}</textarea>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-300">{{ __('Gunakan iframe/link Google Maps yang valid. Sistem akan menolak embed yang tidak aman.') }}</p>
                     </div>
                     <div class="sm:max-w-sm">
                         <label class="text-xs font-semibold text-slate-500 dark:text-slate-300">{{ __('Email Penerima Form') }}</label>

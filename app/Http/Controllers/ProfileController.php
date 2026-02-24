@@ -17,8 +17,16 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $nameLocked = false;
+
+        if (Schema::hasTable('profiles') && $request->user()) {
+            $lockedName = trim((string) ($request->user()->profile()->value('full_name') ?? ''));
+            $nameLocked = $lockedName !== '';
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'nameLocked' => $nameLocked,
         ]);
     }
 
@@ -173,7 +181,28 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validated();
+
+        if (Schema::hasTable('profiles')) {
+            $profile = $request->user()->profile()->first();
+            $lockedName = trim((string) ($profile?->full_name ?? ''));
+
+            if ($lockedName !== '') {
+                $incomingName = trim((string) ($validated['name'] ?? ''));
+
+                if ($incomingName !== '' && strcasecmp($incomingName, $lockedName) !== 0) {
+                    return Redirect::back()
+                        ->withInput($request->except('password'))
+                        ->withErrors([
+                            'name' => __('Nama akun sudah dikunci mengikuti data identitas dan tidak dapat diubah.'),
+                        ]);
+                }
+
+                $validated['name'] = $lockedName;
+            }
+        }
+
+        $request->user()->fill($validated);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;

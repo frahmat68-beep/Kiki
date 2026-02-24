@@ -116,7 +116,7 @@
     @php
         $activePage = $activePage ?? '';
         $brandName = site_setting('brand.name', 'Manake');
-        $logoUrl = $assetWithVersion('MANAKE-FAV-M.png');
+        $logoUrl = $assetWithVersion('manake-logo-blue.png');
         $adminName = auth('admin')->user()->name ?? __('Admin');
         $adminRole = auth('admin')->user()->role ?? 'admin';
         $isSuperAdmin = auth('admin')->check() && $adminRole === 'super_admin';

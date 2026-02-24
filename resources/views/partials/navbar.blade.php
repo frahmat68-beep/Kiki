@@ -203,7 +203,6 @@
                             <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.cart') }}</a>
                             <a href="{{ route('booking.history') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.my_orders') }}</a>
                             <a href="{{ route('profile.complete') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.my_profile') }}</a>
-                            <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.settings') }}</a>
                             <div class="my-1 h-px bg-slate-100"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -286,7 +285,6 @@
                             </article>
                         @endforeach
                     </div>
-                    <a href="{{ route('settings.index') }}" class="block rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">{{ __('ui.nav.settings') }}</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">

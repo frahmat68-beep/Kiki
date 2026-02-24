@@ -46,7 +46,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-widest text-slate-400 dark:border-slate-800">
+                        <tr class="border-b border-slate-200 bg-slate-50/80 text-left text-xs font-semibold uppercase tracking-widest text-slate-500 dark:border-slate-800 dark:bg-slate-950/40">
                             @foreach ($columns as $column)
                                 <th class="px-3 py-2">{{ $column['Field'] }}</th>
                             @endforeach
@@ -56,13 +56,13 @@
                     <tbody>
                         @forelse ($rows as $row)
                             @php $rowArray = (array) $row; @endphp
-                            <tr class="border-b border-slate-100 text-slate-700 dark:border-slate-800 dark:text-slate-200">
+                            <tr class="border-b border-slate-100 text-slate-700 transition hover:bg-blue-50/80 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-blue-950/30">
                                 @foreach ($columns as $column)
                                     @php
                                         $value = $rowArray[$column['Field']] ?? null;
                                         $display = is_null($value) ? '-' : (is_scalar($value) ? (string) $value : json_encode($value));
                                     @endphp
-                                    <td class="px-3 py-2 align-top">{{ $display }}</td>
+                                    <td class="px-3 py-2 align-top break-all">{{ $display }}</td>
                                 @endforeach
                                 <td class="px-3 py-2 whitespace-nowrap">
                                     @if ($primaryKey && isset($rowArray[$primaryKey]))

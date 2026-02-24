@@ -70,8 +70,8 @@
         $version = file_exists($path) ? (string) filemtime($path) : '1';
         return asset($file) . '?v=' . $version;
     };
-    $expandedLogoUrl = $assetWithVersion('manake-logo-blue.png');
-    $expandedLogoUrlDark = $assetWithVersion('manake-logo-white.png');
+    $expandedLogoFallbackUrl = $assetWithVersion('manake-logo-blue.png');
+    $expandedLogoUrl = $logoUrl ?: $expandedLogoFallbackUrl;
     $adminInitial = strtoupper(substr((string) ($adminName ?: 'A'), 0, 1));
 @endphp
 
@@ -83,8 +83,8 @@
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
             <img
                 src="{{ $expandedLogoUrl }}"
-                x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                 alt="{{ $brandName }}"
+                onerror="this.onerror=null;this.src='{{ $expandedLogoFallbackUrl }}';"
                 class="h-auto w-40 object-contain object-left"
             >
         </a>
@@ -102,7 +102,7 @@
             @foreach ($primaryItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-300/40' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-900 hover:ring-1 hover:ring-blue-200' }}"
                 >
                     <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>
@@ -115,7 +115,7 @@
             @foreach ($settingsItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-300/40' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-900 hover:ring-1 hover:ring-blue-200' }}"
                 >
                     <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>

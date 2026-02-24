@@ -174,6 +174,82 @@ if (! function_exists('site_content')) {
     }
 }
 
+if (! function_exists('trusted_map_embed_url')) {
+    function trusted_map_embed_url(?string $rawEmbed, ?string $fallbackAddress = null): ?string
+    {
+        $value = trim((string) $rawEmbed);
+
+        if ($value !== '') {
+            if (preg_match('/<iframe[^>]*\s+src=["\']([^"\']+)["\']/i', $value, $matches) === 1) {
+                $value = html_entity_decode((string) ($matches[1] ?? ''), ENT_QUOTES, 'UTF-8');
+            }
+
+            $trustedUrl = trusted_map_normalize_url($value);
+            if ($trustedUrl !== null) {
+                return $trustedUrl;
+            }
+        }
+
+        $fallback = trim((string) $fallbackAddress);
+        if ($fallback !== '') {
+            return 'https://www.google.com/maps?q=' . rawurlencode($fallback) . '&output=embed';
+        }
+
+        return null;
+    }
+}
+
+if (! function_exists('trusted_map_embed_iframe')) {
+    function trusted_map_embed_iframe(?string $rawEmbed, ?string $fallbackAddress = null): ?string
+    {
+        $embedUrl = trusted_map_embed_url($rawEmbed, $fallbackAddress);
+
+        if ($embedUrl === null) {
+            return null;
+        }
+
+        return '<iframe src="' . e($embedUrl) . '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>';
+    }
+}
+
+if (! function_exists('trusted_map_normalize_url')) {
+    function trusted_map_normalize_url(?string $value): ?string
+    {
+        $candidate = trim((string) $value);
+        if ($candidate === '') {
+            return null;
+        }
+
+        $parts = parse_url($candidate);
+        if ($parts === false) {
+            return null;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? 'https'));
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $path = strtolower((string) ($parts['path'] ?? ''));
+        $query = (string) ($parts['query'] ?? '');
+
+        if ($host === '' || ! in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
+
+        $isGoogleHost = str_ends_with($host, 'google.com')
+            || str_ends_with($host, 'google.co.id')
+            || in_array($host, ['maps.google.com', 'maps.app.goo.gl', 'goo.gl'], true);
+
+        if ($isGoogleHost) {
+            if (str_contains($path, '/maps/embed') || str_contains($query, 'output=embed')) {
+                return preg_replace('/^http:/i', 'https:', $candidate);
+            }
+
+            return 'https://www.google.com/maps?q=' . rawurlencode($candidate) . '&output=embed';
+        }
+
+        return null;
+    }
+}
+
 if (! function_exists('site_setting_forget')) {
     function site_setting_forget(string|array $keys): void
     {

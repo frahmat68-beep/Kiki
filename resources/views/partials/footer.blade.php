@@ -4,43 +4,106 @@
     $footerWhatsapp = setting('footer.whatsapp', setting('social_whatsapp', site_content('footer.whatsapp', setting('footer_phone', '+62 812-3456-7890'))));
     $footerEmail = setting('contact.email', setting('footer_email', site_content('contact.email', 'hello@manakerental.id')));
     $footerInstagram = setting('footer.instagram', setting('social_instagram', site_content('footer.instagram', '@manakerental')));
-    $footerMapEmbed = setting('contact_map_embed', site_content('contact.map_embed', setting('contact.map_embed', '')));
+    $footerAddressLines = collect(preg_split('/\R+/', trim((string) $footerAddress)))
+        ->map(static fn ($line) => trim((string) $line))
+        ->filter()
+        ->values();
+    $footerAddressTitle = $footerAddressLines->first();
+    $footerAddressRest = $footerAddressLines->slice(1);
+    $footerWhatsappEntries = collect(preg_split('/\s*(?:\/|\||,)\s*/', (string) $footerWhatsapp))
+        ->map(static fn ($item) => trim((string) $item))
+        ->filter()
+        ->values();
+    $buildWhatsappHref = static function (string $value): ?string {
+        $digits = preg_replace('/\D+/', '', $value);
+        if (! $digits) {
+            return null;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . ltrim(substr($digits, 1), '0');
+        }
+
+        return 'https://wa.me/' . $digits;
+    };
+    $buildTelHref = static function (string $value): ?string {
+        $sanitized = preg_replace('/[^\d+]/', '', $value);
+        if (! $sanitized) {
+            return null;
+        }
+
+        if (str_starts_with($sanitized, '00')) {
+            $sanitized = '+' . ltrim(substr($sanitized, 2), '0');
+        }
+
+        return 'tel:' . $sanitized;
+    };
+    $defaultFooterMapEmbed = '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.1428282443417!2d106.78129727614359!3d-6.3755559936147135!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ef01a88d499d%3A0x15293a04b517553a!2sManake%20-%20Sewa%20HT%2C%20Alat%20Event%20dan%20Film!5e0!3m2!1sen!2sid!4v1771911840986!5m2!1sen!2sid" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
+    $footerMapRaw = $defaultFooterMapEmbed;
+    $footerMapEmbed = trusted_map_embed_iframe($footerMapRaw, $footerAddress);
 @endphp
 
 <footer class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-blue-100">
-    <div class="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-[1.2fr,0.9fr,1fr,1.2fr]">
+    <div class="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-[1.2fr,1fr,1.2fr]">
         <div>
             <h3 class="text-sm font-semibold text-white">{{ __('app.footer.about_title') }}</h3>
             <p class="mt-3 text-sm leading-relaxed text-blue-100/90">{{ $footerAbout }}</p>
-            <div class="mt-4 rounded-2xl border border-blue-300/25 bg-blue-950/35 p-3">
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-blue-100">{{ setting('footer.rules_title', __('app.footer.rules_title')) }}</p>
-                <a href="{{ route('rental.rules') }}" class="mt-2 inline-flex items-center gap-1 text-sm font-semibold italic text-blue-100 transition hover:text-white">
+            <div class="mt-4">
+                <p class="text-sm font-semibold text-white">{{ setting('footer.rules_title', __('app.footer.rules_title')) }}</p>
+                <a href="{{ route('rental.rules') }}" class="mt-2 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700">
                     {{ setting('footer.rules_link', __('app.footer.rules_link')) }}
                     <span aria-hidden="true">→</span>
                 </a>
-                <p class="mt-2 text-xs leading-relaxed text-blue-100/85">{{ setting('footer.rules_note', __('app.footer.rules_note')) }}</p>
+                <p class="mt-2 text-sm leading-relaxed text-blue-100/90">{{ setting('footer.rules_note', __('app.footer.rules_note')) }}</p>
             </div>
-        </div>
-
-        <div>
-            <h3 class="text-sm font-semibold text-white">{{ __('app.footer.quick_links_title') }}</h3>
-            <nav class="mt-3 flex flex-col gap-2 text-sm text-blue-100/90">
-                <a href="{{ route('about') }}" class="rounded-lg px-2 py-1 transition hover:bg-blue-500/15 hover:text-white">{{ __('app.footer.quick_about') }}</a>
-                <a href="{{ route('contact') }}" class="rounded-lg px-2 py-1 transition hover:bg-blue-500/15 hover:text-white">{{ __('app.footer.quick_contact') }}</a>
-                <a href="{{ route('rental.rules') }}" class="rounded-lg px-2 py-1 transition hover:bg-blue-500/15 hover:text-white">{{ __('app.footer.quick_rules') }}</a>
-                <a href="{{ route('catalog') }}" class="rounded-lg px-2 py-1 transition hover:bg-blue-500/15 hover:text-white">{{ __('app.footer.quick_catalog') }}</a>
-            </nav>
         </div>
 
         <div>
             <h3 class="text-sm font-semibold text-white">{{ __('app.footer.contact_title') }}</h3>
             <div class="mt-3 space-y-2 text-sm text-blue-100/90">
-                <p>WhatsApp: {{ $footerWhatsapp }}</p>
-                <p>Email: {{ $footerEmail }}</p>
+                <p class="text-sm font-semibold text-white">WhatsApp</p>
+                <div class="flex flex-wrap gap-1.5">
+                    @forelse ($footerWhatsappEntries as $whatsappNumber)
+                        @php
+                            $whatsappHref = $buildWhatsappHref($whatsappNumber);
+                            $telHref = $buildTelHref($whatsappNumber);
+                        @endphp
+                        @if ($whatsappHref)
+                            <a
+                                href="{{ $whatsappHref }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-blue-700"
+                            >
+                                {{ $whatsappNumber }}
+                            </a>
+                        @elseif ($telHref)
+                            <a href="{{ $telHref }}" class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-blue-700">
+                                {{ $whatsappNumber }}
+                            </a>
+                        @else
+                            <span class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white">
+                                {{ $whatsappNumber }}
+                            </span>
+                        @endif
+                    @empty
+                        <span class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white">
+                            {{ $footerWhatsapp }}
+                        </span>
+                    @endforelse
+                </div>
+                <p class="break-all">Email: {{ $footerEmail }}</p>
                 <p>Instagram: {{ $footerInstagram }}</p>
             </div>
             <h3 class="mt-5 text-sm font-semibold text-white">{{ __('app.footer.address_title') }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-blue-100/90">{!! nl2br(e($footerAddress)) !!}</p>
+            <div class="mt-2 space-y-1 text-sm leading-relaxed text-blue-100/90">
+                @if ($footerAddressTitle)
+                    <p class="font-semibold text-white">{{ $footerAddressTitle }}</p>
+                @endif
+                @foreach ($footerAddressRest as $addressLine)
+                    <p>{{ $addressLine }}</p>
+                @endforeach
+            </div>
         </div>
 
         <div>

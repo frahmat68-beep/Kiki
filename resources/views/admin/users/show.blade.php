@@ -7,6 +7,7 @@
     @php
         $profile = $user->profile;
         $addressText = $profile?->address_text ?? '-';
+        $safeMapsUrl = trusted_map_embed_url((string) ($profile?->maps_url ?? ''), $addressText !== '-' ? $addressText : null);
         $formatStatus = function (bool $ok, ?string $okText = null, ?string $noText = null): string {
             $okLabel = $okText ?? __('Terverifikasi');
             $noLabel = $noText ?? __('Belum Verifikasi');
@@ -61,13 +62,20 @@
                 <h3 class="text-lg font-semibold text-blue-700">{{ __('Profil Pengguna') }}</h3>
                 <div class="mt-4 grid grid-cols-1 gap-3 text-sm text-slate-600 sm:grid-cols-2">
                     <p><span class="font-semibold text-slate-800">{{ __('Nama Lengkap:') }}</span> {{ $profile?->full_name ?? '-' }}</p>
-                    <p><span class="font-semibold text-slate-800">{{ __('NIK:') }}</span> {{ $profile?->nik ?? '-' }}</p>
+                    <p><span class="font-semibold text-slate-800">{{ __('NIK:') }}</span> {{ $profile?->masked_nik ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('Tanggal Lahir:') }}</span> {{ optional($profile?->date_of_birth)->format('d M Y') ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('Gender:') }}</span> {{ $profile?->gender ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('No. Telepon:') }}</span> {{ $profile?->phone ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('Role:') }}</span> {{ strtoupper($user->role ?? __('pengguna')) }}</p>
                     <p class="sm:col-span-2"><span class="font-semibold text-slate-800">{{ __('Alamat:') }}</span> {{ $addressText }}</p>
-                    <p><span class="font-semibold text-slate-800">{{ __('Google Maps:') }}</span> {{ $profile?->maps_url ?? '-' }}</p>
+                    <p>
+                        <span class="font-semibold text-slate-800">{{ __('Google Maps:') }}</span>
+                        @if ($safeMapsUrl)
+                            <a href="{{ $safeMapsUrl }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-700">{{ __('Buka Link') }}</a>
+                        @else
+                            -
+                        @endif
+                    </p>
                     <p><span class="font-semibold text-slate-800">{{ __('Kode Pos:') }}</span> {{ $profile?->postal_code ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('Kontak Darurat:') }}</span> {{ $profile?->emergency_name ?? '-' }}</p>
                     <p><span class="font-semibold text-slate-800">{{ __('Hubungan Darurat:') }}</span> {{ $profile?->emergency_relation ?? '-' }}</p>

@@ -8,6 +8,7 @@
     $addressText = $profile?->address_text ?? ($profile?->address ?? '-');
     $hasLockedFullName = trim((string) ($profile?->full_name ?? '')) !== '';
     $hasLockedNik = preg_match('/^\d{16}$/', preg_replace('/[^0-9]/', '', (string) ($profile?->nik ?? ''))) === 1;
+    $safeMapsUrl = trusted_map_embed_url((string) ($profile?->maps_url ?? ''), $addressText !== '-' ? $addressText : null);
 @endphp
 
 @section('content')
@@ -88,8 +89,8 @@
                                     <div class="flex justify-between gap-3"><dt class="text-slate-500">{{ __('No. Telepon') }}</dt><dd class="text-right font-semibold text-slate-800">{{ $profile?->phone ?? '-' }}</dd></div>
                                     <div class="flex justify-between gap-3"><dt class="text-slate-500">{{ __('Google Maps') }}</dt>
                                         <dd class="text-right font-semibold text-slate-800">
-                                            @if (! empty($profile?->maps_url))
-                                                <a href="{{ $profile->maps_url }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">{{ __('Buka Link') }}</a>
+                                            @if (! empty($safeMapsUrl))
+                                                <a href="{{ $safeMapsUrl }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-700">{{ __('Buka Link') }}</a>
                                             @else
                                                 -
                                             @endif

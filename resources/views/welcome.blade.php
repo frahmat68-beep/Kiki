@@ -69,15 +69,11 @@
                 (string) ($damageAlertOrder->damagePayment?->status ?? 'pending'),
             ]))
             : null;
-        $quickCategories = collect($navCategories ?? [])->take(4);
         $readyPanelTitle = setting('copy.landing.ready_panel_title', __('app.landing.ready_items'));
         $readyPanelSubtitle = setting('copy.landing.ready_panel_subtitle', __('app.landing.ready_panel_subtitle'));
         $flowKicker = setting('copy.landing.flow_kicker', __('app.landing.flow_kicker'));
         $flowTitle = setting('copy.landing.flow_title', __('app.landing.flow_title'));
         $flowCatalogLink = setting('copy.landing.flow_catalog_link', __('app.landing.flow_catalog_link'));
-        $quickCategoryKicker = setting('copy.landing.quick_category_kicker', __('app.landing.quick_category_kicker'));
-        $quickCategoryTitle = setting('copy.landing.quick_category_title', __('app.landing.quick_category_title'));
-        $quickCategoryEmpty = setting('copy.landing.quick_category_empty', __('app.landing.quick_category_empty'));
         $step1Title = setting('copy.landing.step_1_title', __('app.landing.step_1_title'));
         $step1Desc = setting('copy.landing.step_1_desc', __('app.landing.step_1_desc'));
         $step2Title = setting('copy.landing.step_2_title', __('app.landing.step_2_title'));
@@ -86,6 +82,10 @@
         $step3Desc = setting('copy.landing.step_3_desc', __('app.landing.step_3_desc'));
         $step4Title = setting('copy.landing.step_4_title', __('app.landing.step_4_title'));
         $step4Desc = setting('copy.landing.step_4_desc', __('app.landing.step_4_desc'));
+        $step5Title = setting('copy.landing.step_5_title', __('app.landing.step_5_title'));
+        $step5Desc = setting('copy.landing.step_5_desc', __('app.landing.step_5_desc'));
+        $step6Title = setting('copy.landing.step_6_title', __('app.landing.step_6_title'));
+        $step6Desc = setting('copy.landing.step_6_desc', __('app.landing.step_6_desc'));
     @endphp
 
     <section class="bg-slate-50">
@@ -402,7 +402,7 @@
                 <a href="{{ route('catalog') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">{{ $flowCatalogLink }} →</a>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <article class="manake-panel rounded-2xl p-5">
                     <p class="text-xs font-semibold text-blue-600">STEP 01</p>
                     <h3 class="mt-2 text-base font-semibold text-slate-900">{{ $step1Title }}</h3>
@@ -423,35 +423,20 @@
                     <h3 class="mt-2 text-base font-semibold text-slate-900">{{ $step4Title }}</h3>
                     <p class="mt-2 text-sm text-slate-600">{{ $step4Desc }}</p>
                 </article>
+                <article class="manake-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold text-blue-600">STEP 05</p>
+                    <h3 class="mt-2 text-base font-semibold text-slate-900">{{ $step5Title }}</h3>
+                    <p class="mt-2 text-sm text-slate-600">{{ $step5Desc }}</p>
+                </article>
+                <article class="manake-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold text-blue-600">STEP 06</p>
+                    <h3 class="mt-2 text-base font-semibold text-slate-900">{{ $step6Title }}</h3>
+                    <p class="mt-2 text-sm text-slate-600">{{ $step6Desc }}</p>
+                </article>
             </div>
         </div>
     </section>
 
-    <section class="bg-slate-50">
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-9">
-            <div class="mb-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">{{ $quickCategoryKicker }}</p>
-                <h2 class="text-2xl font-semibold text-slate-900">{{ $quickCategoryTitle }}</h2>
-            </div>
-
-            @if ($quickCategories->isEmpty())
-                <div class="card rounded-2xl p-6 text-center">
-                    <p class="text-sm text-slate-500">{{ $quickCategoryEmpty }}</p>
-                    <a href="{{ route('categories.index') }}" class="btn-secondary mt-4 inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition">
-                        {{ __('app.landing.quick_category_cta') }}
-                    </a>
-                </div>
-            @else
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    @foreach ($quickCategories as $categoryItem)
-                        <a href="{{ route('category.show', $categoryItem->slug) }}" class="card rounded-2xl px-4 py-4 text-center text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-600">
-                            {{ $categoryItem->name }}
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </section>
 @endsection
 
 @push('scripts')

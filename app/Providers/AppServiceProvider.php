@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Notifications\VerifyEmail;
 use App\Models\Category;
 use App\Models\OrderNotification;
 use App\Models\SiteSetting;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadRuntimeTranslationOverrides();
+        $this->registerVerifyEmailMailTemplate();
 
         User::observe(UserObserver::class);
 
@@ -95,6 +98,36 @@ class AppServiceProvider extends ServiceProvider
                 'notificationItems' => $notificationItems,
                 'navCategories' => $navCategoriesCache,
             ]);
+        });
+    }
+
+    private function registerVerifyEmailMailTemplate(): void
+    {
+        VerifyEmail::toMailUsing(function (object $notifiable, string $verificationUrl) {
+            $recipientName = trim((string) ($notifiable->display_name ?? $notifiable->name ?? ''));
+            if ($recipientName === '') {
+                $recipientName = (string) __('app.user.generic');
+            }
+
+            $expireMinutes = max((int) config('auth.verification.expire', 60), 1);
+            $fromAddress = (string) config('mail.from.address', 'no-reply@manake.id');
+
+            return (new MailMessage)
+                ->subject(__('app.auth.verify_email_mail_subject'))
+                ->from($fromAddress, 'Manake No-Reply')
+                ->view('emails.verify-email', [
+                    'recipientName' => $recipientName,
+                    'verificationUrl' => $verificationUrl,
+                    'expireMinutes' => $expireMinutes,
+                    'subjectText' => __('app.auth.verify_email_mail_subject'),
+                    'subtitleText' => __('app.auth.verify_email_mail_subtitle'),
+                    'headingText' => __('app.auth.verify_email_mail_greeting', ['name' => $recipientName]),
+                    'introText' => __('app.auth.verify_email_mail_intro'),
+                    'buttonText' => __('app.auth.verify_email_mail_button'),
+                    'expireText' => __('app.auth.verify_email_mail_expire', ['minutes' => $expireMinutes]),
+                    'ignoreText' => __('app.auth.verify_email_mail_ignore'),
+                    'noReplyText' => __('app.auth.verify_email_mail_no_reply'),
+                ]);
         });
     }
 

@@ -35,7 +35,14 @@ class DbExplorerController extends Controller
         $searchValue = $request->string('q')->toString();
 
         if ($searchColumn && $searchValue && $this->columnExists($columns, $searchColumn)) {
-            $query->where($searchColumn, 'like', '%' . $searchValue . '%');
+            $driver = DB::connection()->getDriverName();
+
+            if ($driver === 'pgsql') {
+                $wrappedColumn = DB::connection()->getQueryGrammar()->wrap($searchColumn);
+                $query->whereRaw("CAST({$wrappedColumn} AS TEXT) ILIKE ?", ['%' . $searchValue . '%']);
+            } else {
+                $query->where($searchColumn, 'like', '%' . $searchValue . '%');
+            }
         }
 
         if ($primaryKey) {
@@ -164,31 +171,135 @@ class DbExplorerController extends Controller
 
     private function getTables(): array
     {
-        $tablesRaw = DB::select('SHOW TABLES');
+        $driver = DB::connection()->getDriverName();
 
-        if (empty($tablesRaw)) {
-            return [];
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $tablesRaw = DB::select('SHOW TABLES');
+
+            if (empty($tablesRaw)) {
+                return [];
+            }
+
+            $firstRow = (array) $tablesRaw[0];
+            $key = array_key_first($firstRow);
+
+            return collect($tablesRaw)
+                ->map(fn ($row) => (array) $row)
+                ->map(fn ($row) => $row[$key] ?? null)
+                ->filter()
+                ->values()
+                ->all();
         }
 
-        $firstRow = (array) $tablesRaw[0];
-        $key = array_key_first($firstRow);
+        if ($driver === 'pgsql') {
+            return collect(DB::select(
+                "SELECT table_name
+                 FROM information_schema.tables
+                 WHERE table_schema = 'public'
+                   AND table_type = 'BASE TABLE'
+                 ORDER BY table_name"
+            ))
+                ->map(fn ($row) => (array) $row)
+                ->map(fn ($row) => $row['table_name'] ?? null)
+                ->filter()
+                ->values()
+                ->all();
+        }
 
-        return collect($tablesRaw)
-            ->map(fn ($row) => (array) $row)
-            ->map(fn ($row) => $row[$key] ?? null)
-            ->filter()
-            ->values()
-            ->all();
+        if ($driver === 'sqlite') {
+            return collect(DB::select(
+                "SELECT name
+                 FROM sqlite_master
+                 WHERE type = 'table'
+                   AND name NOT LIKE 'sqlite_%'
+                 ORDER BY name"
+            ))
+                ->map(fn ($row) => (array) $row)
+                ->map(fn ($row) => $row['name'] ?? null)
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        return DB::connection()->getSchemaBuilder()->getTableListing();
     }
 
     private function getColumns(string $table): array
     {
-        $columnsRaw = DB::select('SHOW COLUMNS FROM `'.$table.'`');
+        $driver = DB::connection()->getDriverName();
 
-        return collect($columnsRaw)
-            ->map(fn ($row) => (array) $row)
-            ->values()
-            ->all();
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $columnsRaw = DB::select('SHOW COLUMNS FROM `'.$table.'`');
+
+            return collect($columnsRaw)
+                ->map(fn ($row) => (array) $row)
+                ->values()
+                ->all();
+        }
+
+        if ($driver === 'pgsql') {
+            $columnsRaw = DB::select(
+                "SELECT
+                    c.column_name,
+                    c.data_type,
+                    c.udt_name,
+                    c.is_nullable,
+                    c.column_default,
+                    CASE WHEN tc.constraint_type = 'PRIMARY KEY' THEN 'PRI' ELSE '' END AS key_type
+                 FROM information_schema.columns c
+                 LEFT JOIN information_schema.key_column_usage kcu
+                    ON c.table_schema = kcu.table_schema
+                   AND c.table_name = kcu.table_name
+                   AND c.column_name = kcu.column_name
+                 LEFT JOIN information_schema.table_constraints tc
+                    ON kcu.constraint_name = tc.constraint_name
+                   AND kcu.table_schema = tc.table_schema
+                   AND kcu.table_name = tc.table_name
+                 WHERE c.table_schema = 'public'
+                   AND c.table_name = ?
+                 ORDER BY c.ordinal_position",
+                [$table]
+            );
+
+            return collect($columnsRaw)
+                ->map(fn ($row) => (array) $row)
+                ->map(function (array $row): array {
+                    $type = (string) ($row['data_type'] ?? '');
+                    $udtName = (string) ($row['udt_name'] ?? '');
+                    $normalizedType = $udtName !== '' ? $udtName : $type;
+
+                    return [
+                        'Field' => (string) ($row['column_name'] ?? ''),
+                        'Type' => $normalizedType,
+                        'Null' => ((string) ($row['is_nullable'] ?? 'NO')) === 'YES' ? 'YES' : 'NO',
+                        'Key' => (string) ($row['key_type'] ?? ''),
+                        'Default' => $row['column_default'] ?? null,
+                    ];
+                })
+                ->values()
+                ->all();
+        }
+
+        if ($driver === 'sqlite') {
+            $tableSafe = str_replace("'", "''", $table);
+            $columnsRaw = DB::select("PRAGMA table_info('{$tableSafe}')");
+
+            return collect($columnsRaw)
+                ->map(fn ($row) => (array) $row)
+                ->map(function (array $row): array {
+                    return [
+                        'Field' => (string) ($row['name'] ?? ''),
+                        'Type' => (string) ($row['type'] ?? 'text'),
+                        'Null' => ((int) ($row['notnull'] ?? 0)) === 0 ? 'YES' : 'NO',
+                        'Key' => ((int) ($row['pk'] ?? 0)) === 1 ? 'PRI' : '',
+                        'Default' => $row['dflt_value'] ?? null,
+                    ];
+                })
+                ->values()
+                ->all();
+        }
+
+        return [];
     }
 
     private function getPrimaryKey(array $columns): ?string
@@ -283,6 +394,19 @@ class DbExplorerController extends Controller
                 }
 
                 $payload[$field] = json_encode($decoded, JSON_UNESCAPED_UNICODE);
+                continue;
+            }
+
+            if (str_contains($type, 'bool')) {
+                if ($value === '' && $nullable) {
+                    $payload[$field] = null;
+                    continue;
+                }
+
+                $payload[$field] = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if ($payload[$field] === null && ! $nullable) {
+                    abort(422, __('Kolom :field harus berupa nilai true/false.', ['field' => $field]));
+                }
                 continue;
             }
 

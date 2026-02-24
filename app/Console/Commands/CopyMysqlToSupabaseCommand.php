@@ -11,10 +11,13 @@ class CopyMysqlToSupabaseCommand extends Command
 {
     protected $signature = 'db:copy-mysql-to-supabase
         {--source=mysql : Nama koneksi source MySQL}
-        {--target=supabase : Nama koneksi target PostgreSQL/Supabase}
+        {--target=pgsql : Nama koneksi target PostgreSQL/Supabase}
+        {--tables= : Daftar tabel dipisah koma. Kosong = semua tabel}
         {--chunk=500 : Jumlah row per batch insert}
         {--migrate-target : Jalankan migrate --database=<target> sebelum copy}
-        {--append : Jangan truncate data target sebelum copy}
+        {--append : Opsi lama, tidak diperlukan lagi karena mode default sudah aman}
+        {--truncate : Truncate data target sebelum copy (DESTRUKTIF)}
+        {--force-destructive : Konfirmasi eksplisit untuk operasi destruktif}
         {--dry-run : Tampilkan rencana tanpa menulis data}';
 
     protected $description = 'Copy seluruh tabel dari MySQL ke Supabase PostgreSQL';
@@ -23,13 +26,32 @@ class CopyMysqlToSupabaseCommand extends Command
     {
         $sourceName = (string) $this->option('source');
         $targetName = (string) $this->option('target');
+        $tablesOption = trim((string) $this->option('tables'));
         $chunkSize = (int) $this->option('chunk');
         $append = (bool) $this->option('append');
+        $truncate = (bool) $this->option('truncate');
+        $forceDestructive = (bool) $this->option('force-destructive');
         $dryRun = (bool) $this->option('dry-run');
         $migrateTarget = (bool) $this->option('migrate-target');
 
         if ($chunkSize < 1) {
             $this->error('Nilai --chunk harus >= 1.');
+
+            return self::FAILURE;
+        }
+
+        if ($append && $truncate) {
+            $this->error('Gunakan salah satu: --append (legacy) atau --truncate.');
+
+            return self::FAILURE;
+        }
+
+        if ($append) {
+            $this->warn('Opsi --append sudah tidak diperlukan. Mode default sekarang aman (tanpa truncate).');
+        }
+
+        if ($truncate && ! $forceDestructive) {
+            $this->error('Mode destruktif terdeteksi. Tambahkan --force-destructive untuk melanjutkan.');
 
             return self::FAILURE;
         }
@@ -120,6 +142,27 @@ class CopyMysqlToSupabaseCommand extends Command
             $orderedTables,
             fn (string $table): bool => isset($targetTableMap[$table])
         ));
+
+        if ($tablesOption !== '') {
+            $selectedTables = collect(explode(',', $tablesOption))
+                ->map(fn (string $table): string => trim($table))
+                ->filter(fn (string $table): bool => $table !== '')
+                ->values()
+                ->all();
+
+            if ($selectedTables === []) {
+                $this->error('Opsi --tables tidak valid. Gunakan format: users,categories,equipments');
+
+                return self::FAILURE;
+            }
+
+            $selectedTableMap = array_fill_keys($selectedTables, true);
+            $copyTables = array_values(array_filter(
+                $copyTables,
+                fn (string $table): bool => isset($selectedTableMap[$table])
+            ));
+        }
+
         $missingInTarget = array_values(array_filter(
             $sourceTables,
             fn (string $table): bool => ! isset($targetTableMap[$table])
@@ -141,7 +184,8 @@ class CopyMysqlToSupabaseCommand extends Command
             return self::SUCCESS;
         }
 
-        if (! $append) {
+        if ($truncate) {
+            $this->warn('Mode destruktif aktif: target akan di-truncate sebelum copy.');
             $this->truncateTargetTables($target, $copyTables);
         }
 
@@ -152,7 +196,8 @@ class CopyMysqlToSupabaseCommand extends Command
                 $target,
                 $sourceDatabase,
                 $table,
-                $chunkSize
+                $chunkSize,
+                ! $truncate
             );
 
             $totalInserted += $inserted;
@@ -323,7 +368,8 @@ class CopyMysqlToSupabaseCommand extends Command
         ConnectionInterface $target,
         string $sourceDatabase,
         string $table,
-        int $chunkSize
+        int $chunkSize,
+        bool $ignoreDuplicates
     ): array {
         $sourceColumns = $this->fetchSourceColumns($source, $sourceDatabase, $table);
         $targetColumns = $this->fetchTargetColumns($target, $table);
@@ -370,15 +416,23 @@ class CopyMysqlToSupabaseCommand extends Command
             $batch[] = $preparedRow;
 
             if (count($batch) >= $chunkSize) {
-                $target->table($table)->insert($batch);
-                $inserted += count($batch);
+                if ($ignoreDuplicates) {
+                    $inserted += (int) $target->table($table)->insertOrIgnore($batch);
+                } else {
+                    $target->table($table)->insert($batch);
+                    $inserted += count($batch);
+                }
                 $batch = [];
             }
         }
 
         if ($batch !== []) {
-            $target->table($table)->insert($batch);
-            $inserted += count($batch);
+            if ($ignoreDuplicates) {
+                $inserted += (int) $target->table($table)->insertOrIgnore($batch);
+            } else {
+                $target->table($table)->insert($batch);
+                $inserted += count($batch);
+            }
         }
 
         return [$inserted, $sourceCount];

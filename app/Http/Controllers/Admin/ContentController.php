@@ -188,7 +188,20 @@ class ContentController extends Controller
                 'label' => 'Contact Map Embed',
                 'type' => 'textarea',
                 'group' => 'contact',
-                'validation' => ['nullable', 'string', 'max:5000'],
+                'validation' => [
+                    'nullable',
+                    'string',
+                    'max:5000',
+                    function (string $attribute, mixed $value, \Closure $fail): void {
+                        if (! is_string($value) || trim($value) === '') {
+                            return;
+                        }
+
+                        if (trusted_map_embed_url($value) === null) {
+                            $fail(__('Embed peta harus menggunakan Google Maps yang valid.'));
+                        }
+                    },
+                ],
             ],
         ];
     }

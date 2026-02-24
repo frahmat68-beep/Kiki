@@ -141,7 +141,7 @@
                             href="{{ $item['url'] }}"
                             title="{{ $item['label'] }}"
                             aria-label="{{ $item['label'] }}"
-                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
+                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/50' : 'bg-white !text-slate-700 hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300' }}"
                         >
                             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
                             <span class="truncate text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
@@ -150,7 +150,7 @@
                             type="button"
                             x-cloak
                             x-show="catalogSubmenuEnabled"
-                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-blue-200 hover:text-blue-600 lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex"
+                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white !text-slate-700 transition hover:border-blue-300 hover:bg-blue-100 hover:!text-slate-900 lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex"
                             @click.prevent="catalogToggle()"
                             :aria-expanded="catalogSubmenuOpen.toString()"
                             aria-label="{{ __('ui.nav.category') }}"
@@ -181,7 +181,7 @@
                                 @endphp
                                 <a
                                     href="{{ route('catalog', ['category' => $category->slug]) }}"
-                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-transparent text-slate-600 hover:border-blue-200 hover:bg-white hover:text-blue-600' }}"
+                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-transparent !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}"
                                 >
                                     <span class="truncate">{{ $category->name }}</span>
                                     <span class="ml-2 inline-flex h-1.5 w-1.5 rounded-full {{ $isCategoryActive ? 'bg-blue-600' : 'bg-slate-300' }}"></span>
@@ -201,7 +201,7 @@
                     @if (isset($item['prefs']) && $item['prefs'])
                         @click.prevent="guestPrefsOpen = !guestPrefsOpen"
                     @endif
-                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-900 hover:text-white' }}"
+                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/50' : 'bg-white !text-slate-700 hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300' }}"
                 >
                     <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
@@ -218,10 +218,10 @@
     >
         <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
         <div class="mt-2 grid grid-cols-2 gap-2">
-            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
                 {{ __('ui.languages.id') }}
             </a>
-            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
                 {{ __('ui.languages.en') }}
             </a>
         </div>
@@ -229,7 +229,7 @@
         <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
         <div class="mt-2 grid grid-cols-3 gap-2">
             @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
                     {{ $label }}
                 </a>
             @endforeach
@@ -242,7 +242,7 @@
                 href="{{ route('profile.complete') }}"
                 title="{{ __('ui.nav.my_profile') }}"
                 aria-label="{{ __('ui.nav.my_profile') }}"
-                class="flex items-center gap-3 rounded-xl px-2 py-2 text-slate-700 transition hover:bg-slate-900 hover:text-white lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
+                class="flex items-center gap-3 rounded-xl px-2 py-2 !text-slate-700 transition hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
             >
                 <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">{{ $userInitial }}</span>
                 <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[10rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[10rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $displayName }}</span>
@@ -253,7 +253,7 @@
                 <button
                     type="submit"
                     title="{{ __('ui.nav.logout') }}"
-                    class="flex h-10 w-full items-center rounded-xl px-3 text-slate-600 transition hover:bg-slate-900 hover:text-white lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3"
+                    class="flex h-10 w-full items-center rounded-xl px-3 !text-slate-700 transition hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300 lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3"
                 >
                     <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

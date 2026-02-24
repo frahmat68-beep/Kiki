@@ -165,13 +165,31 @@
                                     <p class="text-[11px] text-slate-500">{{ $suggestion->category?->name ?? __('ui.cart.gear_generic') }} • {{ __('ui.cart.available_units', ['count' => $suggestionAvailable]) }}</p>
                                     <div class="mt-2 flex items-center justify-between gap-2">
                                         <p class="text-xs font-semibold text-slate-800">{{ $formatIdr((int) $suggestion->price_per_day) }}/hari</p>
-                                        <a href="{{ $suggestionUrl }}" class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
-                                            {{ __('ui.actions.detail') }}
-                                        </a>
+                                        <div class="flex items-center gap-2">
+                                            <a href="{{ $suggestionUrl }}" class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
+                                                {{ __('ui.actions.detail') }}
+                                            </a>
+                                            <button
+                                                type="button"
+                                                class="js-open-suggestion-add-modal inline-flex items-center rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-blue-700"
+                                                data-equipment-id="{{ (int) $suggestion->id }}"
+                                                data-name="{{ $suggestion->name }}"
+                                                data-category="{{ $suggestion->category?->name ?? __('ui.cart.gear_generic') }}"
+                                                data-image="{{ $suggestionImage }}"
+                                                data-price="{{ $formatIdr((int) $suggestion->price_per_day) }}/hari"
+                                                data-max-qty="{{ max(1, min($suggestionAvailable, 99)) }}"
+                                                data-start-date="{{ $cartSuggestedStartDate ?? '' }}"
+                                                data-end-date="{{ $cartSuggestedEndDate ?? '' }}"
+                                                data-start-date-label="{{ $cartSuggestedStartDate ? \Carbon\Carbon::parse($cartSuggestedStartDate)->translatedFormat('d M Y') : '' }}"
+                                                data-end-date-label="{{ $cartSuggestedEndDate ? \Carbon\Carbon::parse($cartSuggestedEndDate)->translatedFormat('d M Y') : '' }}"
+                                            >
+                                                {{ __('ui.cart.suggestions_add_button') }}
+                                            </button>
+                                        </div>
                                     </div>
                                     @if ($cartSuggestedStartDate && $cartSuggestedEndDate)
                                         <p class="mt-1 text-[11px] text-blue-700">
-                                            {{ __('Tanggal otomatis ikut pesanan:') }} {{ \Carbon\Carbon::parse($cartSuggestedStartDate)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($cartSuggestedEndDate)->translatedFormat('d M Y') }}
+                                            {{ __('ui.cart.suggestions_locked_dates_note', ['start' => \Carbon\Carbon::parse($cartSuggestedStartDate)->translatedFormat('d M Y'), 'end' => \Carbon\Carbon::parse($cartSuggestedEndDate)->translatedFormat('d M Y')]) }}
                                         </p>
                                     @endif
                                 </div>
@@ -235,6 +253,59 @@
                 </a>
             </div>
         </div>
+
+        @if (! empty($cartItems) && $suggestedEquipments->isNotEmpty())
+            <div id="suggestion-add-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-900/55 p-4" role="dialog" aria-modal="true" aria-labelledby="suggestion-add-modal-title">
+                <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 id="suggestion-add-modal-title" class="text-base font-semibold text-slate-900">{{ __('ui.cart.suggestions_add_title') }}</h3>
+                            <p class="mt-1 text-xs text-slate-500">{{ __('ui.cart.suggestions_subtitle') }}</p>
+                        </div>
+                        <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-blue-200 hover:text-blue-600" data-modal-close aria-label="{{ __('ui.actions.close') }}">
+                            ✕
+                        </button>
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <img id="suggestion-modal-image" src="" alt="Suggestion" class="h-14 w-14 rounded-lg bg-white object-cover">
+                        <div class="min-w-0 flex-1">
+                            <p id="suggestion-modal-name" class="truncate text-sm font-semibold text-slate-900"></p>
+                            <p id="suggestion-modal-category" class="text-xs text-slate-500"></p>
+                            <p id="suggestion-modal-price" class="mt-1 text-xs font-semibold text-slate-800"></p>
+                        </div>
+                    </div>
+
+                    <p id="suggestion-modal-dates" class="mt-3 hidden text-xs text-blue-700"></p>
+
+                    <form id="suggestion-add-form" method="POST" action="{{ route('cart.add') }}" class="mt-4 space-y-4">
+                        @csrf
+                        <input type="hidden" name="equipment_id" id="suggestion-form-equipment-id">
+                        <input type="hidden" name="qty" id="suggestion-form-qty" value="1">
+                        <input type="hidden" name="rental_start_date" id="suggestion-form-start-date">
+                        <input type="hidden" name="rental_end_date" id="suggestion-form-end-date">
+
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{{ __('ui.cart.suggestions_qty_label') }}</p>
+                            <div class="mt-2 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                <button type="button" class="h-7 w-7 rounded-full border border-slate-300 text-sm font-semibold text-slate-600 transition hover:border-blue-300 hover:text-blue-700" data-qty-action="decrement">-</button>
+                                <span id="suggestion-qty-display" class="min-w-[28px] text-center text-sm font-semibold text-slate-900">1</span>
+                                <button type="button" class="h-7 w-7 rounded-full border border-slate-300 text-sm font-semibold text-slate-600 transition hover:border-blue-300 hover:text-blue-700" data-qty-action="increment">+</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800" data-modal-close>
+                                {{ __('ui.catalog.quick_cancel_button') }}
+                            </button>
+                            <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+                                {{ __('ui.cart.suggestions_confirm_add') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
 
@@ -281,6 +352,123 @@
                         },
                     });
                 });
+            });
+        })();
+
+        (() => {
+            const modal = document.getElementById('suggestion-add-modal');
+            if (!modal) {
+                return;
+            }
+
+            const openButtons = document.querySelectorAll('.js-open-suggestion-add-modal');
+            if (!openButtons.length) {
+                return;
+            }
+
+            const modalName = document.getElementById('suggestion-modal-name');
+            const modalCategory = document.getElementById('suggestion-modal-category');
+            const modalPrice = document.getElementById('suggestion-modal-price');
+            const modalImage = document.getElementById('suggestion-modal-image');
+            const modalDates = document.getElementById('suggestion-modal-dates');
+            const lockedDatesTemplate = @json(__('ui.cart.suggestions_locked_dates_note', ['start' => ':start', 'end' => ':end']));
+
+            const equipmentIdInput = document.getElementById('suggestion-form-equipment-id');
+            const qtyInput = document.getElementById('suggestion-form-qty');
+            const startDateInput = document.getElementById('suggestion-form-start-date');
+            const endDateInput = document.getElementById('suggestion-form-end-date');
+            const qtyDisplay = document.getElementById('suggestion-qty-display');
+
+            const decrementButton = modal.querySelector('[data-qty-action="decrement"]');
+            const incrementButton = modal.querySelector('[data-qty-action="increment"]');
+            const closeButtons = modal.querySelectorAll('[data-modal-close]');
+
+            let maxQty = 99;
+
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            };
+
+            const syncQty = (nextQty) => {
+                const clamped = Math.max(1, Math.min(Number(nextQty || 1), maxQty));
+                qtyInput.value = String(clamped);
+                qtyDisplay.textContent = String(clamped);
+                decrementButton?.toggleAttribute('disabled', clamped <= 1);
+                incrementButton?.toggleAttribute('disabled', clamped >= maxQty);
+                decrementButton?.classList.toggle('opacity-40', clamped <= 1);
+                incrementButton?.classList.toggle('opacity-40', clamped >= maxQty);
+            };
+
+            openButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const {
+                        equipmentId = '',
+                        name = '',
+                        category = '',
+                        image = '',
+                        price = '',
+                        maxQty: buttonMaxQty = '99',
+                        startDate = '',
+                        endDate = '',
+                        startDateLabel = '',
+                        endDateLabel = '',
+                    } = button.dataset;
+
+                    maxQty = Math.max(1, Math.min(Number(buttonMaxQty || '99'), 99));
+                    equipmentIdInput.value = equipmentId;
+                    startDateInput.value = startDate;
+                    endDateInput.value = endDate;
+
+                    modalName.textContent = name;
+                    modalCategory.textContent = category;
+                    modalPrice.textContent = price;
+                    modalImage.src = image || '{{ asset('MANAKE-FAV-M.png') }}';
+
+                    if (startDate && endDate) {
+                        modalDates.textContent = lockedDatesTemplate
+                            .replace(':start', startDateLabel || startDate)
+                            .replace(':end', endDateLabel || endDate);
+                        modalDates.classList.remove('hidden');
+                    } else {
+                        modalDates.textContent = '';
+                        modalDates.classList.add('hidden');
+                    }
+
+                    syncQty(1);
+                    openModal();
+                });
+            });
+
+            decrementButton?.addEventListener('click', () => {
+                syncQty(Number(qtyInput.value || '1') - 1);
+            });
+
+            incrementButton?.addEventListener('click', () => {
+                syncQty(Number(qtyInput.value || '1') + 1);
+            });
+
+            closeButtons.forEach((button) => {
+                button.addEventListener('click', closeModal);
+            });
+
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.classList.contains('flex')) {
+                    closeModal();
+                }
             });
         })();
     </script>

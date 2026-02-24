@@ -13,8 +13,8 @@
         };
         $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
-        $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
-        $logoUrlDark = $assetWithVersion('manake-logo-white.png');
+        $logoFallbackLight = $assetWithVersion('manake-logo-blue.png');
+        $logoUrlLight = $logoFallbackLight;
     @endphp
     <link
         rel="icon"
@@ -38,6 +38,9 @@
         <div class="card w-full max-w-4xl overflow-hidden rounded-3xl shadow-2xl lg:grid lg:grid-cols-2">
             <div class="p-6 text-slate-800 sm:p-8 lg:p-10">
                 <div>
+                    <a href="/" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+                        <img src="{{ $logoUrlLight }}" alt="Manake" class="h-10 w-auto" onerror="this.onerror=null;this.src='{{ $logoFallbackLight }}';">
+                    </a>
                     <div>
                         <h2 class="text-2xl font-semibold text-blue-700">{{ __('ui.admin.admin_login') }}</h2>
                         <p class="mt-2 text-sm text-slate-500">{{ __('ui.admin.login_intro') }}</p>
@@ -84,8 +87,7 @@
                 </form>
             </div>
             <div class="hidden p-8 text-slate-100 lg:block lg:p-10 bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900">
-                <img src="{{ $logoUrlLight }}" alt="Manake" class="brand-logo-light h-12 w-auto rounded-xl bg-white p-2 dark:hidden">
-                <img src="{{ $logoUrlDark }}" alt="Manake" class="brand-logo-dark hidden h-12 w-auto rounded-xl bg-white p-2 dark:block">
+                <img src="{{ $logoUrlLight }}" alt="Manake" class="h-12 w-auto rounded-xl bg-white p-2" onerror="this.onerror=null;this.src='{{ $logoFallbackLight }}';">
                 <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                     {{ __('ui.admin.login_heading') }}
                 </h1>

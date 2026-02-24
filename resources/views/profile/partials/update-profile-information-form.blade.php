@@ -1,4 +1,7 @@
 <section>
+    @php
+        $isNameLocked = (bool) ($nameLocked ?? false);
+    @endphp
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Informasi Profil') }}
@@ -19,7 +22,20 @@
 
         <div>
             <x-input-label for="name" :value="__('Nama')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <x-text-input
+                id="name"
+                name="name"
+                type="text"
+                class="mt-1 block w-full @if($isNameLocked) bg-gray-100 text-gray-500 @endif"
+                :value="old('name', $user->name)"
+                required
+                autofocus
+                autocomplete="name"
+                :readonly="$isNameLocked"
+            />
+            @if ($isNameLocked)
+                <p class="mt-1 text-xs text-gray-500">{{ __('Nama akun dikunci mengikuti data identitas.') }}</p>
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 

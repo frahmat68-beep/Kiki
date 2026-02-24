@@ -6,6 +6,11 @@
     <title>{{ __('ui.invoice.title') }} {{ $order->order_number ?? ('ORD-' . $order->id) }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
+    <script>
+        if ((window.location.hash || '').toLowerCase().includes('embedded')) {
+            document.documentElement.classList.add('invoice-embedded');
+        }
+    </script>
     <style>
         :root {
             --invoice-bg: #f6f8fc;
@@ -492,6 +497,10 @@
             gap: 8px;
         }
 
+        html.invoice-embedded .actions {
+            display: none;
+        }
+
         .action-btn {
             border: 1px solid var(--invoice-border);
             background: var(--invoice-surface);
@@ -545,6 +554,114 @@
         .toast.show {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .pickup-guide-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            background: rgba(2, 6, 23, 0.62);
+        }
+
+        .pickup-guide-overlay.is-visible {
+            display: flex;
+        }
+
+        .pickup-guide-card {
+            width: min(100%, 620px);
+            border: 1px solid var(--invoice-border);
+            border-radius: 16px;
+            background: var(--invoice-surface);
+            box-shadow: var(--invoice-shadow);
+            overflow: hidden;
+        }
+
+        .pickup-guide-head {
+            padding: 16px 18px;
+            background: var(--invoice-primary-soft);
+            border-bottom: 1px solid var(--invoice-border);
+        }
+
+        .pickup-guide-title {
+            margin: 0;
+            color: var(--invoice-heading);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .pickup-guide-subtitle {
+            margin: 6px 0 0;
+            color: var(--invoice-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .pickup-guide-body {
+            padding: 16px 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .pickup-guide-item {
+            border: 1px solid var(--invoice-border);
+            border-radius: 12px;
+            background: var(--invoice-surface-soft);
+            padding: 11px 12px;
+        }
+
+        .pickup-guide-item strong {
+            display: block;
+            color: var(--invoice-heading);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .pickup-guide-item p {
+            margin: 0;
+            color: var(--invoice-text);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .pickup-guide-item .receipt-code {
+            margin-top: 6px;
+            font-weight: 700;
+            color: var(--invoice-primary-strong);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pickup-guide-item .pickup-name {
+            margin-top: 4px;
+            color: var(--invoice-muted);
+            font-size: 12px;
+        }
+
+        .pickup-guide-actions {
+            padding: 0 18px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .pickup-guide-close {
+            border: 0;
+            border-radius: 10px;
+            background: var(--invoice-primary);
+            color: #fff;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .pickup-guide-close:hover {
+            background: var(--invoice-primary-strong);
         }
 
         @media (max-width: 920px) {
@@ -627,7 +744,8 @@
             }
 
             .actions,
-            .toast {
+            .toast,
+            .pickup-guide-overlay {
                 display: none !important;
             }
 
@@ -777,6 +895,16 @@
             ->trim()
             ->limit(100)
             ->value();
+        $pickupAddressRaw = (string) setting('footer.address', $footerAddressRaw);
+        $pickupAddressLines = collect(preg_split('/\R+/', trim((string) strip_tags($pickupAddressRaw))))
+            ->map(static fn ($line) => trim((string) $line))
+            ->filter()
+            ->values();
+        if ($pickupAddressLines->isEmpty() && $footerAddress !== '') {
+            $pickupAddressLines = collect([$footerAddress]);
+        }
+        $pickupRecipientName = (string) ($profile?->full_name ?? $order->user->name ?? '-');
+        $pickupGuideStorageKey = 'manake.invoice_pickup_guide_seen.' . md5((string) $invoiceId);
     @endphp
 
     <main class="invoice-shell">
@@ -962,6 +1090,48 @@
         </section>
     </main>
 
+    <div
+        id="pickup-guide-modal"
+        class="pickup-guide-overlay"
+        data-storage-key="{{ $pickupGuideStorageKey }}"
+        data-enabled="{{ $statusRaw === 'paid' ? '1' : '0' }}"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pickup-guide-title"
+    >
+        <div class="pickup-guide-card">
+            <div class="pickup-guide-head">
+                <h2 id="pickup-guide-title" class="pickup-guide-title">{{ __('ui.invoice.pickup_popup.title') }}</h2>
+                <p class="pickup-guide-subtitle">{{ __('ui.invoice.pickup_popup.subtitle') }}</p>
+            </div>
+            <div class="pickup-guide-body">
+                <div class="pickup-guide-item">
+                    <strong>{{ __('ui.invoice.pickup_popup.where_title') }}</strong>
+                    <p>
+                        @foreach ($pickupAddressLines as $line)
+                            {{ $line }}@if (! $loop->last)<br>@endif
+                        @endforeach
+                    </p>
+                </div>
+                <div class="pickup-guide-item">
+                    <strong>{{ __('ui.invoice.pickup_popup.receipt_title') }}</strong>
+                    <p>{{ __('ui.invoice.pickup_popup.receipt_body') }}</p>
+                    <p class="receipt-code">{{ __('ui.invoice.pickup_popup.receipt_label') }}: {{ $invoiceId }}</p>
+                    <p class="pickup-name">{{ $pickupRecipientName }}</p>
+                </div>
+                <div class="pickup-guide-item">
+                    <strong>{{ __('ui.invoice.pickup_popup.delegate_title') }}</strong>
+                    <p>{{ __('ui.invoice.pickup_popup.delegate_body') }}</p>
+                </div>
+            </div>
+            <div class="pickup-guide-actions">
+                <button type="button" class="pickup-guide-close" data-close-pickup-guide>
+                    {{ __('ui.invoice.pickup_popup.close_button') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="actions" aria-label="Invoice Actions">
         <a href="{{ $signedPdfUrl ?: '#' }}" class="action-btn" @if (! $signedPdfUrl) aria-disabled="true" @endif>{{ __('ui.invoice.actions.download_pdf') }}</a>
         <button type="button" class="action-btn" id="share-invoice-btn">{{ __('ui.invoice.actions.share') }}</button>
@@ -975,6 +1145,7 @@
             const toast = document.getElementById('invoice-toast');
             const shareButton = document.getElementById('share-invoice-btn');
             const printButton = document.getElementById('print-invoice-btn');
+            const pickupGuideModal = document.getElementById('pickup-guide-modal');
             const invoiceId = @json($invoiceId);
             const printStyleId = 'receipt-print-style';
             const allowedPapers = new Set(['auto', 'a3', 'a4', 'a5', 'letter', 'legal']);
@@ -1047,6 +1218,60 @@
                 const orientation = params.get('orientation') || 'portrait';
                 printInvoice(paper, orientation);
             });
+
+            if (pickupGuideModal) {
+                const isEnabled = pickupGuideModal.dataset.enabled === '1';
+                const storageKey = pickupGuideModal.dataset.storageKey || '';
+                const closeButtons = pickupGuideModal.querySelectorAll('[data-close-pickup-guide]');
+
+                const closeGuide = () => {
+                    pickupGuideModal.classList.remove('is-visible');
+                    document.body.style.overflow = '';
+
+                    if (storageKey) {
+                        try {
+                            localStorage.setItem(storageKey, '1');
+                        } catch (error) {
+                            // ignore storage failures
+                        }
+                    }
+                };
+
+                if (isEnabled) {
+                    let shouldOpen = true;
+
+                    if (storageKey) {
+                        try {
+                            shouldOpen = localStorage.getItem(storageKey) !== '1';
+                        } catch (error) {
+                            shouldOpen = true;
+                        }
+                    }
+
+                    if (shouldOpen) {
+                        window.setTimeout(() => {
+                            pickupGuideModal.classList.add('is-visible');
+                            document.body.style.overflow = 'hidden';
+                        }, 350);
+                    }
+                }
+
+                closeButtons.forEach((button) => {
+                    button.addEventListener('click', closeGuide);
+                });
+
+                pickupGuideModal.addEventListener('click', (event) => {
+                    if (event.target === pickupGuideModal) {
+                        closeGuide();
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && pickupGuideModal.classList.contains('is-visible')) {
+                        closeGuide();
+                    }
+                });
+            }
 
             window.addEventListener('message', (event) => {
                 if (!event || !event.data || event.data.type !== 'manake-print-receipt') {

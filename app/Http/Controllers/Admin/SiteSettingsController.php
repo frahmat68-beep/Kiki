@@ -38,7 +38,20 @@ class SiteSettingsController extends Controller
             'social_whatsapp' => ['nullable', 'string', 'max:255'],
             'social_youtube' => ['nullable', 'string', 'max:255'],
             'social_tiktok' => ['nullable', 'string', 'max:255'],
-            'contact_map_embed' => ['nullable', 'string', 'max:5000'],
+            'contact_map_embed' => [
+                'nullable',
+                'string',
+                'max:5000',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! is_string($value) || trim($value) === '') {
+                        return;
+                    }
+
+                    if (trusted_map_embed_url($value) === null) {
+                        $fail(__('Embed peta harus menggunakan Google Maps yang valid.'));
+                    }
+                },
+            ],
             'contact_form_receiver_email' => ['nullable', 'email', 'max:150'],
             'typography_heading_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
             'typography_subheading_color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
