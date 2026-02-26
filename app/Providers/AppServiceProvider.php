@@ -235,7 +235,18 @@ class AppServiceProvider extends ServiceProvider
             }
 
             if ($localeOverrides !== []) {
-                app('translator')->addLines($localeOverrides, $locale);
+                $translator = app('translator');
+                $groups = collect(array_keys($localeOverrides))
+                    ->map(static fn ($key) => explode('.', (string) $key, 2)[0] ?? '')
+                    ->filter(static fn ($group) => $group !== '')
+                    ->unique()
+                    ->values();
+
+                foreach ($groups as $group) {
+                    $translator->load('*', (string) $group, $locale);
+                }
+
+                $translator->addLines($localeOverrides, $locale);
             }
         }
     }

@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4;
-            margin: 12mm 11mm;
+            margin: 10mm;
         }
 
         * {
@@ -17,21 +17,21 @@
             margin: 0;
             color: #0f172a;
             font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
+            font-size: 10.8px;
             line-height: 1.45;
             background: #fff;
         }
 
         .sheet {
-            border: 1px solid #d7e0ee;
-            border-radius: 8px;
+            border: 1px solid #d6deed;
+            border-radius: 16px;
             overflow: hidden;
         }
 
         .header {
-            padding: 12px 14px;
-            border-bottom: 1px solid #d7e0ee;
-            background: linear-gradient(135deg, #eef4ff 0%, #e6eeff 100%);
+            padding: 16px 18px;
+            border-bottom: 1px solid #334987;
+            background: linear-gradient(135deg, #061338 0%, #264bbf 54%, #10295f 100%);
         }
 
         .layout {
@@ -43,48 +43,48 @@
             vertical-align: top;
         }
 
+        .brand-logo-wrap {
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.52);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.97);
+            padding: 7px 11px;
+            margin-bottom: 10px;
+        }
+
         .brand-logo {
             display: block;
             height: 30px;
             width: auto;
-            margin-bottom: 6px;
-        }
-
-        .brand-kicker {
             margin: 0;
-            color: #1d4ed8;
-            font-size: 8.8px;
-            text-transform: uppercase;
-            letter-spacing: .15em;
-            font-weight: 700;
         }
 
         .invoice-title {
-            margin: 3px 0 0;
-            font-size: 24px;
-            color: #0f172a;
+            margin: 4px 0 0;
+            font-size: 29px;
+            color: #fff;
             line-height: 1.1;
             font-weight: 700;
         }
 
         .invoice-subtitle {
-            margin: 6px 0 0;
-            color: #64748b;
-            font-size: 10px;
+            margin: 8px 0 0;
+            color: rgba(232, 240, 255, 0.9);
+            font-size: 10.4px;
         }
 
         .summary-panel {
-            border: 1px solid #d7e0ee;
-            border-radius: 7px;
-            background: #fff;
-            padding: 9px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 12px;
+            background: rgba(5, 16, 44, 0.32);
+            padding: 11px 12px;
         }
 
         .status-badge {
             display: inline-block;
             border-radius: 999px;
-            padding: 2px 8px;
-            font-size: 8.5px;
+            padding: 3px 8px;
+            font-size: 8.4px;
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
@@ -106,51 +106,51 @@
         }
 
         .status-damage {
-            background: #fce7f3;
-            color: #be185d;
+            background: rgba(236, 72, 153, 0.2);
+            color: #fbcfe8;
         }
 
         .summary-label {
-            margin: 8px 0 1px;
-            font-size: 8.5px;
+            margin: 8px 0 2px;
+            font-size: 8.3px;
             text-transform: uppercase;
-            letter-spacing: .08em;
-            color: #64748b;
+            letter-spacing: .12em;
+            color: rgba(232, 240, 255, 0.82);
             font-weight: 700;
         }
 
         .summary-amount {
             margin: 0;
-            color: #0f172a;
-            font-size: 22px;
+            color: #fff;
+            font-size: 25px;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
         }
 
         .cards {
-            padding: 10px 14px 2px;
+            padding: 12px 18px 4px;
         }
 
         .cards-grid {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 7px;
-            margin: -7px;
+            border-spacing: 8px;
+            margin: -8px;
         }
 
         .cards-grid td {
             width: 50%;
-            border: 1px solid #d7e0ee;
-            border-radius: 7px;
-            padding: 9px;
+            border: 1px solid #d8e2f0;
+            border-radius: 12px;
+            padding: 10px;
             vertical-align: top;
             background: #fff;
         }
 
         .card-title {
-            margin: 0 0 6px;
+            margin: 0 0 7px;
             color: #334155;
-            font-size: 8.8px;
+            font-size: 8.7px;
             text-transform: uppercase;
             letter-spacing: .08em;
             font-weight: 700;
@@ -158,8 +158,8 @@
 
         .person-name {
             margin: 0;
-            color: #0f172a;
-            font-size: 14px;
+            color: #0b1530;
+            font-size: 15px;
             font-weight: 700;
             line-height: 1.2;
         }
@@ -167,20 +167,20 @@
         .line {
             margin: 3px 0 0;
             color: #64748b;
-            font-size: 10px;
+            font-size: 9.9px;
             line-height: 1.35;
         }
 
         .meta-row {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
         .meta-row td {
             border: none;
             padding: 2px 0;
-            font-size: 10px;
+            font-size: 9.8px;
             vertical-align: top;
         }
 
@@ -197,12 +197,31 @@
         }
 
         .items {
-            padding: 8px 14px 6px;
+            padding: 8px 18px 8px;
+        }
+
+        .section-head {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+
+        .section-head td {
+            vertical-align: bottom;
+        }
+
+        .section-note {
+            text-align: right;
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
 
         .section-title {
             margin: 0;
-            color: #0f172a;
+            color: #0b1530;
             font-size: 16px;
             font-weight: 700;
         }
@@ -210,10 +229,13 @@
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 8px;
+            margin-top: 6px;
             table-layout: fixed;
             font-size: 10px;
             page-break-inside: auto;
+            border: 1px solid #d8e2f0;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .items-table thead {
@@ -226,9 +248,9 @@
 
         .items-table thead th {
             padding: 7px 8px;
-            background: #edf3ff;
-            border-top: 1px solid #d7e0ee;
-            border-bottom: 1px solid #d7e0ee;
+            background: #eaf0ff;
+            border-top: 1px solid #d8e2f0;
+            border-bottom: 1px solid #d8e2f0;
             color: #334155;
             text-transform: uppercase;
             letter-spacing: .07em;
@@ -238,7 +260,7 @@
 
         .items-table tbody td {
             padding: 7px 8px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #dfe7f5;
             vertical-align: top;
             color: #0f172a;
         }
@@ -266,7 +288,7 @@
             margin: 0;
             font-size: 10.7px;
             font-weight: 700;
-            color: #0f172a;
+            color: #0b1530;
             line-height: 1.35;
         }
 
@@ -290,11 +312,12 @@
 
         .totals-wrap {
             width: 46%;
-            margin: 8px 0 0 auto;
-            border: 1px solid #d7e0ee;
-            border-radius: 7px;
+            margin: 9px 0 0 auto;
+            border: 1px solid #d8e2f0;
+            border-radius: 10px;
             overflow: hidden;
             page-break-inside: avoid;
+            background: #fff;
         }
 
         .totals-table {
@@ -305,7 +328,7 @@
 
         .totals-table td {
             padding: 7px 9px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #dfe7f5;
             font-variant-numeric: tabular-nums;
         }
 
@@ -324,17 +347,17 @@
         }
 
         .totals-table .grand-row td {
-            background: #e8f0ff;
-            color: #1d4ed8;
+            background: #eaf0ff;
+            color: #2248ca;
             font-size: 11.6px;
             font-weight: 700;
         }
 
         .terms {
-            border-top: 1px solid #d7e0ee;
+            border-top: 1px solid #d8e2f0;
             margin-top: 8px;
-            padding: 8px 14px 10px;
-            background: #fcfdff;
+            padding: 10px 18px 12px;
+            background: #f9fbff;
         }
 
         .terms-title {
@@ -347,7 +370,7 @@
         }
 
         .terms ul {
-            margin: 5px 0 0;
+            margin: 6px 0 0;
             padding-left: 16px;
             color: #475569;
             font-size: 9.6px;
@@ -359,7 +382,7 @@
 
         .footer-mini {
             margin-top: 8px;
-            border-top: 1px dashed #d7e0ee;
+            border-top: 1px dashed #d8e2f0;
             padding-top: 6px;
             color: #64748b;
             font-size: 9.4px;
@@ -499,7 +522,9 @@
         <table class="layout">
             <tr>
                 <td style="width: 64%; padding-right: 10px;">
-                    <img src="{{ $logoUrl }}" alt="Manake" class="brand-logo">
+                    <span class="brand-logo-wrap">
+                        <img src="{{ $logoUrl }}" alt="Manake" class="brand-logo">
+                    </span>
                     <h1 class="invoice-title">{{ __('ui.invoice.title') }}</h1>
                     <p class="invoice-subtitle">{{ __('ui.invoice.subtitle') }}</p>
                 </td>
@@ -601,7 +626,12 @@
     </div>
 
     <div class="items">
-        <h2 class="section-title">{{ __('ui.invoice.sections.items') }}</h2>
+        <table class="section-head">
+            <tr>
+                <td><h2 class="section-title">{{ __('ui.invoice.sections.items') }}</h2></td>
+                <td class="section-note">{{ $order->items->count() }} item</td>
+            </tr>
+        </table>
 
         <table class="items-table">
             <thead>
