@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -226,7 +227,7 @@ class PaymentCallbackAndOtpTest extends TestCase
         $this->assertNotNull($user->otp_expires_at);
 
         Mail::assertSent(OtpMail::class, function (OtpMail $mail) use ($user) {
-            return $mail->hasTo($user->email);
+            return $mail->hasTo($user->email) && Hash::check((string) $mail->otp, (string) $user->fresh()->otp_code);
         });
     }
 
@@ -236,7 +237,7 @@ class PaymentCallbackAndOtpTest extends TestCase
 
         $user = User::factory()->create([
             'is_otp_verified' => false,
-            'otp_code' => '123456',
+            'otp_code' => Hash::make('123456'),
             'otp_expires_at' => now()->addMinutes(5),
         ]);
 

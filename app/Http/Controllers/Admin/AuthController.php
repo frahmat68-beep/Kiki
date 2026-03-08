@@ -9,7 +9,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -29,7 +31,22 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        $maxAttempts = max((int) config('security.admin_login_max_attempts', 5), 1);
+        $lockoutSeconds = max((int) config('security.admin_login_lockout_seconds', 300), 60);
+        $throttleKey = 'login:admin:' . Str::lower((string) $credentials['email']) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            return back()->withErrors([
+                'email' => __('Terlalu banyak percobaan login admin. Coba lagi dalam :seconds detik.', [
+                    'seconds' => $seconds,
+                ]),
+            ])->onlyInput('email');
+        }
+
         if (Auth::guard('admin')->attempt($credentials)) {
+            RateLimiter::clear($throttleKey);
             return $this->finalizeLogin($request);
         }
 
@@ -41,9 +58,12 @@ class AuthController extends Controller
 
         if ($admin) {
             Auth::guard('admin')->login($admin);
+            RateLimiter::clear($throttleKey);
 
             return $this->finalizeLogin($request);
         }
+
+        RateLimiter::hit($throttleKey, $lockoutSeconds);
 
         return back()->withErrors([
             'email' => __('Email atau password admin salah'),
@@ -128,14 +148,18 @@ class AuthController extends Controller
     private function syncAdminFromEnv(string $email, string $password): ?Admin
     {
         $superAdminEmail = (string) config('admin.super_admin_email');
-        $superAdminPassword = (string) config('admin.super_admin_password');
+        $superAdminPasswordHash = (string) config('admin.super_admin_password_hash');
         $superAdminName = (string) config('admin.super_admin_name', 'Fikri Rachmat');
 
-        if (! $superAdminEmail || ! $superAdminPassword) {
+        if (! $superAdminEmail || ! $superAdminPasswordHash) {
             return null;
         }
 
-        if (strtolower($email) !== strtolower($superAdminEmail) || $password !== $superAdminPassword) {
+        if (strtolower($email) !== strtolower($superAdminEmail)) {
+            return null;
+        }
+
+        if (! Hash::check($password, $superAdminPasswordHash)) {
             return null;
         }
 
@@ -143,7 +167,7 @@ class AuthController extends Controller
             ['email' => $superAdminEmail],
             [
                 'name' => $superAdminName,
-                'password' => Hash::make($superAdminPassword),
+                'password' => $superAdminPasswordHash,
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
             ]

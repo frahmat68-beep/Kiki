@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
@@ -45,18 +46,20 @@ class OtpController extends Controller
             return back()->withErrors(['otp' => __('Kode OTP belum tersedia. Silakan kirim ulang OTP.')]);
         }
 
-        $maxAttempts = max((int) config('security.otp_resend_max_per_hour', 5), 1);
+        $maxAttempts = max((int) config('security.otp_verify_max_attempts', 5), 1);
+        $lockoutMinutes = max((int) config('security.otp_verify_lockout_minutes', 60), 1);
         $attemptKey = 'otp:verify:attempts:user:' . $user->id;
         $attempts = (int) Cache::get($attemptKey, 0);
         if ($attempts >= $maxAttempts) {
             return back()->withErrors(['otp' => __('Percobaan OTP terlalu banyak. Silakan kirim ulang OTP baru.')]);
         }
 
-        if (
-            $user->otp_code !== $request->otp ||
-            now()->greaterThan($user->otp_expires_at)
-        ) {
-            Cache::put($attemptKey, $attempts + 1, now()->addHour());
+        $otpInput = (string) $request->otp;
+        $storedOtp = (string) $user->otp_code;
+        $otpMatches = Hash::check($otpInput, $storedOtp) || hash_equals($storedOtp, $otpInput);
+
+        if (! $otpMatches || now()->greaterThan($user->otp_expires_at)) {
+            Cache::put($attemptKey, $attempts + 1, now()->addMinutes($lockoutMinutes));
             return back()->withErrors(['otp' => __('OTP salah atau sudah kedaluwarsa.')]);
         }
 

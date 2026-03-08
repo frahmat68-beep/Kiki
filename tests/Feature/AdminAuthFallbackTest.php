@@ -52,4 +52,24 @@ class AdminAuthFallbackTest extends TestCase
         $this->assertAuthenticated('admin');
         $this->assertNotNull($admin->fresh()->email_verified_at);
     }
+
+    public function test_admin_login_can_fallback_from_hashed_env_credentials(): void
+    {
+        config([
+            'admin.super_admin_email' => 'env-super@example.com',
+            'admin.super_admin_password_hash' => Hash::make('super-secret-123'),
+        ]);
+
+        $response = $this->post(route('admin.login.store'), [
+            'email' => 'env-super@example.com',
+            'password' => 'super-secret-123',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticated('admin');
+        $this->assertDatabaseHas('admins', [
+            'email' => 'env-super@example.com',
+            'role' => 'super_admin',
+        ]);
+    }
 }

@@ -11,6 +11,8 @@ use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SetTheme;
 use App\Http\Middleware\ForceHttps;
+use App\Http\Middleware\DisableAuthenticatedCache;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\AdminSuper;
 use App\Http\Middleware\EnsureAuthenticatedForAccountFeature;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -35,8 +37,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Laravel 11/12 CSRF exceptions are configured here (not in app/Http/Middleware/VerifyCsrfToken.php).
         $middleware->validateCsrfTokens(except: [
-            'logout',
-            'admin/logout',
             'payment/callback',
             'midtrans/callback',
             'api/midtrans/callback',
@@ -44,6 +44,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             ForceHttps::class,
+            SecurityHeaders::class,
+            DisableAuthenticatedCache::class,
             SetTheme::class,
             SetLocale::class,
         ]);

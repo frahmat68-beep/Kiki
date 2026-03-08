@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 
@@ -45,13 +46,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function generateOtp()
     {
         $ttlMinutes = max((int) config('security.otp_ttl_minutes', 5), 1);
+        $otp = random_int(100000, 999999);
 
-        $this->otp_code = random_int(100000, 999999);
+        $this->otp_code = Hash::make((string) $otp);
         $this->otp_expires_at = now()->addMinutes($ttlMinutes);
         $this->is_otp_verified = false;
         $this->save();
 
-        return $this->otp_code;
+        return $otp;
     }
 
     public function otpIsExpired(): bool
