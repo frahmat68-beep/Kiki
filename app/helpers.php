@@ -322,6 +322,26 @@ if (! function_exists('site_setting_forget')) {
     }
 }
 
+if (! function_exists('site_public_media_path')) {
+    function site_public_media_path(string $path): ?string
+    {
+        $normalizedPath = ltrim($path, '/');
+
+        $candidates = [
+            public_path('storage/' . $normalizedPath),
+            base_path('storage/app/public/' . $normalizedPath),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+}
+
 if (! function_exists('site_asset')) {
     function site_asset(string $path, bool $withVersion = true): string
     {
@@ -356,12 +376,13 @@ if (! function_exists('site_media_url')) {
 
         try {
             if ($resolvedDisk === 'public') {
-                if (! Storage::disk('public')->exists($normalizedPath)) {
+                $absolutePath = site_public_media_path($normalizedPath);
+
+                if (! $absolutePath) {
                     return null;
                 }
 
                 $version = '1';
-                $absolutePath = Storage::disk('public')->path($normalizedPath);
                 if (is_file($absolutePath)) {
                     $version = (string) filemtime($absolutePath);
                 }

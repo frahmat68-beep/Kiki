@@ -13,7 +13,20 @@ class AssetController extends Controller
 
     public function media(string $path): BinaryFileResponse
     {
-        return $this->serveFile(storage_path('app/public/' . $path), storage_path('app/public'));
+        $normalizedPath = ltrim($path, '/');
+
+        $candidates = [
+            [public_path('storage/' . $normalizedPath), public_path('storage')],
+            [base_path('storage/app/public/' . $normalizedPath), base_path('storage/app/public')],
+        ];
+
+        foreach ($candidates as [$candidatePath, $allowedRoot]) {
+            if (is_file($candidatePath)) {
+                return $this->serveFile($candidatePath, $allowedRoot);
+            }
+        }
+
+        abort(404);
     }
 
     private function serveFile(string $candidatePath, string $allowedRoot): BinaryFileResponse
