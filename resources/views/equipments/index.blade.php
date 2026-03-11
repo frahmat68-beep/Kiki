@@ -55,6 +55,7 @@
         $catalogInUseLabel = __('ui.catalog.in_use_label');
         $catalogAvailableLabel = __('ui.catalog.available_label');
         $catalogAvailabilityNote = __('ui.catalog.availability_note');
+        $catalogFallbackImage = 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
         $catalogQuickOrderButton = __('ui.catalog.quick_order_button');
         $catalogQuickOrderTitle = __('ui.catalog.quick_order_title');
         $catalogQuickOrderHint = __('ui.catalog.quick_order_hint');
@@ -183,9 +184,7 @@
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-amber-100 text-amber-700';
                                 $imagePath = $item->image_path ?? $item->image;
-                                $image = $imagePath
-                                    ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : asset('storage/' . $imagePath))
-                                    : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
+                                $image = site_media_url($imagePath) ?: $catalogFallbackImage;
                                 $reservedUnits = (int) ($item->reserved_units ?? 0);
                                 $availableUnits = (int) $item->available_units;
                                 $canRent = $statusValue === 'ready' && (int) $item->stock > 0;
@@ -222,6 +221,7 @@
                                         src="{{ $image }}"
                                         alt="{{ $item->name }}"
                                         class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                        onerror="this.onerror=null;this.src='{{ $catalogFallbackImage }}';"
                                         loading="lazy"
                                     >
                                     <span class="badge-status absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold">

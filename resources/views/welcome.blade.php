@@ -27,6 +27,7 @@
         $heroSubtitle = setting('home.hero_subtitle', setting('hero_subtitle', site_content('home.hero_subtitle')));
         $heroImage = site_media_url(setting('home.hero_image_path'));
         $heroImageAlt = setting('home.hero_image_path_alt', 'Manake Hero');
+        $productFallbackImage = 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
         $productsReady = $productsReady ?? collect();
         $isLoggedIn = auth('web')->check();
         $userOverview = $userOverview ?? null;
@@ -163,15 +164,13 @@
                                             $name = data_get($product, 'name', 'Alat');
                                             $slug = data_get($product, 'slug') ?? \Illuminate\Support\Str::slug($name);
                                             $imagePath = data_get($product, 'image_path') ?? data_get($product, 'image');
-                                            $image = $imagePath
-                                                ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : asset('storage/' . $imagePath))
-                                                : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
+                                            $image = site_media_url($imagePath) ?: $productFallbackImage;
                                             $price = data_get($product, 'price_per_day', data_get($product, 'price', 0));
                                         @endphp
                                         <div class="swiper-slide">
                                             <article class="card flex h-full flex-col overflow-hidden rounded-2xl bg-slate-50">
                                                 <div class="flex h-40 w-full items-center justify-center bg-slate-100/60 p-3 sm:h-52 lg:h-56">
-                                                    <img src="{{ $image }}" alt="{{ $name }}" class="h-full w-full object-contain">
+                                                    <img src="{{ $image }}" alt="{{ $name }}" class="h-full w-full object-contain" onerror="this.onerror=null;this.src='{{ $productFallbackImage }}';">
                                                 </div>
                                                 <div class="p-4">
                                                     <div class="flex items-center justify-between gap-3">

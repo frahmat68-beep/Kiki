@@ -145,9 +145,8 @@
                         @foreach ($suggestedEquipments as $suggestion)
                             @php
                                 $suggestionImagePath = $suggestion->image_path ?? $suggestion->image;
-                                $suggestionImage = $suggestionImagePath
-                                    ? (\Illuminate\Support\Str::startsWith($suggestionImagePath, ['http://', 'https://']) ? $suggestionImagePath : asset('storage/' . $suggestionImagePath))
-                                    : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
+                                $suggestionFallbackImage = 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
+                                $suggestionImage = site_media_url($suggestionImagePath) ?: $suggestionFallbackImage;
                                 $suggestionAvailable = (int) ($suggestion->available_units ?? $suggestion->stock);
                                 $suggestionUrl = ! empty($suggestion->slug) ? route('product.show', $suggestion->slug) : route('catalog');
                                 if ($cartSuggestedStartDate && $cartSuggestedEndDate && ! empty($suggestion->slug)) {
@@ -159,7 +158,7 @@
                                 }
                             @endphp
                             <article class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                                <img src="{{ $suggestionImage }}" alt="{{ $suggestion->name }}" class="h-16 w-16 rounded-lg bg-white object-cover">
+                                <img src="{{ $suggestionImage }}" alt="{{ $suggestion->name }}" class="h-16 w-16 rounded-lg bg-white object-cover" onerror="this.onerror=null;this.src='{{ $suggestionFallbackImage }}';">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-sm font-semibold text-slate-900">{{ $suggestion->name }}</p>
                                     <p class="text-[11px] text-slate-500">{{ $suggestion->category?->name ?? __('ui.cart.gear_generic') }} • {{ __('ui.cart.available_units', ['count' => $suggestionAvailable]) }}</p>

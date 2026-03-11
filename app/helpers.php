@@ -334,11 +334,27 @@ if (! function_exists('site_media_url')) {
         }
 
         $resolvedDisk = $disk ?: 'public';
-        if ($resolvedDisk === 'public') {
-            return asset('storage/'.ltrim($path, '/'));
-        }
+        $normalizedPath = ltrim($path, '/');
 
-        return Storage::disk($resolvedDisk)->url($path);
+        try {
+            if ($resolvedDisk === 'public') {
+                if (! Storage::disk('public')->exists($normalizedPath)) {
+                    return null;
+                }
+
+                return asset('storage/'.$normalizedPath);
+            }
+
+            $resolvedStorage = Storage::disk($resolvedDisk);
+
+            if (method_exists($resolvedStorage, 'exists') && ! $resolvedStorage->exists($normalizedPath)) {
+                return null;
+            }
+
+            return $resolvedStorage->url($normalizedPath);
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 }
 

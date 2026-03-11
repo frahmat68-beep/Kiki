@@ -8,9 +8,8 @@
         ? 'bg-emerald-100 text-emerald-700'
         : 'bg-amber-100 text-amber-700';
     $imagePath = $equipment->image_path ?? $equipment->image;
-    $mainImage = $imagePath
-        ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : asset('storage/' . $imagePath))
-        : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=1200&q=80';
+    $fallbackImage = 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=1200&q=80';
+    $mainImage = site_media_url($imagePath) ?: $fallbackImage;
     $gallery = $mainImage ? [$mainImage] : [];
     $reservedUnits = (int) ($equipment->reserved_units ?? 0);
     $availableUnits = (int) $equipment->available_units;
@@ -83,6 +82,7 @@
                         src="{{ $mainImage }}"
                         alt="{{ $equipment->name }}"
                         class="h-72 w-full object-contain sm:h-96 lg:h-[420px]"
+                        onerror="this.onerror=null;this.src='{{ $fallbackImage }}';"
                     >
                 </div>
                 @if (count($gallery) > 1)
@@ -93,6 +93,7 @@
                                     src="{{ $image }}"
                                     alt="Gallery {{ $equipment->name }}"
                                     class="h-24 w-full object-contain"
+                                    onerror="this.onerror=null;this.src='{{ $fallbackImage }}';"
                                     loading="lazy"
                                 >
                             </button>

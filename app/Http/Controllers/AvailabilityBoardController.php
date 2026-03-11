@@ -498,11 +498,10 @@ class AvailabilityBoardController extends Controller
         $imagePath = (string) ($equipment->image_path ?? $equipment->image ?? '');
 
         if ($imagePath !== '') {
-            if (Str::startsWith($imagePath, ['http://', 'https://'])) {
-                return $imagePath;
+            $resolvedImageUrl = site_media_url($imagePath);
+            if ($resolvedImageUrl) {
+                return $resolvedImageUrl;
             }
-
-            return asset('storage/' . ltrim($imagePath, '/'));
         }
 
         return asset('MANAKE-FAV-M.png');

@@ -12,6 +12,7 @@
         $emptySubtitle = setting('copy.category.empty_subtitle', __('ui.categories.empty_subtitle'));
         $availabilityLineTemplate = __('ui.category.available_line');
         $availabilityNote = __('ui.category.availability_note');
+        $categoryFallbackImage = 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
         $items = collect($products ?? [])->values();
         $readyCount = $items->filter(fn ($product) => (($product->status ?? 'ready') === 'ready') && (int) ($product->stock ?? 0) > 0)->count();
     @endphp
@@ -60,9 +61,7 @@
                             $name = data_get($product, 'name', __('app.product.generic'));
                             $slug = data_get($product, 'slug') ?? \Illuminate\Support\Str::slug($name);
                             $imagePath = data_get($product, 'image_path') ?? data_get($product, 'image');
-                            $image = $imagePath
-                                ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : asset('storage/' . $imagePath))
-                                : 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=900&q=80';
+                            $image = site_media_url($imagePath) ?: $categoryFallbackImage;
                             $price = (int) data_get($product, 'price_per_day', 0);
                             $statusValue = data_get($product, 'status') ?? ((int) data_get($product, 'stock', 0) > 0 ? 'ready' : 'unavailable');
                             $reservedUnits = (int) data_get($product, 'reserved_units', 0);
@@ -78,7 +77,7 @@
 
                         <article class="card group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
                             <div class="relative flex h-56 items-center justify-center bg-slate-50 p-4 sm:h-60">
-                                <img src="{{ $image }}" alt="{{ $name }}" class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                                <img src="{{ $image }}" alt="{{ $name }}" class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='{{ $categoryFallbackImage }}';" loading="lazy">
                                 <span class="absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">
                                     {{ $statusLabel }}
                                 </span>

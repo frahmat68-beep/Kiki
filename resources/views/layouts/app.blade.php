@@ -15,7 +15,7 @@
         $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
         $cmsBrandLogoPath = site_setting('brand.logo_path');
-        $cmsBrandLogoUrl = $cmsBrandLogoPath ? asset('storage/' . $cmsBrandLogoPath) : null;
+        $cmsBrandLogoUrl = site_media_url($cmsBrandLogoPath);
     @endphp
     <link
         rel="icon"

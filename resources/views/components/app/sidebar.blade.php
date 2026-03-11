@@ -110,6 +110,7 @@
                     x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $compactLogoUrlDark }}' : '{{ $compactLogoUrl }}'"
                     alt="{{ $brandName }}"
                     class="h-9 w-9 shrink-0 rounded-xl object-contain"
+                    onerror="this.onerror=null;this.src='{{ $compactLogoUrl }}';"
                 >
             </div>
             <div class="lg:hidden lg:group-hover/sidebar:block lg:group-focus-within/sidebar:block">
@@ -118,6 +119,7 @@
                     x-bind:src="(document.documentElement.dataset.themeResolved === 'dark') ? '{{ $expandedLogoUrlDark }}' : '{{ $expandedLogoUrl }}'"
                     alt="{{ $brandName }}"
                     class="h-auto w-40 shrink-0 object-contain object-left"
+                    onerror="this.onerror=null;this.src='{{ $expandedLogoUrl }}';"
                 >
             </div>
         </a>

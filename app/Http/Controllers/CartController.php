@@ -398,11 +398,10 @@ class CartController extends Controller
     {
         $imagePath = $equipment->image_path ?: $equipment->image;
         if (is_string($imagePath) && $imagePath !== '') {
-            if (Str::startsWith($imagePath, ['http://', 'https://'])) {
-                return $imagePath;
+            $resolvedImageUrl = site_media_url($imagePath);
+            if ($resolvedImageUrl) {
+                return $resolvedImageUrl;
             }
-
-            return asset('storage/' . ltrim($imagePath, '/'));
         }
 
         return 'https://images.unsplash.com/photo-1519183071298-a2962be96c68?auto=format&fit=crop&w=600&q=80';
