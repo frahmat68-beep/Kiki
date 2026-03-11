@@ -15,7 +15,7 @@
         },
         {
             "src": "/storage/(.*)",
-            "dest": "/storage/app/public/$1"
+            "dest": "/public/storage/$1"
         },
         {
             "src": "/(favicon\\.ico|robots\\.txt|MANAKE-FAV-M\\.png|MANAKE-FAV-M-white\\.png|manake-logo-blue\\.png|manake-logo-white\\.png)",
