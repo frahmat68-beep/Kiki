@@ -1,2 +1,8 @@
 *
 !.gitignore
+!branding/
+!branding/**
+!equipments/
+!equipments/**
+!screenshots/
+!screenshots/**
