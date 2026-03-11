@@ -17,8 +17,28 @@ use App\Http\Middleware\AdminSuper;
 use App\Http\Middleware\EnsureAuthenticatedForAccountFeature;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+$isVercelRuntime = getenv('VERCEL') !== false;
+$vercelStoragePath = null;
 
-return Application::configure(basePath: dirname(__DIR__))
+if ($isVercelRuntime) {
+    $vercelStoragePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'manake-storage';
+
+    foreach ([
+        $vercelStoragePath,
+        $vercelStoragePath . '/framework',
+        $vercelStoragePath . '/framework/cache',
+        $vercelStoragePath . '/framework/cache/data',
+        $vercelStoragePath . '/framework/sessions',
+        $vercelStoragePath . '/framework/views',
+        $vercelStoragePath . '/logs',
+    ] as $directory) {
+        if (! is_dir($directory)) {
+            @mkdir($directory, 0775, true);
+        }
+    }
+}
+
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -81,3 +101,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->with('error', $message);
         });
     })->create();
+
+if ($vercelStoragePath !== null) {
+    $app->useStoragePath($vercelStoragePath);
+}
+
+return $app;
