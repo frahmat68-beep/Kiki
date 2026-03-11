@@ -83,7 +83,8 @@ class AdminContentAndSettingsTest extends TestCase
 
         $home = $this->get(route('home'));
         $home->assertOk();
-        $home->assertSee('storage/' . $setting->value);
+        $home->assertSee('name="manake-cms-logo"', false);
+        $home->assertSee('/assets/media/' . $setting->value, false);
     }
 
     public function test_user_page_renders_dynamic_content(): void

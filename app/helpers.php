@@ -327,6 +327,20 @@ if (! function_exists('site_public_media_path')) {
     {
         $normalizedPath = ltrim($path, '/');
 
+        try {
+            $publicDisk = Storage::disk('public');
+
+            if (method_exists($publicDisk, 'exists') && $publicDisk->exists($normalizedPath)) {
+                $diskPath = $publicDisk->path($normalizedPath);
+
+                if (is_file($diskPath)) {
+                    return $diskPath;
+                }
+            }
+        } catch (\Throwable $exception) {
+            // Fall through to bundled/public path checks.
+        }
+
         $candidates = [
             public_path('storage/' . $normalizedPath),
             base_path('storage/app/public/' . $normalizedPath),

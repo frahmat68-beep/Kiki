@@ -72,4 +72,25 @@ class AdminAuthFallbackTest extends TestCase
             'role' => 'super_admin',
         ]);
     }
+
+    public function test_admin_login_can_fallback_from_plain_env_credentials(): void
+    {
+        config([
+            'admin.super_admin_email' => 'env-plain@example.com',
+            'admin.super_admin_password' => 'plain-super-secret',
+            'admin.super_admin_password_hash' => null,
+        ]);
+
+        $response = $this->post(route('admin.login.store'), [
+            'email' => 'env-plain@example.com',
+            'password' => 'plain-super-secret',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticated('admin');
+        $this->assertDatabaseHas('admins', [
+            'email' => 'env-plain@example.com',
+            'role' => 'super_admin',
+        ]);
+    }
 }

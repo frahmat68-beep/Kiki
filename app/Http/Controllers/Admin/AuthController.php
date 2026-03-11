@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -149,9 +148,14 @@ class AuthController extends Controller
     {
         $superAdminEmail = (string) config('admin.super_admin_email');
         $superAdminPasswordHash = (string) config('admin.super_admin_password_hash');
+        $superAdminPasswordPlain = (string) config('admin.super_admin_password');
         $superAdminName = (string) config('admin.super_admin_name', 'Fikri Rachmat');
 
-        if (! $superAdminEmail || ! $superAdminPasswordHash) {
+        if (! schema_table_exists_cached('admins')) {
+            return null;
+        }
+
+        if (! $superAdminEmail || (! $superAdminPasswordHash && ! $superAdminPasswordPlain)) {
             return null;
         }
 
@@ -159,7 +163,21 @@ class AuthController extends Controller
             return null;
         }
 
-        if (! Hash::check($password, $superAdminPasswordHash)) {
+        $resolvedPasswordHash = $superAdminPasswordHash;
+
+        if ($resolvedPasswordHash !== '') {
+            if (! Hash::check($password, $resolvedPasswordHash)) {
+                return null;
+            }
+        } else {
+            if (! hash_equals($superAdminPasswordPlain, $password)) {
+                return null;
+            }
+
+            $resolvedPasswordHash = Hash::make($superAdminPasswordPlain);
+        }
+
+        if ($resolvedPasswordHash === '') {
             return null;
         }
 
@@ -167,7 +185,7 @@ class AuthController extends Controller
             ['email' => $superAdminEmail],
             [
                 'name' => $superAdminName,
-                'password' => $superAdminPasswordHash,
+                'password' => $resolvedPasswordHash,
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
             ]

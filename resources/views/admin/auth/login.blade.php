@@ -12,7 +12,8 @@
         $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
         $logoFallbackLight = $assetWithVersion('manake-logo-blue.png');
-        $logoUrlLight = $logoFallbackLight;
+        $cmsBrandLogoPath = site_setting('brand.logo_path');
+        $logoUrlLight = site_media_url($cmsBrandLogoPath) ?: $logoFallbackLight;
     @endphp
     <link
         rel="icon"
