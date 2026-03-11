@@ -326,16 +326,17 @@ if (! function_exists('site_asset')) {
     function site_asset(string $path, bool $withVersion = true): string
     {
         $normalizedPath = ltrim($path, '/');
-        $relativePath = '/' . $normalizedPath;
+        $version = '1';
 
-        if (! $withVersion) {
-            return $relativePath;
+        if ($withVersion) {
+            $publicPath = public_path($normalizedPath);
+            $version = file_exists($publicPath) ? (string) filemtime($publicPath) : '1';
         }
 
-        $publicPath = public_path($normalizedPath);
-        $version = file_exists($publicPath) ? (string) filemtime($publicPath) : '1';
-
-        return $relativePath . '?v=' . $version;
+        return route('assets.public', [
+            'path' => $normalizedPath,
+            'v' => $version,
+        ], false);
     }
 }
 
@@ -359,7 +360,16 @@ if (! function_exists('site_media_url')) {
                     return null;
                 }
 
-                return '/' . ltrim('storage/' . $normalizedPath, '/');
+                $version = '1';
+                $absolutePath = Storage::disk('public')->path($normalizedPath);
+                if (is_file($absolutePath)) {
+                    $version = (string) filemtime($absolutePath);
+                }
+
+                return route('assets.media', [
+                    'path' => $normalizedPath,
+                    'v' => $version,
+                ], false);
             }
 
             $resolvedStorage = Storage::disk($resolvedDisk);

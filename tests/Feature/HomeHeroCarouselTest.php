@@ -100,7 +100,7 @@ class HomeHeroCarouselTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('/storage/equipments/home-relative-path.png', false);
+        $response->assertSee('/assets/media/equipments/home-relative-path.png?v=', false);
         $response->assertDontSee('http://127.0.0.1:8000/storage/equipments/home-relative-path.png', false);
     }
 

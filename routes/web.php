@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
@@ -34,6 +35,13 @@ use App\Http\Controllers\Admin\WebsiteSettingsController as AdminWebsiteSettings
 | PUBLIC PAGES (NO AUTH)
 |--------------------------------------------------------------------------
 */
+
+Route::get('/assets/public/{path}', [AssetController::class, 'public'])
+    ->where('path', '.*')
+    ->name('assets.public');
+Route::get('/assets/media/{path}', [AssetController::class, 'media'])
+    ->where('path', '.*')
+    ->name('assets.media');
 
 Route::get('/', [CategoryController::class, 'home'])->name('home');
 Route::get('/logout', function (Request $request) {
