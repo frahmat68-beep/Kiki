@@ -1726,10 +1726,8 @@ html[data-theme-resolved='dark'] [data-ui-chip-option][data-ui-active='true'] {
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-        radial-gradient(260px 160px at 50% 50%, rgba(42, 86, 232, 0.12), transparent 72%),
-        rgba(238, 243, 251, 0.78);
-    backdrop-filter: blur(16px);
+    background: rgba(244, 247, 253, 0.94);
+    backdrop-filter: blur(12px);
     transition:
         opacity 260ms ease,
         visibility 260ms ease,
@@ -1737,9 +1735,7 @@ html[data-theme-resolved='dark'] [data-ui-chip-option][data-ui-active='true'] {
 }
 
 html[data-theme-resolved='dark'] .manake-page-loader {
-    background:
-        radial-gradient(260px 160px at 50% 50%, rgba(91, 132, 255, 0.12), transparent 72%),
-        rgba(10, 18, 34, 0.78);
+    background: rgba(9, 16, 29, 0.94);
 }
 
 .manake-page-loader.is-hidden {
@@ -1755,28 +1751,6 @@ html[data-theme-resolved='dark'] .manake-page-loader {
     position: relative;
 }
 
-.manake-page-loader__inner::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -0.95rem;
-    width: min(20rem, 68vw);
-    height: 0.32rem;
-    transform: translateX(-50%);
-    border-radius: 999px;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        color-mix(in oklab, var(--primary) 30%, white 20%) 18%,
-        color-mix(in oklab, var(--primary) 72%, white 28%) 50%,
-        color-mix(in oklab, var(--primary) 30%, white 20%) 82%,
-        transparent 100%
-    );
-    filter: blur(0.25px);
-    opacity: 0.92;
-    animation: manake-loader-track 1.15s ease-in-out infinite;
-}
-
 .manake-loader-wordmark-shell {
     position: relative;
     display: inline-flex;
@@ -1789,47 +1763,40 @@ html[data-theme-resolved='dark'] .manake-page-loader {
 .manake-loader-wordmark-shell::before {
     content: '';
     position: absolute;
-    inset: -46% -32%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        color-mix(in oklab, var(--primary) 24%, white 10%) 24%,
-        color-mix(in oklab, var(--primary) 44%, white 16%) 50%,
-        color-mix(in oklab, var(--primary) 24%, white 10%) 76%,
-        transparent 100%
-    );
-    opacity: 0.94;
-    filter: blur(22px);
-    animation: manake-loader-pulse 1.7s ease-in-out infinite;
+    inset: -26% -10%;
+    background: radial-gradient(circle at center, color-mix(in oklab, var(--primary) 16%, white 12%), transparent 62%);
+    opacity: 0.78;
+    filter: blur(18px);
+    animation: manake-loader-pulse 1.55s ease-in-out infinite;
     pointer-events: none;
 }
 
 .manake-loader-wordmark-shell::after {
     content: '';
     position: absolute;
-    inset: -34% -10%;
+    inset: -10% -6%;
     background: linear-gradient(
         108deg,
         transparent 22%,
-        rgba(255, 255, 255, 0.04) 36%,
-        rgba(255, 255, 255, 0.96) 50%,
-        rgba(255, 255, 255, 0.08) 64%,
+        rgba(255, 255, 255, 0.02) 36%,
+        rgba(255, 255, 255, 0.82) 50%,
+        rgba(255, 255, 255, 0.04) 64%,
         transparent 78%
     );
     transform: translateX(-138%) skewX(-18deg);
-    animation: manake-loader-sheen 0.96s ease-in-out infinite;
+    animation: manake-loader-sheen 1.05s ease-in-out infinite;
     mix-blend-mode: screen;
 }
 
 .manake-loader-wordmark {
     position: relative;
     z-index: 1;
-    height: 3.95rem;
+    height: 4.15rem;
     width: auto;
     object-fit: contain;
     object-position: center;
-    filter: drop-shadow(0 14px 28px rgba(42, 86, 232, 0.2));
-    animation: manake-loader-float 1.45s ease-in-out infinite alternate;
+    filter: drop-shadow(0 10px 22px rgba(42, 86, 232, 0.16));
+    animation: manake-loader-float 1.55s ease-in-out infinite alternate;
 }
 
 html[data-theme-resolved='dark'] .manake-loader-wordmark-shell {
@@ -1840,9 +1807,9 @@ html[data-theme-resolved='dark'] .manake-loader-wordmark-shell::after {
     background: linear-gradient(
         108deg,
         transparent 22%,
-        rgba(255, 255, 255, 0.03) 36%,
-        rgba(147, 197, 253, 0.45) 50%,
-        rgba(255, 255, 255, 0.04) 64%,
+        rgba(255, 255, 255, 0.02) 36%,
+        rgba(147, 197, 253, 0.5) 50%,
+        rgba(255, 255, 255, 0.03) 64%,
         transparent 78%
     );
 }
@@ -1861,31 +1828,19 @@ html[data-theme-resolved='dark'] .manake-loader-wordmark-shell::after {
         transform: translateY(0) scale(1);
     }
     100% {
-        transform: translateY(-4px) scale(1.015);
+        transform: translateY(-2px) scale(1.01);
     }
 }
 
 @keyframes manake-loader-pulse {
     0%,
     100% {
-        opacity: 0.58;
-        transform: scale(0.96);
+        opacity: 0.46;
+        transform: scale(0.98);
     }
     50% {
-        opacity: 0.92;
-        transform: scale(1.04);
-    }
-}
-
-@keyframes manake-loader-track {
-    0%,
-    100% {
-        opacity: 0.42;
-        transform: translateX(-50%) scaleX(0.84);
-    }
-    50% {
-        opacity: 0.96;
-        transform: translateX(-50%) scaleX(1.08);
+        opacity: 0.74;
+        transform: scale(1.02);
     }
 }
 
@@ -1901,6 +1856,6 @@ html[data-theme-resolved='dark'] .manake-loader-wordmark-shell::after {
     }
 
     .manake-loader-wordmark {
-        height: 3rem;
+        height: 3.2rem;
     }
 }

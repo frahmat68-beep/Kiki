@@ -22,6 +22,7 @@
         || request()->routeIs('category.show')
         || request()->routeIs('product.show');
     $isAvailabilityRoute = request()->routeIs('availability.board');
+    $isSettingsRoute = request()->routeIs('settings.*');
 
     $items = [
         [
@@ -53,9 +54,9 @@
     $items[] = [
         'key' => 'settings',
         'label' => __('ui.nav.settings'),
-        'url' => '#',
-        'active' => false,
-        'prefs' => true,
+        'url' => $isAuthenticated ? route('settings.index') : '#',
+        'active' => $isSettingsRoute,
+        'prefs' => ! $isAuthenticated,
         'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>',
     ];
 
@@ -105,7 +106,7 @@
                 <img
                     src="{{ $resolvedLogoUrl }}"
                     alt="{{ $brandName }}"
-                    class="h-8 w-auto max-w-[10.5rem] shrink-0 object-contain object-left lg:h-8 lg:max-w-[5.5rem] lg:group-hover/sidebar:h-9 lg:group-hover/sidebar:max-w-[10.5rem] lg:group-focus-within/sidebar:h-9 lg:group-focus-within/sidebar:max-w-[10.5rem]"
+                    class="h-8 w-auto max-w-[10.5rem] shrink-0 object-contain object-left lg:h-9 lg:max-w-[6.25rem] lg:group-hover/sidebar:h-10 lg:group-hover/sidebar:max-w-[10.75rem] lg:group-focus-within/sidebar:h-10 lg:group-focus-within/sidebar:max-w-[10.75rem]"
                     onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
                 >
             </span>
@@ -205,31 +206,33 @@
         @endforeach
     </nav>
 
-    <div
-        x-cloak
-        x-show="guestPrefsOpen"
-        x-transition
-        class="mx-1 mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 lg:absolute lg:bottom-5 lg:left-[calc(100%-0.25rem)] lg:mt-0 lg:w-64 lg:rounded-[1.4rem] lg:shadow-2xl lg:group-hover/sidebar:left-[calc(100%-1rem)] lg:group-focus-within/sidebar:left-[calc(100%-1rem)]"
-    >
-        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
-        <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? '!text-slate-900' : '!text-slate-700' }}">
-                {{ __('ui.languages.id') }}
-            </a>
-            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? '!text-slate-900' : '!text-slate-700' }}">
-                {{ __('ui.languages.en') }}
-            </a>
-        </div>
-
-        <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
-        <div class="mt-2 grid grid-cols-1 gap-2">
-            @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? '!text-slate-900' : '!text-slate-700' }}">
-                    {{ $label }}
+    @unless ($isAuthenticated)
+        <div
+            x-cloak
+            x-show="guestPrefsOpen"
+            x-transition
+            class="mx-1 mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 lg:absolute lg:bottom-5 lg:left-[calc(100%-0.25rem)] lg:mt-0 lg:w-64 lg:rounded-[1.4rem] lg:shadow-2xl lg:group-hover/sidebar:left-[calc(100%-1rem)] lg:group-focus-within/sidebar:left-[calc(100%-1rem)]"
+        >
+            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
+            <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? '!text-slate-900' : '!text-slate-700' }}">
+                    {{ __('ui.languages.id') }}
                 </a>
-            @endforeach
+                <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? '!text-slate-900' : '!text-slate-700' }}">
+                    {{ __('ui.languages.en') }}
+                </a>
+            </div>
+
+            <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
+            <div class="mt-2 grid grid-cols-1 gap-2">
+                @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
+                    <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? '!text-slate-900' : '!text-slate-700' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
         </div>
-    </div>
+    @endunless
 
     @if ($isAuthenticated)
         <div class="mt-auto border-t border-slate-200 pt-4">
