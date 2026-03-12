@@ -108,12 +108,35 @@
         .availability-surface {
             animation: availabilitySurfaceIn 0.28s ease-out both;
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            backdrop-filter: blur(18px);
         }
 
         .availability-surface:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 26px -20px rgba(15, 23, 42, 0.42);
-            border-color: rgba(59, 130, 246, 0.32);
+            border-color: color-mix(in oklab, var(--primary) 18%, var(--border));
+        }
+
+        .availability-hero {
+            background:
+                radial-gradient(280px 160px at 8% 0%, color-mix(in oklab, var(--primary) 11%, transparent), transparent 72%),
+                radial-gradient(320px 180px at 100% 0%, color-mix(in oklab, var(--primary) 9%, transparent), transparent 76%),
+                var(--gradient-surface);
+        }
+
+        .availability-toolbar {
+            background: color-mix(in oklab, var(--surface) 94%, white);
+        }
+
+        html[data-theme-resolved='dark'] .availability-hero {
+            background:
+                radial-gradient(260px 150px at 8% 0%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 72%),
+                radial-gradient(300px 170px at 100% 0%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 76%),
+                linear-gradient(180deg, rgba(20, 31, 48, 0.96) 0%, rgba(25, 37, 57, 0.98) 100%);
+        }
+
+        html[data-theme-resolved='dark'] .availability-toolbar {
+            background: color-mix(in oklab, var(--surface) 90%, #0d1524);
         }
 
         .board-cell {
@@ -158,6 +181,18 @@
             transform: none !important;
             background: #f1f5f9 !important;
             color: #64748b !important;
+        }
+
+        html[data-theme-resolved='dark'] .board-cell--range {
+            border-color: rgba(110, 138, 255, 0.7) !important;
+            background: linear-gradient(160deg, #1b2c49 0%, #25426e 100%) !important;
+            color: #eef4ff !important;
+            box-shadow: 0 0 0 1px rgba(110, 138, 255, 0.18), 0 16px 28px -24px rgba(8, 17, 34, 0.8) !important;
+        }
+
+        html[data-theme-resolved='dark'] .board-cell--locked {
+            background: color-mix(in oklab, var(--surface-2) 90%, #0d1524) !important;
+            color: var(--text-soft) !important;
         }
 
         .board-item {
@@ -468,19 +503,16 @@
         x-on:keydown.escape.window="handleEscape()"
         x-on:pointerup.window="cancelDanglingSelection()"
     >
-        <section class="availability-surface relative overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-white via-blue-50/70 to-slate-100 px-6 py-6 shadow-sm sm:px-7 sm:py-7">
-            <div class="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-100/70 blur-2xl"></div>
-            <div class="pointer-events-none absolute -bottom-20 left-12 h-56 w-56 rounded-full bg-white/80 blur-2xl"></div>
-
+        <section class="availability-surface availability-hero relative overflow-hidden rounded-3xl border border-slate-200 px-6 py-6 shadow-sm sm:px-7 sm:py-7">
             <div class="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-blue-700 sm:text-3xl">{{ $availabilityTitle }}</h1>
+                    <h1 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">{{ $availabilityTitle }}</h1>
                     <p class="mt-2 max-w-2xl text-sm italic text-slate-600 sm:text-base">
                         {{ $availabilitySubtitle }}
                     </p>
                 </div>
 
-                <form method="GET" action="{{ route('availability.board') }}" class="availability-surface grid w-full gap-2 rounded-2xl border border-slate-200 bg-white/95 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] lg:max-w-2xl">
+                <form method="GET" action="{{ route('availability.board') }}" class="availability-surface availability-toolbar command-surface grid w-full gap-2 rounded-2xl p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] lg:max-w-2xl">
                     <input
                         type="text"
                         name="q"
@@ -522,11 +554,11 @@
         </section>
 
         <section class="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-            <article class="availability-surface overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/70 px-5 py-4">
+            <article class="availability-surface surface-band overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/40 px-5 py-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilityCalendarTitle }}</p>
-                        <h2 class="mt-1 text-xl font-semibold text-blue-700">{{ $monthLabel }}</h2>
+                        <h2 class="mt-1 text-xl font-semibold text-slate-900">{{ $monthLabel }}</h2>
                         <p class="mt-1 text-[11px] text-slate-500 sm:hidden">{{ $availabilityDragHint }}</p>
                     </div>
                     <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
@@ -623,9 +655,9 @@
             </article>
 
             <div class="space-y-4">
-                <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <article class="availability-surface command-surface rounded-3xl border border-slate-200 p-5 shadow-sm">
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilitySelectedTitle }}</p>
-                    <h2 class="mt-1 text-2xl font-semibold text-blue-700">{{ $selectedDateLabel }}</h2>
+                    <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ $selectedDateLabel }}</h2>
 
                     <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
@@ -647,9 +679,9 @@
                     </div>
                 </article>
 
-                <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                     <div class="flex items-center justify-between gap-2">
-                        <h3 class="text-base font-semibold text-blue-700">{{ $availabilityReadyTitle }}</h3>
+                        <h3 class="text-base font-semibold text-slate-900">{{ $availabilityReadyTitle }}</h3>
                         <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
                             {{ $selectedFreeRows->count() }} {{ $availabilityCountEmptySuffix }}
                         </span>
@@ -676,9 +708,9 @@
         </section>
 
         <section class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-blue-700">{{ $availabilityBusyTitle }} di {{ $selectedDateLabel }}</h2>
+                    <h2 class="text-lg font-semibold text-slate-900">{{ $availabilityBusyTitle }} di {{ $selectedDateLabel }}</h2>
                     <span class="rounded-full bg-rose-100 px-2.5 py-1 text-[11px] font-semibold text-rose-700">{{ $selectedBusyRows->count() }} {{ $availabilityCountToolsSuffix }}</span>
                 </div>
                 <div class="mt-3 space-y-2">
@@ -700,9 +732,9 @@
                 </div>
             </article>
 
-            <article class="availability-surface rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <h2 class="text-lg font-semibold text-blue-700">{{ $availabilityMonthlyTitle }}</h2>
+                    <h2 class="text-lg font-semibold text-slate-900">{{ $availabilityMonthlyTitle }}</h2>
                     <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ $monthlySchedules->count() }} {{ $availabilityCountSchedulesSuffix }}</span>
                 </div>
                 <div class="mt-3 max-h-[29rem] space-y-2 overflow-y-auto pr-1">
@@ -739,11 +771,11 @@
         >
             <div class="absolute inset-0 bg-slate-950/55 backdrop-blur-[1px]"></div>
 
-            <div class="availability-surface relative z-10 w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl">
-                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-5 sm:py-4">
+            <div class="availability-surface surface-band relative z-10 w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 shadow-2xl sm:rounded-3xl">
+                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/40 px-4 py-3 sm:px-5 sm:py-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilityModalDateTitle }}</p>
-                        <h2 class="mt-1 text-xl font-semibold text-blue-700" x-text="modalDateLabel"></h2>
+                        <h2 class="mt-1 text-xl font-semibold text-slate-900" x-text="modalDateLabel"></h2>
                     </div>
                     <button
                         type="button"
@@ -808,11 +840,11 @@
         >
             <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]"></div>
 
-            <div class="availability-surface relative z-10 w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:rounded-3xl">
-                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-blue-50/80 px-4 py-3 sm:px-5 sm:py-4">
+            <div class="availability-surface surface-band relative z-10 w-full max-w-4xl max-h-[92vh] overflow-hidden rounded-2xl border border-slate-200 shadow-2xl sm:rounded-3xl">
+                <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/40 px-4 py-3 sm:px-5 sm:py-4">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">{{ $availabilityRangeKicker }}</p>
-                        <h2 class="mt-1 text-lg font-semibold text-blue-700">{{ $availabilityRangeTitle }}</h2>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $availabilityRangeKicker }}</p>
+                        <h2 class="mt-1 text-lg font-semibold text-slate-900">{{ $availabilityRangeTitle }}</h2>
                         <p class="mt-1 text-xs text-slate-600">
                             <span x-text="formatDateLabel(getRangeStartDate())"></span>
                             -
@@ -823,7 +855,7 @@
                     </div>
                     <button
                         type="button"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 transition hover:border-blue-300 hover:text-blue-700"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
                         @click="closeRangeSelectionModal()"
                         aria-label="{{ $availabilityModalClose }}"
                     >

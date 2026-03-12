@@ -79,13 +79,15 @@
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
 >
     <div class="flex h-20 items-center justify-between border-b border-slate-200 px-4">
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-            <img
-                src="{{ $expandedLogoUrl }}"
-                alt="{{ $brandName }}"
-                onerror="this.onerror=null;this.src='{{ $expandedLogoFallbackUrl }}';"
-                class="h-auto w-40 object-contain object-left"
-            >
+        <a href="{{ route('admin.dashboard') }}" class="manake-brand-lockup">
+            <span class="manake-brand-lockup__mark h-12 px-4">
+                <img
+                    src="{{ $expandedLogoUrl }}"
+                    alt="{{ $brandName }}"
+                    onerror="this.onerror=null;this.src='{{ $expandedLogoFallbackUrl }}';"
+                    class="manake-brand-lockup__wordmark h-8 w-auto object-contain object-left"
+                >
+            </span>
         </a>
         <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

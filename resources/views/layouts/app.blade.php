@@ -10,19 +10,11 @@
         $assetWithVersion = static function (string $file): string {
             return site_asset($file);
         };
-        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
-        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
+        $faviconUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $cmsBrandLogoPath = site_setting('brand.logo_path');
         $cmsBrandLogoUrl = site_media_url($cmsBrandLogoPath);
     @endphp
-    <link
-        rel="icon"
-        type="image/png"
-        href="{{ $faviconLightUrl }}"
-        data-theme-favicon
-        data-light="{{ $faviconLightUrl }}"
-        data-dark="{{ $faviconDarkUrl }}"
-    >
+    <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
     @if ($cmsBrandLogoUrl)
         <meta name="manake-cms-logo" content="{{ $cmsBrandLogoUrl }}">
     @endif

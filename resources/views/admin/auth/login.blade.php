@@ -9,20 +9,12 @@
         $assetWithVersion = static function (string $file): string {
             return site_asset($file);
         };
-        $faviconLightUrl = $assetWithVersion('MANAKE-FAV-M.png');
-        $faviconDarkUrl = $assetWithVersion('MANAKE-FAV-M-white.png');
+        $faviconUrl = $assetWithVersion('MANAKE-FAV-M.png');
         $logoFallbackLight = $assetWithVersion('manake-logo-blue.png');
         $cmsBrandLogoPath = site_setting('brand.logo_path');
         $logoUrlLight = site_media_url($cmsBrandLogoPath) ?: $logoFallbackLight;
     @endphp
-    <link
-        rel="icon"
-        type="image/png"
-        href="{{ $faviconLightUrl }}"
-        data-theme-favicon
-        data-light="{{ $faviconLightUrl }}"
-        data-dark="{{ $faviconDarkUrl }}"
-    >
+    <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>

@@ -3,8 +3,7 @@
     $assetWithVersion = static function (string $file): string {
         return site_asset($file);
     };
-    $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
-    $logoUrlDark = $assetWithVersion('manake-logo-white.png');
+    $logoUrl = $assetWithVersion('manake-logo-blue.png');
     $locale = app()->getLocale();
     $currentTheme = $themePreference ?? request()->attributes->get('theme_preference', 'light');
     if (! in_array($currentTheme, ['system', 'dark', 'light'], true)) {
@@ -38,9 +37,8 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6">
         <div class="flex h-16 items-center justify-between gap-3">
             <div class="flex min-w-0 items-center gap-6">
-                <a href="/" class="shrink-0">
-                    <img src="{{ $logoUrlLight }}" alt="{{ $brandName }}" class="brand-logo-light h-8 w-auto dark:hidden">
-                    <img src="{{ $logoUrlDark }}" alt="{{ $brandName }}" class="brand-logo-dark hidden h-8 w-auto dark:block">
+                <a href="/" class="manake-brand-pill inline-flex shrink-0 items-center rounded-2xl px-3 py-2 shadow-sm">
+                    <img src="{{ $logoUrl }}" alt="{{ $brandName }}" class="h-8 w-auto">
                 </a>
 
                 <div class="hidden items-center gap-5 text-sm font-semibold text-slate-600 lg:flex">

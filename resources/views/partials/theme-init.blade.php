@@ -48,15 +48,6 @@
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         };
 
-        const syncThemeAssets = (resolvedTheme) => {
-            const activeTheme = resolvedTheme || (document.documentElement.dataset.themeResolved || 'light');
-            document.querySelectorAll('link[data-theme-favicon]').forEach((faviconLink) => {
-                const lightHref = faviconLink.getAttribute('data-light') || faviconLink.getAttribute('href');
-                const darkHref = faviconLink.getAttribute('data-dark') || lightHref;
-                faviconLink.setAttribute('href', activeTheme === 'dark' ? darkHref : lightHref);
-            });
-        };
-
         const applyTheme = (themePreference) => {
             const resolvedTheme = resolveTheme(themePreference);
             const root = document.documentElement;
@@ -64,7 +55,6 @@
             root.dataset.theme = 'manake-brand';
             root.dataset.themePreference = themePreference;
             root.dataset.themeResolved = resolvedTheme;
-            syncThemeAssets(resolvedTheme);
         };
 
         applyTheme(preference);
@@ -81,12 +71,6 @@
             applyTheme,
             resolveTheme,
         };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => syncThemeAssets());
-        } else {
-            syncThemeAssets();
-        }
 
         if (typeof window.matchMedia === 'function') {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

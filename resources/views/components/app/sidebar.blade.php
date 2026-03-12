@@ -99,14 +99,16 @@
             href="{{ route('home') }}"
             title="{{ $brandName }}"
             aria-label="{{ $brandName }}"
-            class="flex min-w-0 items-center gap-3 rounded-xl px-1 py-1 text-slate-900 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
+            class="manake-brand-lockup rounded-xl px-1 py-1 text-slate-900 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
         >
-            <img
-                src="{{ $resolvedLogoUrl }}"
-                alt="{{ $brandName }}"
-                class="h-10 w-10 shrink-0 rounded-2xl object-contain object-left transition-all duration-300 lg:w-10 lg:group-hover/sidebar:w-36 lg:group-focus-within/sidebar:w-36"
-                onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
-            >
+            <span class="manake-brand-lockup__mark h-11 w-36 px-3 lg:w-11 lg:px-0 lg:group-hover/sidebar:w-36 lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:w-36 lg:group-focus-within/sidebar:px-3">
+                <img
+                    src="{{ $resolvedLogoUrl }}"
+                    alt="{{ $brandName }}"
+                    class="manake-brand-lockup__wordmark h-8 w-28 shrink-0 transition-all duration-300 lg:w-8 lg:group-hover/sidebar:w-28 lg:group-focus-within/sidebar:w-28"
+                    onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
+                >
+            </span>
         </a>
         <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -128,7 +130,7 @@
                             href="{{ $item['url'] }}"
                             title="{{ $item['label'] }}"
                             aria-label="{{ $item['label'] }}"
-                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/50' : 'bg-white !text-slate-700 hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300' }}"
+                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/30' : 'bg-white/70 !text-slate-700 hover:bg-white hover:!text-slate-900 hover:ring-1 hover:ring-blue-300/70' }}"
                         >
                             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
                             <span class="truncate text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
@@ -168,7 +170,7 @@
                                 @endphp
                                 <a
                                     href="{{ route('catalog', ['category' => $category->slug]) }}"
-                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-transparent !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}"
+                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-transparent !text-slate-700 hover:border-blue-300/70 hover:bg-white hover:!text-slate-900' }}"
                                 >
                                     <span class="truncate">{{ $category->name }}</span>
                                     <span class="ml-2 inline-flex h-1.5 w-1.5 rounded-full {{ $isCategoryActive ? 'bg-blue-600' : 'bg-slate-300' }}"></span>
@@ -188,7 +190,7 @@
                     @if (isset($item['prefs']) && $item['prefs'])
                         @click.prevent="guestPrefsOpen = !guestPrefsOpen"
                     @endif
-                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/50' : 'bg-white !text-slate-700 hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300' }}"
+                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/30' : 'bg-white/70 !text-slate-700 hover:bg-white hover:!text-slate-900 hover:ring-1 hover:ring-blue-300/70' }}"
                 >
                     <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
                     <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>

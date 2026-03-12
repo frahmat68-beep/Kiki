@@ -30,25 +30,26 @@ html[data-theme-resolved='light'] {
 
 html[data-theme-resolved='dark'] {
     color-scheme: dark;
-    --bg: #0a1222;
-    --bg-soft: #111c31;
-    --surface: #132039;
-    --surface-2: #192944;
-    --surface-3: #223656;
-    --border: #304666;
+    --bg: #0c1420;
+    --bg-soft: #121b29;
+    --surface: #141f30;
+    --surface-2: #1a273a;
+    --surface-3: #22324a;
+    --border: #2d3f5b;
     --text: #edf2ff;
-    --text-muted: #e1e9fb;
-    --text-soft: #cedaf2;
-    --primary: #5b84ff;
-    --primary-strong: #4570e6;
-    --primary-soft: rgba(91, 132, 255, 0.2);
-    --primary-ring: rgba(91, 132, 255, 0.36);
+    --text-muted: #adbed9;
+    --text-soft: #7e95b2;
+    --primary: #5d82ff;
+    --primary-strong: #4269dd;
+    --primary-soft: rgba(93, 130, 255, 0.16);
+    --primary-ring: rgba(93, 130, 255, 0.28);
     --success: #34d399;
     --warning: #fbbf24;
     --danger: #fb7185;
-    --shadow-soft: 0 20px 44px rgba(2, 8, 23, 0.52), 0 8px 24px rgba(2, 8, 23, 0.34);
-    --shadow-xs: 0 12px 28px rgba(2, 8, 23, 0.4);
-    --gradient-brand: linear-gradient(135deg, #040b1d 0%, #1b3475 54%, #0d214d 100%);
+    --shadow-soft: 0 22px 48px rgba(2, 8, 23, 0.44), 0 10px 26px rgba(2, 8, 23, 0.24);
+    --shadow-xs: 0 14px 30px rgba(2, 8, 23, 0.28);
+    --gradient-brand: linear-gradient(145deg, #0d1629 0%, #16336f 44%, #315eff 100%);
+    --gradient-surface: linear-gradient(180deg, rgba(20, 31, 48, 0.95) 0%, rgba(26, 39, 58, 0.97) 100%);
 }
 
 html {
@@ -67,6 +68,24 @@ body.bg-slate-50 {
         ),
         radial-gradient(860px 360px at -18% -14%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 66%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(238, 243, 251, 0.82) 100%),
+        var(--bg);
+}
+
+html[data-theme-resolved='dark'] body,
+html[data-theme-resolved='dark'] body.bg-slate-100,
+html[data-theme-resolved='dark'] body.bg-slate-50 {
+    background:
+        radial-gradient(
+            960px 420px at 112% -18%,
+            color-mix(in oklab, var(--primary) 12%, transparent),
+            transparent 68%
+        ),
+        radial-gradient(
+            780px 340px at -14% -10%,
+            color-mix(in oklab, var(--primary) 8%, transparent),
+            transparent 70%
+        ),
+        linear-gradient(180deg, rgba(8, 14, 24, 0.4) 0%, rgba(12, 20, 32, 0.9) 100%),
         var(--bg);
 }
 
@@ -336,12 +355,12 @@ html[data-theme-resolved='dark'] .text-slate-600,
 html[data-theme-resolved='dark'] .text-slate-500,
 html[data-theme-resolved='dark'] .text-gray-600,
 html[data-theme-resolved='dark'] .text-gray-500 {
-    color: #e1e9fb !important;
+    color: var(--text-muted) !important;
 }
 
 html[data-theme-resolved='dark'] .text-slate-400,
 html[data-theme-resolved='dark'] .text-gray-400 {
-    color: #d7e3f7 !important;
+    color: color-mix(in oklab, var(--text-muted) 84%, white) !important;
 }
 
 html[data-theme-resolved='dark']
@@ -360,7 +379,7 @@ html[data-theme-resolved='light'] [data-admin-panel='true'] :is(header h1, main 
 }
 
 html[data-theme-resolved='dark'] [data-admin-panel='true'] :is(header h1, main h1, main h2, main h3, main h4) {
-    color: #93c5fd !important;
+    color: color-mix(in oklab, var(--text) 82%, var(--primary) 18%) !important;
 }
 
 .text-slate-300 {
@@ -389,12 +408,12 @@ html[data-theme-resolved='dark'] [data-admin-panel='true'] :is(header h1, main h
 
 html[data-theme-resolved='dark'] .bg-blue-100,
 html[data-theme-resolved='dark'] .bg-blue-50 {
-    background-color: #1e3a8a !important;
+    background-color: color-mix(in oklab, var(--primary) 16%, var(--surface-2)) !important;
 }
 
 html[data-theme-resolved='dark'] .text-blue-700,
 html[data-theme-resolved='dark'] .text-blue-600 {
-    color: #dbeafe !important;
+    color: color-mix(in oklab, var(--text) 76%, var(--primary) 24%) !important;
 }
 
 .from-blue-600,
@@ -472,6 +491,12 @@ html[data-theme-resolved='dark'] table tbody tr:hover {
     background: color-mix(in oklab, var(--surface-3) 66%, var(--surface));
 }
 
+html[data-theme-resolved='dark'] table tbody tr:hover td,
+html[data-theme-resolved='dark'] table tbody tr:focus-within td {
+    background-color: color-mix(in oklab, var(--surface-3) 66%, var(--surface)) !important;
+    color: var(--text) !important;
+}
+
 table thead th:first-child {
     border-top-left-radius: 12px;
 }
@@ -489,7 +514,7 @@ header.sticky {
 
 .group\/sidebar {
     background:
-        linear-gradient(180deg, color-mix(in oklab, var(--surface) 94%, white) 0%, color-mix(in oklab, var(--surface-2) 92%, white) 100%) !important;
+        linear-gradient(180deg, color-mix(in oklab, var(--surface) 95%, white) 0%, color-mix(in oklab, var(--surface-2) 94%, white) 100%) !important;
     border-right-color: var(--border) !important;
     box-shadow: 14px 0 32px rgba(12, 30, 72, 0.08);
     backdrop-filter: blur(18px);
@@ -506,10 +531,14 @@ header.sticky {
 
 .group\/sidebar a.bg-blue-600,
 .group\/sidebar a.bg-blue-700 {
-    background: var(--primary) !important;
+    background: linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--surface-3) 58%, var(--primary)) 0%,
+        color-mix(in oklab, var(--primary) 78%, black 8%) 100%
+    ) !important;
     color: #fff !important;
-    border-color: color-mix(in oklab, var(--primary) 65%, var(--border)) !important;
-    box-shadow: 0 9px 20px color-mix(in oklab, var(--primary) 35%, transparent);
+    border-color: color-mix(in oklab, var(--primary) 42%, var(--border)) !important;
+    box-shadow: 0 12px 26px color-mix(in oklab, var(--primary) 24%, transparent);
 }
 
 .group\/sidebar a:hover {
@@ -1007,11 +1036,11 @@ html[data-theme-resolved='dark'] .footer-rules-card {
 }
 
 html[data-theme-resolved='dark'] {
-    --shell-edge: rgba(148, 163, 184, 0.15);
-    --shell-panel: rgba(10, 18, 35, 0.72);
-    --shell-panel-strong: rgba(15, 23, 42, 0.86);
-    --shell-grid: rgba(96, 165, 250, 0.08);
-    --shell-shadow: 0 24px 56px rgba(2, 6, 23, 0.46);
+    --shell-edge: rgba(148, 163, 184, 0.12);
+    --shell-panel: rgba(12, 20, 32, 0.72);
+    --shell-panel-strong: rgba(16, 25, 38, 0.86);
+    --shell-grid: rgba(96, 165, 250, 0.04);
+    --shell-shadow: 0 22px 48px rgba(2, 6, 23, 0.38);
 }
 
 body[data-manake-shell] {
@@ -1045,7 +1074,7 @@ body[data-manake-shell]::after {
     left: -120px;
     width: 360px;
     height: 360px;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.18) 0%, transparent 72%);
+    background: radial-gradient(circle, rgba(42, 86, 232, 0.16) 0%, transparent 72%);
 }
 
 .manake-topbar-shell {
@@ -1053,6 +1082,10 @@ body[data-manake-shell]::after {
     background: color-mix(in oklab, var(--shell-panel) 88%, transparent) !important;
     border-color: color-mix(in oklab, var(--primary) 12%, var(--border)) !important;
     box-shadow: 0 16px 38px rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme-resolved='dark'] body[data-manake-shell] :is(header h1, header h2, header h3, main h1, main h2, main h3, main h4) {
+    color: color-mix(in oklab, var(--text) 82%, var(--primary) 18%) !important;
 }
 
 .manake-main-stage {
@@ -1076,9 +1109,9 @@ body[data-manake-shell]::after {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(120, 145, 210, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(120, 145, 210, 0.08) 1px, transparent 1px),
-        radial-gradient(320px 180px at 20% 0%, rgba(42, 86, 232, 0.14), transparent 72%);
+        linear-gradient(rgba(120, 145, 210, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120, 145, 210, 0.05) 1px, transparent 1px),
+        radial-gradient(280px 160px at 18% 0%, rgba(42, 86, 232, 0.1), transparent 72%);
     background-size: 26px 26px, 26px 26px, auto;
     mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 96%);
     pointer-events: none;
@@ -1098,6 +1131,55 @@ body[data-manake-shell]::after {
 [data-manake-sidebar='app'] nav a:hover,
 [data-manake-sidebar='admin'] nav a:hover {
     transform: translateX(2px);
+}
+
+.manake-brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.manake-brand-lockup__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--primary) 16%, var(--border));
+    border-radius: 1.15rem;
+    background: color-mix(in oklab, var(--surface) 96%, white);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+}
+
+.manake-brand-lockup__wordmark {
+    display: block;
+    width: auto;
+    object-fit: contain;
+    object-position: left center;
+}
+
+html[data-theme-resolved='dark'] .manake-brand-lockup__mark,
+html[data-theme-resolved='dark'] .manake-brand-pill {
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.22);
+}
+
+html[data-theme-resolved='dark'] [data-manake-sidebar='app']::before,
+html[data-theme-resolved='dark'] [data-manake-sidebar='admin']::before {
+    background:
+        linear-gradient(rgba(120, 145, 210, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120, 145, 210, 0.03) 1px, transparent 1px),
+        radial-gradient(260px 150px at 18% 0%, rgba(93, 130, 255, 0.08), transparent 72%);
+}
+
+html[data-theme-resolved='dark'] [data-manake-sidebar='app'] nav a.bg-blue-600,
+html[data-theme-resolved='dark'] [data-manake-sidebar='app'] nav a.bg-blue-700,
+html[data-theme-resolved='dark'] [data-manake-sidebar='admin'] nav a.bg-blue-600,
+html[data-theme-resolved='dark'] [data-manake-sidebar='admin'] nav a.bg-blue-700 {
+    background: linear-gradient(135deg, #1b2c4d 0%, #234389 100%) !important;
+    border-color: rgba(110, 138, 255, 0.34) !important;
+    box-shadow: 0 12px 24px rgba(8, 17, 34, 0.26) !important;
 }
 
 .manake-brand-pill {
