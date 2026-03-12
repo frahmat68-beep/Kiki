@@ -12,7 +12,7 @@
         __('app.auth.login_benefit_3'),
     ]"
 >
-    <div class="space-y-5">
+    <div class="space-y-4">
         @if ($errors->any())
             <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                 {{ $errors->first() }}

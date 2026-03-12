@@ -1,1 +1,1 @@
-<img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" {{ $attributes }}>
+<x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" {{ $attributes }} />

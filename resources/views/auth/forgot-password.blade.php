@@ -3,7 +3,7 @@
     :eyebrow="__('ui.auth.forgot_title')"
     :heading="__('ui.auth.forgot_heading')"
     :subheading="__('ui.auth.forgot_subheading')"
-    :aside-eyebrow="__('ui.auth.back_to_login')"
+    :aside-eyebrow="__('ui.auth.forgot_title')"
     :aside-heading="__('ui.auth.forgot_title')"
     :aside-text="__('ui.auth.forgot_hint')"
     :aside-points="[
@@ -11,7 +11,7 @@
         __('ui.auth.forgot_note'),
     ]"
 >
-    <div class="space-y-5">
+    <div class="space-y-4">
         @if (session('status'))
             <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 {{ session('status') }}

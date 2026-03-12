@@ -3,7 +3,7 @@
     :eyebrow="__('app.auth.login_title')"
     :heading="__('app.auth.login_heading')"
     :subheading="__('app.auth.login_subheading')"
-    :aside-eyebrow="__('ui.nav.notifications')"
+    :aside-eyebrow="__('app.auth.login_title')"
     :aside-heading="__('app.auth.login_title')"
     :aside-text="__('app.auth.login_note')"
     :aside-points="[
@@ -12,7 +12,7 @@
         __('app.auth.login_benefit_3'),
     ]"
 >
-    <div class="space-y-5">
+    <div class="space-y-4">
         @if ($errors->any())
             <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                 {{ $errors->first() }}

@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Admin – Detail Pemesanan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/css/theme.css', 'resources/js/app.js'])
     @vite(['resources/css/theme.css'])
 </head>
 <body class="bg-slate-100 p-10">

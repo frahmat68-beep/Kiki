@@ -15,14 +15,14 @@
     <img
         src="{{ $lightUrl }}"
         alt="{{ $alt }}"
-        class="manake-themed-asset__light {{ $imgClass }}"
+        class="manake-themed-asset__light block {{ $imgClass }}"
     >
     @if ($swapInDark)
         <img
             src="{{ $darkUrl }}"
             alt=""
             aria-hidden="true"
-            class="manake-themed-asset__dark {{ $imgClass }}"
+            class="manake-themed-asset__dark block {{ $imgClass }}"
         >
     @endif
 </span>

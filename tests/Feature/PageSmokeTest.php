@@ -52,6 +52,17 @@ class PageSmokeTest extends TestCase
         $response->assertDontSee('http://127.0.0.1:8000/manake-logo-blue.png', false);
     }
 
+    public function test_core_shell_pages_do_not_depend_on_runtime_cdn_assets(): void
+    {
+        foreach ([route('home'), route('login'), route('admin.login')] as $url) {
+            $response = $this->get($url);
+
+            $response->assertOk();
+            $response->assertDontSee('https://cdn.tailwindcss.com', false);
+            $response->assertDontSee('https://cdn.jsdelivr.net/npm/alpinejs', false);
+        }
+    }
+
     public function test_public_asset_routes_serve_logo_and_media_files(): void
     {
         Storage::disk('public')->put('equipments/test-asset-route.png', 'fake-image');

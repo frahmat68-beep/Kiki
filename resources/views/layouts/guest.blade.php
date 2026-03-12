@@ -38,16 +38,16 @@
     <body class="min-h-screen antialiased" data-manake-shell="auth">
         @include('partials.page-loader')
 
-        <div class="manake-auth-shell min-h-screen px-4 py-6 sm:px-6 sm:py-8">
+        <div class="manake-auth-shell min-h-screen px-4 py-4 sm:px-6 sm:py-6">
             <div class="manake-auth-card mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] lg:grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-                <div class="manake-auth-panel p-6 sm:p-8 lg:p-10">
-                    <div class="space-y-5">
+                <div class="manake-auth-panel p-5 sm:p-7 lg:p-8">
+                    <div class="space-y-4">
                         <a href="{{ route('home') }}" class="inline-flex items-center" data-skip-loader="true" aria-label="{{ $brandName }}">
                             <x-brand.image
                                 light="manake-logo-blue.png"
                                 dark="manake-logo-white.png"
                                 :alt="$brandName"
-                                img-class="h-10 w-auto"
+                                img-class="h-[2.2rem] w-auto"
                             />
                         </a>
 
@@ -66,12 +66,12 @@
                         @endif
                     </div>
 
-                    <div class="mt-7">
+                    <div class="mt-6">
                         {{ $slot }}
                     </div>
                 </div>
 
-                <div class="manake-auth-showcase hidden p-8 text-slate-100 lg:block lg:p-10">
+                <div class="manake-auth-showcase hidden p-7 text-slate-100 lg:block lg:p-8">
                     @if ($asideEyebrow)
                         <span class="manake-kicker manake-kicker-inverse">{{ $asideEyebrow }}</span>
                     @endif

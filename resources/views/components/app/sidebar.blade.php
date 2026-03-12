@@ -73,22 +73,22 @@
             href="{{ route('home') }}"
             title="{{ $brandName }}"
             aria-label="{{ $brandName }}"
-            class="flex w-full items-center justify-start rounded-xl px-2 py-1 text-slate-900 lg:justify-center lg:px-1 lg:group-hover/sidebar:justify-start lg:group-focus-within/sidebar:justify-start"
+            class="manake-sidebar-brand-link flex w-full items-center justify-start overflow-hidden rounded-xl px-2 py-1 text-slate-900 lg:justify-center lg:px-1"
         >
-            <span class="manake-sidebar-brand__mark hidden lg:inline-flex lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
+            <span class="manake-sidebar-brand__mark" aria-hidden="true">
                 <x-brand.image
                     light="MANAKE-FAV-M.png"
                     dark="MANAKE-FAV-M-white.png"
                     :alt="$brandName"
-                    img-class="h-12 w-auto object-contain"
+                    img-class="h-[2.45rem] w-[2.45rem] object-contain"
                 />
             </span>
-            <span class="manake-sidebar-brand__wordmark inline-flex lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex">
+            <span class="manake-sidebar-brand__wordmark">
                 <x-brand.image
                     light="manake-logo-blue.png"
                     dark="manake-logo-white.png"
                     :alt="$brandName"
-                    img-class="h-11 w-auto max-w-[13rem] shrink-0 object-contain object-left"
+                    img-class="h-[2.35rem] w-auto max-w-[13.5rem] shrink-0 object-contain object-left"
                 />
             </span>
         </a>
@@ -184,7 +184,7 @@
             @endif
         @endforeach
 
-        <div class="relative pt-1" @click.outside="shellPrefsOpen = false">
+        <div class="relative pt-2" @click.outside="shellPrefsOpen = false">
             <button
                 type="button"
                 data-nav-item
@@ -203,9 +203,9 @@
             <div
                 x-cloak
                 x-show="shellPrefsOpen"
-                x-transition.origin.left.center
+                x-transition.origin.left.top
                 @click.stop
-                class="mt-2 w-full lg:absolute lg:left-[calc(100%+0.35rem)] lg:top-1/2 lg:z-20 lg:mt-0 lg:w-[15.5rem] lg:-translate-y-1/2"
+                class="fixed inset-x-4 bottom-4 z-[90] w-auto max-w-[22rem] lg:absolute lg:inset-auto lg:left-[calc(100%+0.85rem)] lg:top-full lg:z-20 lg:mt-2 lg:w-[18rem] lg:max-w-none"
             >
                 <x-preferences.popover
                     :locale="$locale"

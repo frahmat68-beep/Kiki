@@ -5,7 +5,7 @@
     <title>Pemesanan | Manake Rental</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/css/theme.css', 'resources/js/app.js'])
     @vite(['resources/css/theme.css'])
 
     <style>
@@ -18,7 +18,7 @@
 <div class="bg-white border-b sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
         <a href="/">
-            <img src="{{ site_asset('manake-logo-blue.png') }}" class="h-8">
+            <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-8 w-auto" />
         </a>
         <span class="text-sm text-slate-500">Pemesanan Alat</span>
     </div>

@@ -1,4 +1,4 @@
-<div id="manake-page-loader" class="manake-page-loader" aria-hidden="true">
+<div id="manake-page-loader" class="manake-page-loader is-hidden" aria-hidden="true">
     <div class="manake-page-loader__inner">
         <div class="manake-loader-wordmark-shell" role="presentation">
             <x-brand.image
@@ -23,11 +23,17 @@
     (() => {
         const root = document.documentElement;
         const loader = () => document.getElementById('manake-page-loader');
+        let navigationTimer = null;
 
         const hideLoader = () => {
             const element = loader();
             if (!element) {
                 return;
+            }
+
+            if (navigationTimer) {
+                window.clearTimeout(navigationTimer);
+                navigationTimer = null;
             }
 
             element.classList.add('is-hidden');
@@ -44,11 +50,19 @@
             root.classList.remove('manake-loaded');
         };
 
-        if (document.readyState === 'complete') {
-            requestAnimationFrame(hideLoader);
-        } else {
-            window.addEventListener('load', () => requestAnimationFrame(hideLoader), { once: true });
-        }
+        const showLoaderDeferred = () => {
+            if (navigationTimer) {
+                window.clearTimeout(navigationTimer);
+            }
+
+            navigationTimer = window.setTimeout(showLoader, 120);
+        };
+
+        root.classList.add('manake-loaded');
+        hideLoader();
+
+        window.addEventListener('pageshow', hideLoader);
+        window.addEventListener('load', hideLoader, { once: true });
 
         document.addEventListener('click', (event) => {
             const link = event.target.closest('a[href]');
@@ -78,7 +92,7 @@
                 return;
             }
 
-            showLoader();
+            showLoaderDeferred();
         });
 
         document.addEventListener('submit', (event) => {
@@ -91,7 +105,7 @@
                 return;
             }
 
-            showLoader();
+            showLoaderDeferred();
         });
     })();
 </script>

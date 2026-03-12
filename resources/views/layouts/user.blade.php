@@ -14,9 +14,7 @@
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
-    <script src="https://cdn.tailwindcss.com"></script>
-    @vite(['resources/css/theme.css'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/app.css', 'resources/css/theme.css', 'resources/js/app.js'])
     @stack('head')
     @php
         $resolveHexColor = static function ($value, string $fallback): string {
@@ -193,7 +191,7 @@
                 </div>
             </header>
 
-            <main class="px-4 py-6 sm:px-6 sm:py-8">
+            <main class="px-4 py-4 sm:px-6 sm:py-6">
                 <div class="mx-auto w-full max-w-[1320px]">
                     @yield('content')
                 </div>

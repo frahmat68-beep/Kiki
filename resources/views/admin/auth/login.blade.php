@@ -3,7 +3,7 @@
     :eyebrow="__('ui.admin.panel_title')"
     :heading="__('ui.admin.login_heading')"
     :subheading="__('ui.admin.login_intro')"
-    :aside-eyebrow="__('ui.admin.sidebar_operational')"
+    :aside-eyebrow="__('ui.admin.admin_login')"
     :aside-heading="__('ui.admin.panel_title')"
     :aside-text="__('ui.admin.login_subheading')"
     :aside-points="[
@@ -12,7 +12,7 @@
         __('ui.admin.website_settings'),
     ]"
 >
-    <div class="space-y-5">
+    <div class="space-y-4">
         @if ($errors->any())
             <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                 {{ $errors->first() }}

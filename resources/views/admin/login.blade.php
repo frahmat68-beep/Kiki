@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="{{ site_asset('MANAKE-FAV-M.png') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/css/theme.css', 'resources/js/app.js'])
     @vite(['resources/css/theme.css'])
 
     <style>
@@ -17,7 +17,9 @@
 
 <div class="w-full max-w-md rounded-2xl bg-slate-800 p-8 shadow-xl">
     <div class="text-center mb-6">
-        <img src="{{ site_asset('manake-logo-blue.png') }}" class="mx-auto h-12 mb-4">
+        <div class="mb-4 flex justify-center">
+            <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-12 w-auto" />
+        </div>
         <h2 class="text-xl font-semibold text-white">Login Admin</h2>
     </div>
 
