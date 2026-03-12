@@ -204,6 +204,54 @@
             box-shadow: 0 10px 22px -19px rgba(15, 23, 42, 0.4);
         }
 
+        .availability-pill {
+            display: inline-flex;
+            min-height: 2.2rem;
+            min-width: 6.75rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 0.45rem 0.9rem;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .availability-pill--success {
+            background: color-mix(in oklab, var(--success) 18%, var(--surface));
+            color: color-mix(in oklab, var(--success) 84%, var(--text));
+            border: 1px solid color-mix(in oklab, var(--success) 20%, var(--border));
+        }
+
+        .availability-pill--danger {
+            background: color-mix(in oklab, var(--danger) 16%, var(--surface));
+            color: color-mix(in oklab, var(--danger) 86%, var(--text));
+            border: 1px solid color-mix(in oklab, var(--danger) 18%, var(--border));
+        }
+
+        .availability-pill--info {
+            background: color-mix(in oklab, var(--primary-soft) 78%, var(--surface));
+            color: var(--primary-strong);
+            border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
+        }
+
+        html[data-theme-resolved='dark'] .availability-pill--success {
+            background: color-mix(in oklab, var(--success) 24%, var(--surface));
+            color: color-mix(in oklab, var(--success) 52%, white 48%);
+        }
+
+        html[data-theme-resolved='dark'] .availability-pill--danger {
+            background: color-mix(in oklab, var(--danger) 24%, var(--surface));
+            color: color-mix(in oklab, var(--danger) 48%, white 52%);
+        }
+
+        html[data-theme-resolved='dark'] .availability-pill--info {
+            background: color-mix(in oklab, var(--primary-soft) 62%, var(--surface-2));
+            color: color-mix(in oklab, var(--primary) 42%, white 58%);
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .availability-surface,
             .board-cell,
@@ -537,11 +585,11 @@
                         class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                     <div class="sm:col-span-3 flex flex-wrap items-center gap-2">
-                        <button class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+                        <button class="btn-primary inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold">
                             {{ $availabilityShowButton }}
                         </button>
                         @if ($search !== '')
-                            <a href="{{ route('availability.board', ['month' => $monthValue, 'date' => $selectedDateValue]) }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                            <a href="{{ route('availability.board', ['month' => $monthValue, 'date' => $selectedDateValue]) }}" class="btn-secondary inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold">
                                 {{ $availabilityResetButton }}
                             </a>
                         @endif
@@ -565,7 +613,8 @@
                         @if ($canGoPrev)
                             <a
                                 href="{{ route('availability.board', ['month' => $prevMonth, 'date' => $monthDate->copy()->subMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                                data-ui-icon-button
+                                class="inline-flex h-9 w-9 items-center justify-center rounded-lg"
                                 aria-label="Bulan sebelumnya"
                             >
                                 ←
@@ -577,7 +626,8 @@
                         @if ($canGoNext)
                             <a
                                 href="{{ route('availability.board', ['month' => $nextMonth, 'date' => $monthDate->copy()->addMonth()->startOfMonth()->toDateString(), 'q' => $search ?: null]) }}"
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                                data-ui-icon-button
+                                class="inline-flex h-9 w-9 items-center justify-center rounded-lg"
                                 aria-label="Bulan berikutnya"
                             >
                                 →
@@ -682,7 +732,7 @@
                 <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                     <div class="flex items-center justify-between gap-2">
                         <h3 class="text-base font-semibold text-slate-900">{{ $availabilityReadyTitle }}</h3>
-                        <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                        <span class="availability-pill availability-pill--success shrink-0">
                             {{ $selectedFreeRows->count() }} {{ $availabilityCountEmptySuffix }}
                         </span>
                     </div>
@@ -691,7 +741,7 @@
                             <article class="board-item rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
                                 <div class="flex items-center justify-between gap-3">
                                     <p class="text-sm font-semibold text-slate-900">{{ $row['name'] }}</p>
-                                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                                    <span class="availability-pill availability-pill--success shrink-0">
                                         {{ strtr($availabilityMinLeftTemplate, [':qty' => (string) $row['selected_available']]) }}
                                     </span>
                                 </div>
@@ -711,7 +761,7 @@
             <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="text-lg font-semibold text-slate-900">{{ $availabilityBusyTitle }} di {{ $selectedDateLabel }}</h2>
-                    <span class="rounded-full bg-rose-100 px-2.5 py-1 text-[11px] font-semibold text-rose-700">{{ $selectedBusyRows->count() }} {{ $availabilityCountToolsSuffix }}</span>
+                    <span class="availability-pill availability-pill--danger shrink-0">{{ $selectedBusyRows->count() }} {{ $availabilityCountToolsSuffix }}</span>
                 </div>
                 <div class="mt-3 space-y-2">
                     @forelse ($selectedBusyRows->take(10) as $row)
@@ -735,7 +785,7 @@
             <article class="availability-surface surface-band rounded-3xl border border-slate-200 p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="text-lg font-semibold text-slate-900">{{ $availabilityMonthlyTitle }}</h2>
-                    <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ $monthlySchedules->count() }} {{ $availabilityCountSchedulesSuffix }}</span>
+                    <span class="availability-pill availability-pill--info shrink-0">{{ $monthlySchedules->count() }} {{ $availabilityCountSchedulesSuffix }}</span>
                 </div>
                 <div class="mt-3 max-h-[29rem] space-y-2 overflow-y-auto pr-1">
                     @forelse ($monthlySchedules as $schedule)

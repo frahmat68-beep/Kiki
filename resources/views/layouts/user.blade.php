@@ -154,11 +154,15 @@
         </aside>
 
         <div class="lg:pl-72">
-            <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
+            <header class="manake-topbar-shell sticky top-0 z-30 border-b border-slate-200 bg-white">
                 <div class="mx-auto flex w-full max-w-[1320px] flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                     <div class="flex items-center gap-3">
-                        <button class="lg:hidden rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm" @click="sidebarOpen = true">
-                            ☰
+                        <button data-ui-icon-button class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl" @click="sidebarOpen = true" aria-label="{{ __('ui.nav.toggle_menu') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                <line x1="4" y1="7" x2="20" y2="7" />
+                                <line x1="4" y1="12" x2="20" y2="12" />
+                                <line x1="4" y1="17" x2="20" y2="17" />
+                            </svg>
                         </button>
                         <div>
                             <h1 class="text-lg font-semibold text-slate-900">@yield('page_title', __('ui.overview.title'))</h1>

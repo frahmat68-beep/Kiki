@@ -64,7 +64,6 @@
     };
 
     $logoFallbackUrl = $assetWithVersion('manake-logo-blue.png');
-    $logoMarkUrl = $assetWithVersion('MANAKE-FAV-M.png');
     $resolvedLogoUrl = $logoUrl ?: $logoFallbackUrl;
     $activeCategorySlug = (string) request()->query('category', request()->route('slug', ''));
     $submenuEnabledRaw = strtolower(trim((string) setting('catalog.sidebar_submenu_enabled', '1')));
@@ -92,29 +91,21 @@
         }
     }"
     data-manake-sidebar="app"
-    class="group/sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-visible border-r border-slate-200 bg-white px-2 py-5 shadow-sm transition-[width,transform,box-shadow] duration-200 ease-out lg:w-[5.75rem] lg:translate-x-0 lg:hover:w-72 lg:focus-within:w-72 lg:hover:shadow-2xl lg:focus-within:shadow-2xl"
+    class="group/sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-visible border-r border-slate-200 bg-white px-2 py-5 shadow-sm transition-[width,transform,box-shadow] duration-200 ease-out lg:w-24 lg:translate-x-0 lg:hover:w-72 lg:focus-within:w-72 lg:hover:shadow-2xl lg:focus-within:shadow-2xl"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
 >
-    <div class="flex h-14 items-center justify-between px-2">
+    <div class="flex h-14 items-center justify-between px-1.5">
         <a
             href="{{ route('home') }}"
             title="{{ $brandName }}"
             aria-label="{{ $brandName }}"
             class="flex w-full items-center justify-center rounded-xl px-1 py-1 text-slate-900 lg:group-hover/sidebar:justify-start lg:group-focus-within/sidebar:justify-start"
         >
-            <span class="manake-sidebar-brand__mark hidden lg:inline-flex lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
-                <img
-                    src="{{ $logoMarkUrl }}"
-                    alt="{{ $brandName }}"
-                    class="h-8 w-8 object-contain"
-                    onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
-                >
-            </span>
-            <span class="manake-sidebar-brand__wordmark inline-flex lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex">
+            <span class="manake-sidebar-brand__wordmark inline-flex">
                 <img
                     src="{{ $resolvedLogoUrl }}"
                     alt="{{ $brandName }}"
-                    class="h-10 w-auto max-w-[10.5rem] shrink-0 object-contain object-left"
+                    class="h-8 w-auto max-w-[10.5rem] shrink-0 object-contain object-left lg:h-8 lg:max-w-[5.5rem] lg:group-hover/sidebar:h-9 lg:group-hover/sidebar:max-w-[10.5rem] lg:group-focus-within/sidebar:h-9 lg:group-focus-within/sidebar:max-w-[10.5rem]"
                     onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
                 >
             </span>
@@ -218,10 +209,10 @@
         x-cloak
         x-show="guestPrefsOpen"
         x-transition
-        class="mx-1 mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 lg:group-hover/sidebar:mx-1 lg:group-focus-within/sidebar:mx-1"
+        class="mx-1 mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 lg:absolute lg:bottom-5 lg:left-[calc(100%-0.25rem)] lg:mt-0 lg:w-64 lg:rounded-[1.4rem] lg:shadow-2xl lg:group-hover/sidebar:left-[calc(100%-1rem)] lg:group-focus-within/sidebar:left-[calc(100%-1rem)]"
     >
         <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
-        <div class="mt-2 grid grid-cols-2 gap-2">
+        <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
             <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? '!text-slate-900' : '!text-slate-700' }}">
                 {{ __('ui.languages.id') }}
             </a>
@@ -231,7 +222,7 @@
         </div>
 
         <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
-        <div class="mt-2 grid grid-cols-3 gap-2">
+        <div class="mt-2 grid grid-cols-1 gap-2">
             @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
                 <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? '!text-slate-900' : '!text-slate-700' }}">
                     {{ $label }}
