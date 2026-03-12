@@ -779,7 +779,8 @@
                     </div>
                     <button
                         type="button"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
+                        data-ui-icon-button
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-full transition"
                         @click="closeScheduleModal()"
                         aria-label="{{ $availabilityModalClose }}"
                     >
@@ -855,7 +856,8 @@
                     </div>
                     <button
                         type="button"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
+                        data-ui-icon-button
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-full transition"
                         @click="closeRangeSelectionModal()"
                         aria-label="{{ $availabilityModalClose }}"
                     >

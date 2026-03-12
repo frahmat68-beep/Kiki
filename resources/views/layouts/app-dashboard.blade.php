@@ -117,13 +117,13 @@
             </div>
 
             <nav class="mt-8 space-y-2 text-sm font-semibold">
-                <a href="{{ route('overview') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('overview') ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('overview') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('overview') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.overview') }}</span>
                 </a>
-                <a href="{{ route('booking.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('booking.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('booking.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('booking.*') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.booking') }}</span>
                 </a>
-                <a href="{{ route('cart') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('cart') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('cart') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('cart') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.cart') }}</span>
                     @if (($cartCount ?? 0) > 0)
                         <span class="inline-flex min-w-[22px] items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-[10px] text-white">
@@ -131,14 +131,14 @@
                         </span>
                     @endif
                 </a>
-                <a href="{{ route('settings.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('settings.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('settings.*') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.settings') }}</span>
                 </a>
             </nav>
 
             <form method="POST" action="{{ route('logout') }}" class="mt-10">
                 @csrf
-                <button type="submit" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600 transition">
+                <button type="submit" class="btn-secondary w-full rounded-xl px-3 py-2 text-sm font-semibold transition">
                     {{ __('ui.nav.logout') }}
                 </button>
             </form>
@@ -165,7 +165,7 @@
                             >
                         </div>
                         <div class="flex items-center gap-2 sm:gap-3">
-                            <a href="{{ route('settings.index') }}" class="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:shadow-sm transition flex items-center justify-center" aria-label="{{ __('ui.nav.settings') }}">
+                            <a href="{{ route('settings.index') }}" data-ui-icon-button class="flex h-10 w-10 items-center justify-center rounded-xl transition" aria-label="{{ __('ui.nav.settings') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="3" />
                                     <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
@@ -174,7 +174,7 @@
                             <div class="relative" @click.outside="userOpen = false">
                                 <button
                                     type="button"
-                                    class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5 hover:border-blue-200 hover:shadow-sm transition"
+                                    class="btn-secondary flex items-center gap-2 rounded-full px-2 py-1.5 transition"
                                     @click="userOpen = !userOpen"
                                     aria-haspopup="true"
                                     :aria-expanded="userOpen.toString()"

@@ -11,13 +11,9 @@
             return site_asset($file);
         };
         $faviconUrl = $assetWithVersion('MANAKE-FAV-M.png');
-        $cmsBrandLogoPath = site_setting('brand.logo_path');
-        $cmsBrandLogoUrl = site_media_url($cmsBrandLogoPath);
+        $brandLogoUrl = $assetWithVersion('manake-logo-blue.png');
     @endphp
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
-    @if ($cmsBrandLogoUrl)
-        <meta name="manake-cms-logo" content="{{ $cmsBrandLogoUrl }}">
-    @endif
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
     @include('partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -114,7 +110,7 @@
 @php
     $isAuthenticated = auth('web')->check();
     $brandName = site_setting('brand.name', 'Manake');
-    $sidebarLogoUrl = $cmsBrandLogoUrl ?: $assetWithVersion('manake-logo-blue.png');
+    $sidebarLogoUrl = $brandLogoUrl;
     $locale = app()->getLocale();
 
     $categories = collect($navCategories ?? [])->filter(fn ($category) => ! empty($category->slug ?? null))->values();
@@ -255,7 +251,8 @@
                         <div class="relative" @click.outside="notifOpen = false">
                             <button
                                 type="button"
-                                class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                                data-ui-icon-button
+                                class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                                 @click="notifOpen = !notifOpen"
                                 :aria-expanded="notifOpen.toString()"
                                 aria-label="{{ __('ui.nav.notifications') }}"
@@ -306,7 +303,8 @@
                     @else
                         <button
                             type="button"
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                            data-ui-icon-button
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                             aria-label="{{ __('ui.nav.notifications') }}"
                             title="{{ __('ui.nav.notifications') }}"
                             @click="openAuthModal('login')"
@@ -321,7 +319,8 @@
                     @if ($isAuthenticated)
                         <a
                             href="{{ route('cart') }}"
-                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                            data-ui-icon-button
+                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                             aria-label="{{ __('ui.nav.cart') }}"
                             title="{{ __('ui.nav.cart') }}"
                         >
@@ -339,7 +338,8 @@
                     @else
                         <button
                             type="button"
-                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                            data-ui-icon-button
+                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                             aria-label="{{ __('ui.nav.cart') }}"
                             title="{{ __('ui.nav.cart') }}"
                             @click="openAuthModal('login')"
@@ -355,7 +355,8 @@
                     @unless($isAuthenticated)
                         <button
                             type="button"
-                            class="hidden text-sm font-semibold text-slate-600 transition hover:text-blue-600 sm:inline"
+                            data-ui-text-button
+                            class="hidden text-sm font-semibold transition sm:inline"
                             @click="openAuthModal('login')"
                         >
                             {{ __('ui.nav.login') }}
@@ -393,7 +394,8 @@
             <div class="relative z-10 w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
                 <button
                     type="button"
-                    class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                    data-ui-icon-button
+                    class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full transition"
                     @click="closeAuthModal()"
                     aria-label="{{ __('ui.actions.close') }}"
                 >
@@ -556,7 +558,7 @@
                 <div class="relative hidden overflow-hidden bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900 p-8 text-white lg:block lg:p-10">
                     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top,_white,_transparent_60%)]"></div>
                     <div class="relative z-10">
-                        <img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto rounded-xl bg-white p-2">
+                        <img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto">
                         <h1 class="mt-6 text-3xl font-semibold leading-tight">{{ __('app.auth.login_heading') }}</h1>
                         <p class="mt-4 text-sm leading-relaxed text-blue-100">
                             {{ __('app.auth.login_note') }}

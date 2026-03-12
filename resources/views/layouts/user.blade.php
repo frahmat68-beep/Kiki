@@ -117,14 +117,14 @@
             </div>
 
             <nav class="mt-8 space-y-2 text-sm font-semibold">
-                <a href="{{ route('overview') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('overview') ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('overview') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('overview') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.overview') }}</span>
                     <span class="text-[10px] uppercase tracking-widest">{{ __('ui.overview.tag') }}</span>
                 </a>
-                <a href="{{ route('booking.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('booking.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('booking.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('booking.*') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.booking') }}</span>
                 </a>
-                <a href="{{ route('cart') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('cart') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('cart') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('cart') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.cart') }}</span>
                     @if (($cartCount ?? 0) > 0)
                         <span class="inline-flex min-w-[22px] items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-[10px] text-white">
@@ -132,7 +132,7 @@
                         </span>
                     @endif
                 </a>
-                <a href="{{ route('settings.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <a href="{{ route('settings.index') }}" class="flex items-center justify-between rounded-xl px-3 py-2 {{ request()->routeIs('settings.*') ? 'btn-primary text-white' : 'btn-secondary text-slate-700' }}">
                     <span>{{ __('ui.nav.settings') }}</span>
                 </a>
             </nav>
@@ -140,14 +140,14 @@
             <div class="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
                 <p class="font-semibold text-slate-900">{{ __('ui.overview.quick_help_title') }}</p>
                 <p class="mt-2">{{ __('ui.overview.quick_help_body') }}</p>
-                <a href="/contact" class="mt-3 inline-flex items-center justify-center rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:text-blue-600">
+                <a href="/contact" class="btn-secondary mt-3 inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-semibold transition">
                     {{ __('ui.actions.contact') }}
                 </a>
             </div>
 
             <form method="POST" action="{{ route('logout') }}" class="mt-6">
                 @csrf
-                <button type="submit" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600 transition">
+                <button type="submit" class="btn-secondary w-full rounded-xl px-3 py-2 text-sm font-semibold transition">
                     {{ __('ui.nav.logout') }}
                 </button>
             </form>
@@ -174,7 +174,7 @@
                             >
                         </div>
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('catalog') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 hover:border-blue-200 hover:text-blue-600 transition">
+                            <a href="{{ route('catalog') }}" class="btn-secondary rounded-xl px-4 py-2 text-xs font-semibold transition">
                                 {{ __('ui.actions.explore_catalog') }}
                             </a>
                             <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5">

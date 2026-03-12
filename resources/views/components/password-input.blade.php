@@ -7,7 +7,7 @@
     'required' => false,
     'inputClass' => '',
     'wrapperClass' => '',
-    'buttonClass' => 'text-slate-400 hover:text-blue-600',
+    'buttonClass' => 'text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-100',
 ])
 
 @php

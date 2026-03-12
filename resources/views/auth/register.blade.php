@@ -82,7 +82,7 @@
             <div class="relative hidden p-8 text-white lg:block lg:p-10 bg-gradient-to-br from-slate-900 via-blue-900 to-blue-700">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top,_white,_transparent_60%)]"></div>
                 <div class="relative z-10">
-                    <img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto bg-white rounded-xl p-2">
+                    <img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto">
                     <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                         {{ __('app.auth.register_heading') }}
                     </h1>

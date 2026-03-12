@@ -108,8 +108,7 @@
     @php
         $activePage = $activePage ?? '';
         $brandName = site_setting('brand.name', 'Manake');
-        $cmsBrandLogoPath = site_setting('brand.logo_path');
-        $logoUrl = site_media_url($cmsBrandLogoPath) ?: $assetWithVersion('manake-logo-blue.png');
+        $logoUrl = $assetWithVersion('manake-logo-blue.png');
         $adminName = auth('admin')->user()->name ?? __('Admin');
         $adminRole = auth('admin')->user()->role ?? 'admin';
         $isSuperAdmin = auth('admin')->check() && $adminRole === 'super_admin';
@@ -150,11 +149,12 @@
                     </div>
 
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <a href="/" class="hidden text-sm font-semibold text-slate-600 transition hover:text-blue-600 sm:inline">{{ __('ui.admin.view_website') }}</a>
+                        <a href="/" data-ui-text-button class="hidden text-sm font-semibold transition sm:inline">{{ __('ui.admin.view_website') }}</a>
                         <div class="relative" @click.outside="adminSettingsOpen = false">
                             <button
                                 type="button"
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                                data-ui-icon-button
+                                class="inline-flex h-9 w-9 items-center justify-center rounded-xl transition"
                                 @click="adminSettingsOpen = !adminSettingsOpen"
                                 :aria-expanded="adminSettingsOpen.toString()"
                                 aria-label="{{ __('ui.nav.settings') }}"
@@ -167,17 +167,17 @@
                             <div x-cloak x-show="adminSettingsOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-64 rounded-xl p-2 shadow-lg">
                                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.language') }}</p>
                                 <div class="mb-2 grid grid-cols-2 gap-2 px-2">
-                                    <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                    <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'text-blue-700' : 'text-slate-600' }}">
                                         {{ __('ui.languages.id') }}
                                     </a>
-                                    <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                    <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-lg border px-2 py-1.5 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'text-blue-700' : 'text-slate-600' }}">
                                         {{ __('ui.languages.en') }}
                                     </a>
                                 </div>
                                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">{{ __('ui.nav.theme') }}</p>
                                 <div class="mb-2 space-y-1 px-2">
                                     @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                                        <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="block rounded-lg border px-2 py-1.5 text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                        <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="block rounded-lg border px-2 py-1.5 text-xs font-semibold transition {{ $currentTheme === $value ? 'text-blue-700' : 'text-slate-600' }}">
                                             {{ $label }}
                                         </a>
                                     @endforeach
@@ -189,7 +189,7 @@
                         </div>
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
-                            <button class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-600">
+                            <button class="btn-secondary rounded-xl px-3 py-1.5 text-xs font-semibold transition">
                                 {{ __('ui.nav.logout') }}
                             </button>
                         </form>

@@ -85,11 +85,11 @@
                     src="{{ $expandedLogoUrl }}"
                     alt="{{ $brandName }}"
                     onerror="this.onerror=null;this.src='{{ $expandedLogoFallbackUrl }}';"
-                    class="h-8 w-auto object-contain object-left"
+                    class="h-10 w-auto object-contain object-left"
                 >
             </span>
         </a>
-        <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">
+        <button type="button" data-ui-icon-button class="rounded-lg p-1.5 lg:hidden" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -103,9 +103,11 @@
             @foreach ($primaryItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-300/40' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-900 hover:ring-1 hover:ring-blue-200' }}"
+                    data-nav-item
+                    data-nav-active="{{ $activePage === $item['key'] ? 'true' : 'false' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'text-white' : 'text-slate-700' }}"
                 >
-                    <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
+                    <span data-nav-icon>{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>
                 </a>
             @endforeach
@@ -116,9 +118,11 @@
             @foreach ($settingsItems as $item)
                 <a
                     href="{{ $item['url'] }}"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-300/40' : 'text-slate-700 hover:bg-blue-50 hover:text-blue-900 hover:ring-1 hover:ring-blue-200' }}"
+                    data-nav-item
+                    data-nav-active="{{ $activePage === $item['key'] ? 'true' : 'false' }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition {{ $activePage === $item['key'] ? 'text-white' : 'text-slate-700' }}"
                 >
-                    <span class="inline-flex h-8 w-8 items-center justify-center">{!! $item['icon'] !!}</span>
+                    <span data-nav-icon>{!! $item['icon'] !!}</span>
                     <span>{{ $item['label'] }}</span>
                 </a>
             @endforeach

@@ -92,21 +92,21 @@
         }
     }"
     data-manake-sidebar="app"
-    class="group/sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-visible border-r border-slate-200 bg-white px-2 py-5 shadow-sm transition-[width,transform,box-shadow] duration-200 ease-out lg:w-16 lg:translate-x-0 lg:hover:w-72 lg:focus-within:w-72 lg:hover:shadow-2xl lg:focus-within:shadow-2xl"
+    class="group/sidebar fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-visible border-r border-slate-200 bg-white px-2 py-5 shadow-sm transition-[width,transform,box-shadow] duration-200 ease-out lg:w-[5.75rem] lg:translate-x-0 lg:hover:w-72 lg:focus-within:w-72 lg:hover:shadow-2xl lg:focus-within:shadow-2xl"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
 >
-    <div class="flex h-12 items-center justify-between px-2">
+    <div class="flex h-14 items-center justify-between px-2">
         <a
             href="{{ route('home') }}"
             title="{{ $brandName }}"
             aria-label="{{ $brandName }}"
-            class="flex items-center rounded-xl px-1 py-1 text-slate-900"
+            class="flex w-full items-center justify-center rounded-xl px-1 py-1 text-slate-900 lg:group-hover/sidebar:justify-start lg:group-focus-within/sidebar:justify-start"
         >
             <span class="manake-sidebar-brand__mark hidden lg:inline-flex lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
                 <img
                     src="{{ $logoMarkUrl }}"
                     alt="{{ $brandName }}"
-                    class="h-7 w-7 object-contain"
+                    class="h-8 w-8 object-contain"
                     onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
                 >
             </span>
@@ -114,12 +114,12 @@
                 <img
                     src="{{ $resolvedLogoUrl }}"
                     alt="{{ $brandName }}"
-                    class="h-8 w-auto max-w-[9rem] shrink-0 object-contain object-left"
+                    class="h-10 w-auto max-w-[10.5rem] shrink-0 object-contain object-left"
                     onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
                 >
             </span>
         </a>
-        <button class="rounded-lg border border-slate-200 p-1.5 text-slate-500 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
+        <button data-ui-icon-button class="rounded-lg p-1.5 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -137,18 +137,20 @@
                     <div class="flex items-center gap-1">
                         <a
                             href="{{ $item['url'] }}"
-                            title="{{ $item['label'] }}"
                             aria-label="{{ $item['label'] }}"
-                            class="flex h-11 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/30' : 'bg-white/70 !text-slate-700 hover:bg-white hover:!text-slate-900 hover:ring-1 hover:ring-blue-300/70' }}"
+                            data-nav-item
+                            data-nav-active="{{ $item['active'] ? 'true' : 'false' }}"
+                            class="flex h-12 min-w-0 flex-1 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? '!text-white' : '!text-slate-700' }}"
                         >
-                            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
+                            <span data-nav-icon>{!! $item['icon'] !!}</span>
                             <span class="truncate text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
                         </a>
                         <button
                             type="button"
                             x-cloak
                             x-show="catalogSubmenuEnabled"
-                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white !text-slate-700 transition hover:border-blue-300 hover:bg-blue-100 hover:!text-slate-900 lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex"
+                            data-ui-icon-button
+                            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl !text-slate-700 lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex"
                             @click.prevent="catalogToggle()"
                             :aria-expanded="catalogSubmenuOpen.toString()"
                             aria-label="{{ __('ui.nav.category') }}"
@@ -168,6 +170,7 @@
                         x-transition:leave="transition ease-in"
                         x-transition:leave-start="opacity-100 translate-y-0 max-h-80"
                         x-transition:leave-end="opacity-0 -translate-y-1 max-h-0"
+                        data-nav-panel
                         class="overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50/90 p-2 lg:ml-10"
                         style="transition-duration: {{ $submenuDurationMs }}ms;"
                     >
@@ -179,7 +182,9 @@
                                 @endphp
                                 <a
                                     href="{{ route('catalog', ['category' => $category->slug]) }}"
-                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-transparent !text-slate-700 hover:border-blue-300/70 hover:bg-white hover:!text-slate-900' }}"
+                                    data-ui-chip-option
+                                    data-ui-active="{{ $isCategoryActive ? 'true' : 'false' }}"
+                                    class="flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition {{ $isCategoryActive ? '!text-slate-900' : '!text-slate-700' }}"
                                 >
                                     <span class="truncate">{{ $category->name }}</span>
                                     <span class="ml-2 inline-flex h-1.5 w-1.5 rounded-full {{ $isCategoryActive ? 'bg-blue-600' : 'bg-slate-300' }}"></span>
@@ -191,17 +196,18 @@
             @else
                 <a
                     href="{{ $item['url'] }}"
-                    title="{{ $item['label'] }}"
                     aria-label="{{ $item['label'] }}"
+                    data-nav-item
+                    data-nav-active="{{ $item['active'] ? 'true' : 'false' }}"
                     @if (isset($item['modal']))
                         @click.prevent="openAuthModal('{{ $item['modal'] }}')"
                     @endif
                     @if (isset($item['prefs']) && $item['prefs'])
                         @click.prevent="guestPrefsOpen = !guestPrefsOpen"
                     @endif
-                    class="flex h-11 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? 'bg-blue-700 !text-white shadow-sm ring-1 ring-blue-300/30' : 'bg-white/70 !text-slate-700 hover:bg-white hover:!text-slate-900 hover:ring-1 hover:ring-blue-300/70' }}"
+                    class="flex h-12 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? '!text-white' : '!text-slate-700' }}"
                 >
-                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">{!! $item['icon'] !!}</span>
+                    <span data-nav-icon>{!! $item['icon'] !!}</span>
                     <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $item['label'] }}</span>
                 </a>
             @endif
@@ -216,10 +222,10 @@
     >
         <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
         <div class="mt-2 grid grid-cols-2 gap-2">
-            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
+            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? '!text-slate-900' : '!text-slate-700' }}">
                 {{ __('ui.languages.id') }}
             </a>
-            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
+            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? '!text-slate-900' : '!text-slate-700' }}">
                 {{ __('ui.languages.en') }}
             </a>
         </div>
@@ -227,7 +233,7 @@
         <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
         <div class="mt-2 grid grid-cols-3 gap-2">
             @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-300 bg-blue-100 !text-slate-900' : 'border-slate-200 !text-slate-700 hover:border-blue-300 hover:bg-white hover:!text-slate-900' }}">
+                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? '!text-slate-900' : '!text-slate-700' }}">
                     {{ $label }}
                 </a>
             @endforeach
@@ -240,9 +246,11 @@
                 href="{{ route('profile.complete') }}"
                 title="{{ __('ui.nav.my_profile') }}"
                 aria-label="{{ __('ui.nav.my_profile') }}"
-                class="flex items-center gap-3 rounded-xl px-2 py-2 !text-slate-700 transition hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300 lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
+                data-nav-item
+                data-nav-active="false"
+                class="flex items-center gap-3 rounded-xl px-2 py-2 !text-slate-700 transition lg:justify-center lg:gap-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:gap-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:gap-3"
             >
-                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">{{ $userInitial }}</span>
+                <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white shadow-sm">{{ $userInitial }}</span>
                 <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[10rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[10rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ $displayName }}</span>
             </a>
 
@@ -251,9 +259,11 @@
                 <button
                     type="submit"
                     title="{{ __('ui.nav.logout') }}"
-                    class="flex h-10 w-full items-center rounded-xl px-3 !text-slate-700 transition hover:bg-blue-100 hover:!text-slate-900 hover:ring-1 hover:ring-blue-300 lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3"
+                    data-nav-item
+                    data-nav-active="false"
+                    class="flex h-11 w-full items-center rounded-xl px-3 !text-slate-700 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3"
                 >
-                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center">
+                    <span data-nav-icon>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                             <polyline points="16 17 21 12 16 7" />

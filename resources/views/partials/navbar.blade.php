@@ -44,10 +44,11 @@
                 <div class="hidden items-center gap-5 text-sm font-semibold text-slate-600 lg:flex">
                     <div class="relative" @mouseenter="categoryOpen = true" @mouseleave="categoryOpen = false" @click.outside="categoryOpen = false">
                         <div class="inline-flex items-center gap-1">
-                            <a href="{{ route('catalog') }}" class="transition hover:text-blue-600">{{ __('ui.nav.category') }}</a>
+                            <a href="{{ route('catalog') }}" data-ui-text-button class="transition">{{ __('ui.nav.category') }}</a>
                             <button
                                 type="button"
-                                class="inline-flex items-center rounded-full p-0.5 transition hover:text-blue-600"
+                                data-ui-text-button
+                                class="inline-flex items-center rounded-full p-0.5 transition"
                                 @click="categoryOpen = !categoryOpen"
                                 :aria-expanded="categoryOpen.toString()"
                                 aria-label="{{ __('ui.nav.category') }}"
@@ -59,11 +60,11 @@
                         </div>
                         <div x-cloak x-show="categoryOpen" x-transition.origin.top.left class="card absolute left-0 mt-2 w-56 rounded-xl p-2 shadow-lg">
                             @forelse ($categories as $cat)
-                                <a href="{{ $cat['url'] }}" class="block rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-blue-600">
+                                <a href="{{ $cat['url'] }}" data-ui-menu-item class="block rounded-lg px-3 py-2 text-sm transition">
                                     {{ $cat['label'] }}
                                 </a>
                             @empty
-                                <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-blue-600">
+                                <a href="{{ route('categories.index') }}" data-ui-menu-item class="block rounded-lg px-3 py-2 text-sm transition">
                                     {{ __('app.category.title') }}
                                 </a>
                             @endforelse
@@ -93,7 +94,8 @@
                 <div class="relative hidden sm:block" @click.outside="prefOpen = false">
                     <button
                         type="button"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                        data-ui-icon-button
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                         @click="prefOpen = !prefOpen"
                         :aria-expanded="prefOpen.toString()"
                         aria-label="{{ __('ui.nav.settings') }}"
@@ -106,10 +108,10 @@
                     <div x-cloak x-show="prefOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-72 rounded-xl p-3 shadow-lg">
                         <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
                         <div class="mt-2 grid grid-cols-2 gap-2">
-                            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'text-blue-700' : 'text-slate-600' }}">
                                 {{ __('ui.languages.id') }}
                             </a>
-                            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'text-blue-700' : 'text-slate-600' }}">
                                 {{ __('ui.languages.en') }}
                             </a>
                         </div>
@@ -117,7 +119,7 @@
                         <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
                         <div class="mt-2 space-y-1">
                             @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="block rounded-xl border px-3 py-2 text-xs font-semibold transition {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600' }}">
+                                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="block rounded-xl border px-3 py-2 text-xs font-semibold transition {{ $currentTheme === $value ? 'text-blue-700' : 'text-slate-600' }}">
                                     {{ $label }}
                                 </a>
                             @endforeach
@@ -129,7 +131,8 @@
                     <div class="relative" @click.outside="notifOpen = false">
                         <button
                             type="button"
-                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                            data-ui-icon-button
+                            class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                             @click="notifOpen = !notifOpen"
                             :aria-expanded="notifOpen.toString()"
                             aria-label="{{ __('ui.nav.notifications') }}"
@@ -162,7 +165,8 @@
 
                 <a
                     href="{{ route('cart') }}"
-                    class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+                    data-ui-icon-button
+                    class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition"
                     aria-label="{{ __('ui.nav.cart') }}"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -178,15 +182,15 @@
                 </a>
 
                 @guest
-                    <a href="{{ route('login') }}" class="hidden text-sm font-semibold text-slate-600 transition hover:text-blue-600 sm:inline">{{ __('ui.nav.login') }}</a>
-                    <a href="{{ route('register') }}" class="hidden rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline">{{ __('ui.nav.register') }}</a>
+                    <a href="{{ route('login') }}" data-ui-text-button class="hidden text-sm font-semibold transition sm:inline">{{ __('ui.nav.login') }}</a>
+                    <a href="{{ route('register') }}" class="btn-primary hidden rounded-xl px-3 py-2 text-sm font-semibold transition sm:inline">{{ __('ui.nav.register') }}</a>
                 @endguest
 
                 @auth
                     <div class="relative hidden sm:block" @click.outside="userOpen = false">
                         <button
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5 transition hover:border-blue-200"
+                            class="btn-secondary inline-flex items-center gap-2 rounded-full px-2 py-1.5 transition"
                             @click="userOpen = !userOpen"
                             :aria-expanded="userOpen.toString()"
                         >
@@ -196,19 +200,19 @@
                             <span class="max-w-[120px] truncate text-sm font-semibold text-slate-700">{{ auth()->user()->display_name ?? __('app.user.generic') }}</span>
                         </button>
                         <div x-cloak x-show="userOpen" x-transition.origin.top.right class="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white py-2 shadow-lg">
-                            <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.cart') }}</a>
-                            <a href="{{ route('booking.history') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.my_orders') }}</a>
-                            <a href="{{ route('profile.complete') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.my_profile') }}</a>
+                            <a href="{{ route('cart') }}" data-ui-menu-item class="block px-4 py-2 text-sm">{{ __('ui.nav.cart') }}</a>
+                            <a href="{{ route('booking.history') }}" data-ui-menu-item class="block px-4 py-2 text-sm">{{ __('ui.nav.my_orders') }}</a>
+                            <a href="{{ route('profile.complete') }}" data-ui-menu-item class="block px-4 py-2 text-sm">{{ __('ui.nav.my_profile') }}</a>
                             <div class="my-1 h-px bg-slate-100"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">{{ __('ui.nav.logout') }}</button>
+                                <button type="submit" data-ui-menu-item class="w-full px-4 py-2 text-left text-sm">{{ __('ui.nav.logout') }}</button>
                             </form>
                         </div>
                     </div>
                 @endauth
 
-                <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 lg:hidden" @click="mobileOpen = !mobileOpen" aria-label="{{ __('ui.nav.toggle_menu') }}">
+                <button type="button" data-ui-icon-button class="inline-flex h-10 w-10 items-center justify-center rounded-xl lg:hidden" @click="mobileOpen = !mobileOpen" aria-label="{{ __('ui.nav.toggle_menu') }}">
                     <svg x-show="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="4" y1="7" x2="20" y2="7" />
                         <line x1="4" y1="12" x2="20" y2="12" />
@@ -245,11 +249,11 @@
                     <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.nav.category') }}</p>
                     <div class="mt-2 grid grid-cols-2 gap-2">
                         @forelse ($categories as $cat)
-                            <a href="{{ $cat['url'] }}" class="card rounded-xl px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
+                            <a href="{{ $cat['url'] }}" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold transition">
                                 {{ $cat['label'] }}
                             </a>
                         @empty
-                            <a href="{{ route('categories.index') }}" class="card col-span-2 rounded-xl px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600">
+                            <a href="{{ route('categories.index') }}" class="btn-secondary col-span-2 rounded-xl px-3 py-2 text-center text-sm font-semibold transition">
                                 {{ __('app.category.title') }}
                             </a>
                         @endforelse
@@ -258,17 +262,17 @@
 
                 @guest
                     <div class="grid grid-cols-2 gap-2">
-                        <a href="{{ route('login') }}" class="rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">{{ __('ui.nav.login') }}</a>
-                        <a href="{{ route('register') }}" class="rounded-xl bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-blue-700">{{ __('ui.nav.register') }}</a>
+                        <a href="{{ route('login') }}" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold">{{ __('ui.nav.login') }}</a>
+                        <a href="{{ route('register') }}" class="btn-primary rounded-xl px-3 py-2 text-center text-sm font-semibold">{{ __('ui.nav.register') }}</a>
                     </div>
                 @endguest
 
                 @auth
                     <div class="grid grid-cols-2 gap-2">
-                        <a href="{{ route('cart') }}" class="rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">{{ __('ui.nav.cart') }}</a>
-                        <a href="{{ route('booking.history') }}" class="rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">{{ __('ui.nav.my_orders') }}</a>
-                        <a href="{{ route('profile.complete') }}" class="rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">{{ __('ui.nav.my_profile') }}</a>
-                        <button type="button" class="rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600" @click="notifOpen = !notifOpen; mobileOpen = true">
+                        <a href="{{ route('cart') }}" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold">{{ __('ui.nav.cart') }}</a>
+                        <a href="{{ route('booking.history') }}" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold">{{ __('ui.nav.my_orders') }}</a>
+                        <a href="{{ route('profile.complete') }}" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold">{{ __('ui.nav.my_profile') }}</a>
+                        <button type="button" class="btn-secondary rounded-xl px-3 py-2 text-center text-sm font-semibold" @click="notifOpen = !notifOpen; mobileOpen = true">
                             {{ __('ui.nav.notifications') }}
                         </button>
                     </div>
@@ -283,7 +287,7 @@
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-600">
+                        <button type="submit" class="btn-secondary w-full rounded-xl px-3 py-2 text-sm font-semibold">
                             {{ __('ui.nav.logout') }}
                         </button>
                     </form>
@@ -292,17 +296,17 @@
                 <div class="rounded-xl bg-slate-50 p-3">
                     <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.nav.language') }}</p>
                     <div class="mt-2 grid grid-cols-2 gap-2">
-                        <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'id' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-700 hover:border-blue-200 hover:text-blue-600' }}">
+                        <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'id' ? 'text-blue-700' : 'text-slate-700' }}">
                             {{ __('ui.languages.id') }}
                         </a>
-                        <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'en' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-700 hover:border-blue-200 hover:text-blue-600' }}">
+                        <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'en' ? 'text-blue-700' : 'text-slate-700' }}">
                             {{ __('ui.languages.en') }}
                         </a>
                     </div>
                     <p class="mt-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.nav.theme') }}</p>
                     <div class="mt-2 grid grid-cols-3 gap-2">
                         @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                            <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold {{ $currentTheme === $value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-700 hover:border-blue-200 hover:text-blue-600' }}">
+                            <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold {{ $currentTheme === $value ? 'text-blue-700' : 'text-slate-700' }}">
                                 {{ $label }}
                             </a>
                         @endforeach
