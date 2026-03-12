@@ -9,7 +9,6 @@
             return site_asset($file);
         };
         $faviconUrl = $assetWithVersion('MANAKE-FAV-M.png');
-        $logoUrl = $assetWithVersion('manake-logo-blue.png');
     @endphp
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -26,7 +25,7 @@
         <div class="card w-full max-w-5xl overflow-hidden rounded-3xl shadow-xl lg:grid lg:grid-cols-2">
             <div class="p-6 sm:p-8 lg:p-10">
                 <a href="/" class="inline-flex items-center">
-                    <img src="{{ $logoUrl }}" alt="Manake" class="h-10 w-auto">
+                    <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-10 w-auto" />
                 </a>
                 <h2 class="text-2xl font-semibold text-blue-700">{{ __('app.auth.login_title') }}</h2>
                 <p class="mt-2 text-sm text-slate-500">{{ __('app.auth.login_subheading') }}</p>
@@ -92,7 +91,7 @@
             <div class="relative hidden p-8 text-white lg:block lg:p-10 bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top,_white,_transparent_60%)]"></div>
                 <div class="relative z-10">
-                    <img src="{{ $logoUrl }}" alt="Manake" class="h-12 w-auto">
+                    <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-12 w-auto" />
                     <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                         {{ __('app.auth.login_heading') }}
                     </h1>

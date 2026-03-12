@@ -1,11 +1,12 @@
 <div id="manake-page-loader" class="manake-page-loader" aria-hidden="true">
     <div class="manake-page-loader__inner">
         <div class="manake-loader-wordmark-shell" role="presentation">
-            <img
-                src="{{ site_asset('manake-logo-blue.png') }}"
-                alt="{{ site_setting('brand.name', 'Manake') }}"
-                class="manake-loader-wordmark"
-            >
+            <x-brand.image
+                light="manake-logo-blue.png"
+                dark="manake-logo-white.png"
+                :alt="site_setting('brand.name', 'Manake')"
+                img-class="manake-loader-wordmark"
+            />
         </div>
     </div>
 </div>

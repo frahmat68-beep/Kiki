@@ -105,25 +105,8 @@
                             <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
                         </svg>
                     </button>
-                    <div x-cloak x-show="prefOpen" x-transition.origin.top.right class="card absolute right-0 mt-2 w-72 rounded-xl p-3 shadow-lg">
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
-                        <div class="mt-2 grid grid-cols-2 gap-2">
-                            <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? 'text-blue-700' : 'text-slate-600' }}">
-                                {{ __('ui.languages.id') }}
-                            </a>
-                            <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? 'text-blue-700' : 'text-slate-600' }}">
-                                {{ __('ui.languages.en') }}
-                            </a>
-                        </div>
-
-                        <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
-                        <div class="mt-2 space-y-1">
-                            @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                                <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="block rounded-xl border px-3 py-2 text-xs font-semibold transition {{ $currentTheme === $value ? 'text-blue-700' : 'text-slate-600' }}">
-                                    {{ $label }}
-                                </a>
-                            @endforeach
-                        </div>
+                    <div x-cloak x-show="prefOpen" x-transition.origin.top.right class="absolute right-0 mt-2 w-[18.5rem]">
+                        <x-preferences.popover :locale="$locale" :current-theme="$currentTheme" :redirect="url()->full()" />
                     </div>
                 </div>
 
@@ -293,25 +276,7 @@
                     </form>
                 @endauth
 
-                <div class="rounded-xl bg-slate-50 p-3">
-                    <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.nav.language') }}</p>
-                    <div class="mt-2 grid grid-cols-2 gap-2">
-                        <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'id' ? 'text-blue-700' : 'text-slate-700' }}">
-                            {{ __('ui.languages.id') }}
-                        </a>
-                        <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-sm font-semibold {{ $locale === 'en' ? 'text-blue-700' : 'text-slate-700' }}">
-                            {{ __('ui.languages.en') }}
-                        </a>
-                    </div>
-                    <p class="mt-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ __('ui.nav.theme') }}</p>
-                    <div class="mt-2 grid grid-cols-3 gap-2">
-                        @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                            <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold {{ $currentTheme === $value ? 'text-blue-700' : 'text-slate-700' }}">
-                                {{ $label }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
+                <x-preferences.popover :locale="$locale" :current-theme="$currentTheme" :redirect="url()->full()" class="mt-1" />
             </div>
         </div>
     </div>

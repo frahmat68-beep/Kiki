@@ -21,7 +21,7 @@
             <div class="relative p-8 md:p-10 bg-gradient-to-br from-slate-900 via-blue-900 to-blue-700 text-white">
                 <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_white,_transparent_60%)]"></div>
                 <div class="relative z-10">
-                    <img src="{{ site_asset('manake-logo-blue.png') }}" alt="Manake" class="h-12 w-auto">
+                    <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-12 w-auto" />
                     <h1 class="mt-6 text-2xl md:text-3xl font-semibold leading-tight">
                         {{ __('ui.auth.forgot_heading') }}
                     </h1>

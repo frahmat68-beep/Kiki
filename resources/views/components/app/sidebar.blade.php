@@ -22,8 +22,6 @@
         || request()->routeIs('category.show')
         || request()->routeIs('product.show');
     $isAvailabilityRoute = request()->routeIs('availability.board');
-    $isSettingsRoute = request()->routeIs('settings.*');
-
     $items = [
         [
             'key' => 'catalog',
@@ -51,21 +49,6 @@
         ];
     }
 
-    $items[] = [
-        'key' => 'settings',
-        'label' => __('ui.nav.settings'),
-        'url' => $isAuthenticated ? route('settings.index') : '#',
-        'active' => $isSettingsRoute,
-        'prefs' => ! $isAuthenticated,
-        'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>',
-    ];
-
-    $assetWithVersion = static function (string $file): string {
-        return site_asset($file);
-    };
-
-    $logoFallbackUrl = $assetWithVersion('manake-logo-blue.png');
-    $resolvedLogoUrl = $logoUrl ?: $logoFallbackUrl;
     $activeCategorySlug = (string) request()->query('category', request()->route('slug', ''));
     $submenuEnabledRaw = strtolower(trim((string) setting('catalog.sidebar_submenu_enabled', '1')));
     $submenuEnabled = ! in_array($submenuEnabledRaw, ['0', 'false', 'off', 'no', 'tidak'], true);
@@ -100,18 +83,26 @@
             href="{{ route('home') }}"
             title="{{ $brandName }}"
             aria-label="{{ $brandName }}"
-            class="flex w-full items-center justify-center rounded-xl px-1 py-1 text-slate-900 lg:group-hover/sidebar:justify-start lg:group-focus-within/sidebar:justify-start"
+            class="flex w-full items-center justify-start rounded-xl px-2 py-1 text-slate-900 lg:justify-center lg:px-1 lg:group-hover/sidebar:justify-start lg:group-focus-within/sidebar:justify-start"
         >
-            <span class="manake-sidebar-brand__wordmark inline-flex">
-                <img
-                    src="{{ $resolvedLogoUrl }}"
-                    alt="{{ $brandName }}"
-                    class="h-8 w-auto max-w-[10.5rem] shrink-0 object-contain object-left lg:h-9 lg:max-w-[6.25rem] lg:group-hover/sidebar:h-10 lg:group-hover/sidebar:max-w-[10.75rem] lg:group-focus-within/sidebar:h-10 lg:group-focus-within/sidebar:max-w-[10.75rem]"
-                    onerror="this.onerror=null;this.src='{{ $logoFallbackUrl }}';"
-                >
+            <span class="manake-sidebar-brand__mark hidden lg:inline-flex lg:group-hover/sidebar:hidden lg:group-focus-within/sidebar:hidden">
+                <x-brand.image
+                    light="MANAKE-FAV-M.png"
+                    dark="MANAKE-FAV-M-white.png"
+                    :alt="$brandName"
+                    img-class="h-11 w-auto object-contain"
+                />
+            </span>
+            <span class="manake-sidebar-brand__wordmark inline-flex lg:hidden lg:group-hover/sidebar:inline-flex lg:group-focus-within/sidebar:inline-flex">
+                <x-brand.image
+                    light="manake-logo-blue.png"
+                    dark="manake-logo-white.png"
+                    :alt="$brandName"
+                    img-class="h-9 w-auto max-w-[10.75rem] shrink-0 object-contain object-left"
+                />
             </span>
         </a>
-        <button data-ui-icon-button class="rounded-lg p-1.5 lg:hidden" type="button" @click="sidebarOpen = false; guestPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
+        <button data-ui-icon-button class="rounded-lg p-1.5 lg:hidden" type="button" @click="sidebarOpen = false; shellPrefsOpen = false" aria-label="{{ __('ui.actions.close') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -191,11 +182,9 @@
                     aria-label="{{ $item['label'] }}"
                     data-nav-item
                     data-nav-active="{{ $item['active'] ? 'true' : 'false' }}"
+                    @click="shellPrefsOpen = false"
                     @if (isset($item['modal']))
                         @click.prevent="openAuthModal('{{ $item['modal'] }}')"
-                    @endif
-                    @if (isset($item['prefs']) && $item['prefs'])
-                        @click.prevent="guestPrefsOpen = !guestPrefsOpen"
                     @endif
                     class="flex h-12 items-center rounded-xl px-3 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3 {{ $item['active'] ? '!text-white' : '!text-slate-700' }}"
                 >
@@ -206,36 +195,39 @@
         @endforeach
     </nav>
 
-    @unless ($isAuthenticated)
-        <div
-            x-cloak
-            x-show="guestPrefsOpen"
-            x-transition
-            class="mx-1 mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 lg:absolute lg:bottom-5 lg:left-[calc(100%-0.25rem)] lg:mt-0 lg:w-64 lg:rounded-[1.4rem] lg:shadow-2xl lg:group-hover/sidebar:left-[calc(100%-1rem)] lg:group-focus-within/sidebar:left-[calc(100%-1rem)]"
-        >
-            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.language') }}</p>
-            <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                <a href="{{ route('lang.switch', ['locale' => 'id', 'redirect' => url()->full()]) }}" data-locale-option="id" data-ui-chip-option data-ui-active="{{ $locale === 'id' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'id' ? '!text-slate-900' : '!text-slate-700' }}">
-                    {{ __('ui.languages.id') }}
-                </a>
-                <a href="{{ route('lang.switch', ['locale' => 'en', 'redirect' => url()->full()]) }}" data-locale-option="en" data-ui-chip-option data-ui-active="{{ $locale === 'en' ? 'true' : 'false' }}" class="rounded-xl border px-3 py-2 text-center text-xs font-semibold transition {{ $locale === 'en' ? '!text-slate-900' : '!text-slate-700' }}">
-                    {{ __('ui.languages.en') }}
-                </a>
-            </div>
+    <div class="mt-auto border-t border-slate-200 pt-4">
+        <div class="relative px-1" @click.outside="shellPrefsOpen = false">
+            <button
+                type="button"
+                data-nav-item
+                :data-nav-active="shellPrefsOpen ? 'true' : 'false'"
+                class="flex h-12 w-full items-center rounded-xl px-3 !text-slate-700 transition lg:justify-center lg:px-0 lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3 lg:group-focus-within/sidebar:justify-start lg:group-focus-within/sidebar:px-3"
+                @click="shellPrefsOpen = !shellPrefsOpen"
+                :aria-expanded="shellPrefsOpen.toString()"
+                aria-label="{{ __('ui.nav.settings') }}"
+            >
+                <span data-nav-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>
+                </span>
+                <span class="text-sm font-semibold transition-all duration-200 lg:ml-0 lg:pointer-events-none lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:-translate-x-2 lg:group-hover/sidebar:ml-3 lg:group-hover/sidebar:pointer-events-auto lg:group-hover/sidebar:max-w-[12rem] lg:group-hover/sidebar:opacity-100 lg:group-hover/sidebar:translate-x-0 lg:group-focus-within/sidebar:ml-3 lg:group-focus-within/sidebar:pointer-events-auto lg:group-focus-within/sidebar:max-w-[12rem] lg:group-focus-within/sidebar:opacity-100 lg:group-focus-within/sidebar:translate-x-0">{{ __('ui.nav.settings') }}</span>
+            </button>
 
-            <p class="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{{ __('ui.nav.theme') }}</p>
-            <div class="mt-2 grid grid-cols-1 gap-2">
-                @foreach (['system' => __('ui.settings.theme_system'), 'dark' => __('ui.settings.theme_dark'), 'light' => __('ui.settings.theme_light')] as $value => $label)
-                    <a href="{{ route('theme.switch', ['theme' => $value, 'redirect' => url()->full()]) }}" data-theme-option="{{ $value }}" data-ui-chip-option data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}" class="rounded-xl border px-2 py-2 text-center text-xs font-semibold transition {{ $currentTheme === $value ? '!text-slate-900' : '!text-slate-700' }}">
-                        {{ $label }}
-                    </a>
-                @endforeach
+            <div
+                x-cloak
+                x-show="shellPrefsOpen"
+                x-transition.origin.bottom.left
+                class="mt-3 w-full lg:absolute lg:bottom-0 lg:left-[calc(100%-0.25rem)] lg:z-20 lg:mt-0 lg:w-[18.5rem]"
+            >
+                <x-preferences.popover
+                    :locale="$locale"
+                    :current-theme="$currentTheme"
+                    :redirect="url()->full()"
+                />
             </div>
         </div>
-    @endunless
 
     @if ($isAuthenticated)
-        <div class="mt-auto border-t border-slate-200 pt-4">
+        <div class="mt-3 border-t border-slate-200 pt-3">
             <a
                 href="{{ route('profile.complete') }}"
                 title="{{ __('ui.nav.my_profile') }}"
@@ -269,6 +261,7 @@
             </form>
         </div>
     @endif
+    </div>
 
     <span class="absolute -right-3 top-0 hidden h-full w-3 lg:block" aria-hidden="true"></span>
 </aside>

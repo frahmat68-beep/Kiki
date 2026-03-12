@@ -65,11 +65,6 @@
         ];
     }
 
-    $assetWithVersion = static function (string $file): string {
-        return site_asset($file);
-    };
-    $expandedLogoFallbackUrl = $assetWithVersion('manake-logo-blue.png');
-    $expandedLogoUrl = $logoUrl ?: $expandedLogoFallbackUrl;
     $adminInitial = strtoupper(substr((string) ($adminName ?: 'A'), 0, 1));
 @endphp
 
@@ -81,12 +76,12 @@
     <div class="flex h-20 items-center justify-between border-b border-slate-200 px-4">
         <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center">
             <span class="manake-sidebar-brand__wordmark">
-                <img
-                    src="{{ $expandedLogoUrl }}"
-                    alt="{{ $brandName }}"
-                    onerror="this.onerror=null;this.src='{{ $expandedLogoFallbackUrl }}';"
-                    class="h-10 w-auto object-contain object-left"
-                >
+                <x-brand.image
+                    light="manake-logo-blue.png"
+                    dark="manake-logo-white.png"
+                    :alt="$brandName"
+                    img-class="h-10 w-auto object-contain object-left"
+                />
             </span>
         </a>
         <button type="button" data-ui-icon-button class="rounded-lg p-1.5 lg:hidden" @click="sidebarOpen = false" aria-label="{{ __('ui.actions.close') }}">

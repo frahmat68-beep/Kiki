@@ -141,19 +141,19 @@
     $authModalOpen = ! $isAuthenticated && $authModalView !== null;
 @endphp
 
-<div
+    <div
     x-data="{
         sidebarOpen: false,
         notifOpen: false,
         notifCount: {{ (int) ($notificationCount ?? 0) }},
-        guestPrefsOpen: false,
+        shellPrefsOpen: false,
         authModalOpen: {{ $authModalOpen ? 'true' : 'false' }},
         authModalView: '{{ $authModalView ?: 'login' }}',
         openAuthModal(view = 'login') {
             this.authModalView = view;
             this.authModalOpen = true;
             this.notifOpen = false;
-            this.guestPrefsOpen = false;
+            this.shellPrefsOpen = false;
             this.sidebarOpen = false;
         },
         closeAuthModal() {
@@ -197,7 +197,7 @@
     x-on:open-auth-modal.window="openAuthModal(($event.detail && typeof $event.detail === 'string') ? $event.detail : 'login')"
     class="min-h-screen"
 >
-    <div class="fixed inset-0 z-40 bg-slate-900/40 transition lg:hidden" x-show="sidebarOpen" x-cloak @click="sidebarOpen = false; guestPrefsOpen = false"></div>
+    <div class="fixed inset-0 z-40 bg-slate-900/40 transition lg:hidden" x-show="sidebarOpen" x-cloak @click="sidebarOpen = false; shellPrefsOpen = false"></div>
 
     <x-app.sidebar
         :logo-url="$sidebarLogoUrl"

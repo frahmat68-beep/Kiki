@@ -10,7 +10,6 @@
             return site_asset($file);
         };
         $faviconUrl = $assetWithVersion('MANAKE-FAV-M.png');
-        $logoUrlLight = $assetWithVersion('manake-logo-blue.png');
     @endphp
     <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -30,7 +29,7 @@
             <div class="manake-auth-panel p-6 text-slate-800 sm:p-8 lg:p-10">
                 <div class="space-y-5">
                     <a href="/" class="inline-flex items-center" data-skip-loader="true">
-                        <img src="{{ $logoUrlLight }}" alt="Manake" class="h-10 w-auto">
+                        <x-brand.image light="manake-logo-blue.png" dark="manake-logo-white.png" alt="Manake" img-class="h-10 w-auto" />
                     </a>
                     <div class="space-y-2">
                         <span class="manake-kicker">{{ __('ui.admin.panel_title') }}</span>
