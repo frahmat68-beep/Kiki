@@ -15,13 +15,7 @@
             $pageTitle = $pageTitle ?: $brandName;
             $backUrl = $backUrl ?: route('home');
             $backLabel = $backLabel ?: __('app.auth.back_home');
-            $asidePoints = count($asidePoints) > 0
-                ? $asidePoints
-                : [
-                    __('app.auth.login_benefit_1'),
-                    __('app.auth.login_benefit_2'),
-                    __('app.auth.login_benefit_3'),
-                ];
+            $asidePoints = array_values(array_filter($asidePoints));
         @endphp
 
         <title>{{ $pageTitle }}</title>
@@ -59,9 +53,9 @@
                                 @if ($heading)
                                     <h1 class="text-3xl font-semibold tracking-[-0.03em] text-slate-950">{{ $heading }}</h1>
                                 @endif
-                                @if ($subheading)
-                                    <p class="max-w-md text-sm leading-6 text-slate-500">{{ $subheading }}</p>
-                                @endif
+                        @if ($subheading)
+                            <p class="max-w-md text-sm leading-6 text-slate-500">{{ $subheading }}</p>
+                        @endif
                             </div>
                         @endif
                     </div>

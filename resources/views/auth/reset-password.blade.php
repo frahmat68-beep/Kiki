@@ -2,14 +2,11 @@
     :page-title="__('app.auth.reset_password_button') . ' | Manake.Id'"
     :eyebrow="__('ui.auth.forgot_title')"
     :heading="__('app.auth.reset_password_button')"
-    :subheading="__('ui.auth.forgot_help')"
-    :aside-eyebrow="__('ui.auth.back_to_login')"
-    :aside-heading="__('app.auth.reset_password_button')"
-    :aside-text="__('ui.auth.forgot_hint')"
-    :aside-points="[
-        __('app.auth.password_placeholder'),
-        __('app.auth.password_confirm'),
-    ]"
+    :subheading="null"
+    :aside-eyebrow="null"
+    :aside-heading="__('ui.auth.forgot_help')"
+    :aside-text="null"
+    :aside-points="[]"
 >
     <div class="space-y-5">
         @if ($errors->any())

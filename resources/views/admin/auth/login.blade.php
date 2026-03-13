@@ -1,15 +1,12 @@
 <x-guest-layout
     :page-title="__('ui.admin.admin_login') . ' | Manake.Id'"
-    :eyebrow="__('ui.admin.panel_title')"
-    :heading="__('ui.admin.login_heading')"
-    :subheading="__('ui.admin.login_intro')"
-    :aside-eyebrow="__('ui.admin.admin_login')"
-    :aside-heading="__('ui.admin.panel_title')"
+    :eyebrow="__('ui.admin.admin_login')"
+    :heading="__('ui.admin.panel_title')"
+    :subheading="null"
+    :aside-eyebrow="null"
+    :aside-heading="__('ui.admin.login_intro')"
     :aside-text="null"
-    :aside-points="[
-        __('ui.admin.orders'),
-        __('ui.admin.website_settings'),
-    ]"
+    :aside-points="[]"
 >
     <div class="space-y-4">
         @if ($errors->any())

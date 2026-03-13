@@ -45,29 +45,26 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.total_booking') }}</p>
             <p class="mt-2 text-2xl font-semibold text-slate-900">{{ $stats['total_booking'] ?? 0 }}</p>
-            <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.stats.total_booking_note') }}</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.active_rental') }}</p>
             <p class="mt-2 text-2xl font-semibold text-blue-600">{{ $stats['active_rental'] ?? 0 }}</p>
-            <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.stats.active_rental_note') }}</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.completed') }}</p>
             <p class="mt-2 text-2xl font-semibold text-blue-600">{{ $stats['completed'] ?? 0 }}</p>
-            <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.stats.completed_note') }}</p>
         </div>
     </div>
 
     <div class="mt-6 grid grid-cols-1 items-start gap-5 xl:grid-cols-[1.4fr,1fr]">
-        <div class="flex min-h-[28rem] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex h-[30rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingActiveTitle }}</h3>
             </div>
 
-            <div class="mt-4 flex-1">
+            <div class="mt-4 min-h-0 flex-1">
                 @if ($activeRentals->isNotEmpty())
-                    <div class="scroll-panel max-h-[34rem] space-y-3.5 overflow-y-auto pr-1">
+                    <div class="scroll-panel h-full space-y-3.5 overflow-y-auto pr-1">
                         @foreach ($activeRentals as $order)
                             @php
                                 $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
@@ -112,7 +109,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="flex min-h-[18rem] items-center">
+                    <div class="flex h-full items-center">
                         <div class="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
                             <p class="text-sm font-semibold text-slate-700">{{ __('ui.overview.empty_active_title') }}</p>
                             <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.empty_active_body') }}</p>
@@ -125,13 +122,13 @@
             </div>
         </div>
 
-        <div class="flex min-h-[28rem] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex h-[30rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingRecentTitle }}</h3>
             </div>
 
             <div class="mt-4 flex-1 overflow-hidden">
-                <div class="scroll-panel max-h-[34rem] divide-y divide-slate-100 overflow-y-auto pr-1">
+                <div class="scroll-panel h-full divide-y divide-slate-100 overflow-y-auto pr-1">
                     @forelse ($recentBookings as $order)
                         @php
                             $meta = $paymentMeta($order->status_pembayaran ?? 'pending');

@@ -225,7 +225,7 @@
                     method="GET"
                     action="{{ route('catalog') }}"
                     data-search-suggest-url="{{ route('search.suggestions') }}"
-                    class="command-surface command-surface--search relative order-3 w-full rounded-2xl sm:order-2 sm:flex-1 sm:max-w-2xl"
+                    class="command-surface command-surface--search relative order-3 w-full rounded-2xl sm:order-2 sm:flex-1 sm:max-w-xl"
                 >
                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -419,7 +419,6 @@
 
                     <div class="mt-6" x-show="authModalView === 'login'" x-transition>
                         <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{{ __('app.auth.login_title') }}</h2>
-                        <p class="mt-2 text-sm leading-6 text-slate-500">{{ __('app.auth.login_subheading') }}</p>
 
                         @if (session('error') && (old('auth_modal') === 'login' || $authModalView === 'login'))
                             <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">{{ session('error') }}</div>
@@ -470,7 +469,6 @@
 
                     <div class="mt-6" x-show="authModalView === 'register'" x-transition>
                         <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{{ __('app.auth.register_title') }}</h2>
-                        <p class="mt-2 text-sm leading-6 text-slate-500">{{ __('app.auth.register_subheading') }}</p>
 
                         @if ($errors->any() && old('auth_modal') === 'register')
                             <div class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">{{ $errors->first() }}</div>
@@ -524,7 +522,6 @@
 
                     <div class="mt-6" x-show="authModalView === 'forgot'" x-transition>
                         <h2 class="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{{ __('ui.auth.forgot_title') }}</h2>
-                        <p class="mt-2 text-sm leading-6 text-slate-500">{{ __('ui.auth.forgot_subheading') }}</p>
 
                         @if (session('status') && ($authModalView === 'forgot' || old('auth_modal') === 'forgot'))
                             <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('status') }}</div>
@@ -562,26 +559,12 @@
                 </div>
 
                 <div class="manake-auth-showcase relative hidden overflow-hidden p-8 text-white lg:block lg:p-10">
-                    <span class="manake-kicker manake-kicker-inverse">{{ __('ui.nav.register') }}</span>
+                    <span class="manake-kicker manake-kicker-inverse">{{ __('ui.nav.login') }}</span>
                     <div class="relative z-10">
-                        <h1 class="mt-6 text-3xl font-semibold leading-tight tracking-[-0.04em]">{{ __('app.auth.login_heading') }}</h1>
-                        <p class="mt-4 max-w-md text-sm leading-7 text-blue-100/82">
-                            {{ __('app.auth.login_note') }}
+                        <h1 class="mt-6 text-3xl font-semibold leading-tight tracking-[-0.04em]">{{ __('app.auth.login_title') }}</h1>
+                        <p class="mt-4 max-w-sm text-sm leading-7 text-blue-100/82">
+                            {{ __('app.auth.login_benefit_1') }}
                         </p>
-                        <div class="manake-auth-matrix mt-8">
-                            <article class="manake-auth-chip">
-                                <span>Orders</span>
-                                <strong>{{ __('app.auth.login_benefit_1') }}</strong>
-                            </article>
-                            <article class="manake-auth-chip">
-                                <span>Alerts</span>
-                                <strong>{{ __('app.auth.login_benefit_2') }}</strong>
-                            </article>
-                            <article class="manake-auth-chip">
-                                <span>Checkout</span>
-                                <strong>{{ __('app.auth.login_benefit_3') }}</strong>
-                            </article>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -646,13 +629,13 @@
         const createItemNode = (item) => {
             const link = document.createElement('a');
             link.href = item.detail_url || '#';
-            link.className = 'flex items-center gap-3 border-b border-slate-100 px-3 py-3 transition hover:bg-blue-50';
+            link.className = 'flex items-center gap-3 border-b border-slate-100 px-3 py-2.5 transition hover:bg-blue-50';
 
             const image = document.createElement('img');
             image.src = item.image_url || '{{ site_asset('MANAKE-FAV-M.png') }}';
             image.alt = item.name || genericItemLabel;
             image.loading = 'lazy';
-            image.className = 'h-11 w-11 rounded-xl border border-slate-200 bg-slate-50 object-cover';
+            image.className = 'h-10 w-10 rounded-xl border border-slate-200 bg-slate-50 object-cover';
             link.appendChild(image);
 
             const content = document.createElement('div');
@@ -673,7 +656,7 @@
             lastItems = items;
 
             const list = document.createElement('div');
-            list.className = 'scroll-panel max-h-[22rem] overflow-y-auto';
+            list.className = 'scroll-panel max-h-[16rem] overflow-y-auto';
 
             if (!items.length) {
                 const emptyState = document.createElement('p');

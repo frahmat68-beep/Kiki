@@ -15,7 +15,6 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-blue-700">{{ __('Daftar Pesanan') }}</h2>
-                    <p class="text-xs text-slate-500">{{ __('Pantau status, arsip bulanan, dan log perubahan pesanan.') }}</p>
                 </div>
             </div>
 
@@ -40,11 +39,10 @@
         </section>
 
         <section class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
-            <article class="flex h-[38rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex h-[34rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
                 <div>
                     <h3 class="text-base font-semibold text-slate-900">{{ __('Arsip Bulanan') }}</h3>
-                    <p class="text-xs text-slate-500">{{ __('Periode awal bulan sampai akhir bulan.') }}</p>
                 </div>
             </div>
 
@@ -69,7 +67,7 @@
                                 </div>
                             </div>
                             @if (! empty($recap['latest_orders']))
-                                <div class="scroll-panel mt-3 max-h-[10rem] space-y-2 overflow-y-auto border-t border-slate-200 pt-3 pr-1">
+                                <div class="scroll-panel mt-3 max-h-[8.75rem] space-y-2 overflow-y-auto border-t border-slate-200 pt-3 pr-1">
                                     @foreach ($recap['latest_orders'] as $archivedOrder)
                                         <a href="{{ route('admin.orders.show', $archivedOrder['id']) }}" class="block rounded-xl border border-slate-200 bg-white px-3 py-2 transition hover:border-blue-200">
                                             <p class="truncate text-xs font-semibold text-blue-600 hover:text-blue-700">
@@ -90,10 +88,9 @@
                 </div>
             </article>
 
-            <article class="flex h-[38rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex h-[34rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div>
                     <h3 class="text-base font-semibold text-slate-900">{{ __('Log Pesanan') }}</h3>
-                    <p class="text-xs text-slate-500">{{ __('Perubahan terbaru untuk pelacakan pesanan.') }}</p>
                 </div>
 
                 <div class="scroll-panel mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
@@ -118,7 +115,7 @@
         </section>
 
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="scroll-panel max-h-[42rem] overflow-auto">
+            <div class="scroll-panel max-h-[34rem] overflow-auto">
                 <table class="min-w-[860px] w-full text-sm">
                     <thead class="sticky top-0 z-10 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                         <tr>

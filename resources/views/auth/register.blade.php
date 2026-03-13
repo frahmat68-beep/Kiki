@@ -1,15 +1,12 @@
 <x-guest-layout
     :page-title="__('app.auth.register_page_title')"
     :eyebrow="__('app.auth.register_title')"
-    :heading="__('app.auth.register_heading')"
-    :subheading="__('app.auth.register_subheading')"
-    :aside-eyebrow="__('ui.nav.register')"
-    :aside-heading="__('app.auth.register_title')"
+    :heading="__('app.auth.register_title')"
+    :subheading="null"
+    :aside-eyebrow="null"
+    :aside-heading="__('app.auth.register_step_1_desc')"
     :aside-text="null"
-    :aside-points="[
-        __('app.auth.register_step_1_desc'),
-        __('app.auth.register_step_2_desc'),
-    ]"
+    :aside-points="[]"
 >
     <div class="space-y-4">
         @if ($errors->any())

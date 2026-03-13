@@ -9,20 +9,16 @@
 
 @section('content')
     <div class="space-y-4">
-        <div class="flex flex-col gap-2.5 md:flex-row md:items-end md:justify-between">
-            <div class="space-y-1">
-                <h1 class="text-2xl font-semibold text-blue-700">{{ __('ui.placeholders.notifications_title') }}</h1>
-                <p class="text-sm text-slate-500">{{ __('ui.placeholders.notifications_message') }}</p>
-            </div>
+        <div class="flex items-center justify-between gap-3">
+            <h1 class="text-2xl font-semibold text-blue-700">{{ __('ui.placeholders.notifications_title') }}</h1>
             <div class="flex items-center gap-2">
-                <span class="status-chip status-chip-info">{{ $notifications->total() }} {{ __('ui.notifications_page.total') }}</span>
                 <span class="status-chip {{ $unreadCount > 0 ? 'status-chip-warning' : 'status-chip-success' }}">
                     {{ $unreadCount > 0 ? __('ui.notifications_page.unread', ['count' => $unreadCount]) : __('ui.notifications_page.all_read') }}
                 </span>
             </div>
         </div>
 
-        <section class="grid gap-3">
+        <section class="scroll-panel max-h-[34rem] space-y-3 overflow-y-auto pr-1">
             @forelse ($notifications as $notification)
                 @php
                     $targetUrl = $notification->order

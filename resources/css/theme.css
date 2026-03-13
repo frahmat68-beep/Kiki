@@ -805,6 +805,10 @@ html[data-theme-resolved='dark'] .rounded-full.bg-slate-100.text-slate-700 {
     background: transparent;
 }
 
+.scroll-panel {
+    overscroll-behavior: contain;
+}
+
 .spotlight-shell {
     position: relative;
     overflow: hidden;
@@ -1536,6 +1540,10 @@ html[data-theme-resolved='dark'] .manake-brand-pill {
     display: grid;
     gap: 12px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#global-catalog-search-dropdown {
+    max-width: min(100%, 34rem);
 }
 
 .manake-sidebar-brand__mark {

@@ -34,7 +34,31 @@ class SearchSuggestionsTest extends TestCase
         $response->assertJsonPath('data.0.name', 'HT WLAN UHF');
     }
 
-    public function test_search_suggestions_fall_back_to_recommended_items_when_no_exact_match_exists(): void
+    public function test_search_suggestions_return_fuzzy_match_for_small_typo(): void
+    {
+        $category = Category::create([
+            'name' => 'Lighting',
+            'slug' => 'lighting',
+        ]);
+
+        Equipment::create([
+            'category_id' => $category->id,
+            'name' => 'Aputure NOVA II 2x1 Tunable Color LED Light Panel',
+            'slug' => 'aputure-nova-ii-2x1',
+            'description' => 'Large lighting panel',
+            'price_per_day' => 250000,
+            'stock' => 3,
+            'status' => 'ready',
+        ]);
+
+        $response = $this->getJson(route('search.suggestions', ['q' => 'aputur']));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.name', 'Aputure NOVA II 2x1 Tunable Color LED Light Panel');
+    }
+
+    public function test_search_suggestions_return_empty_when_query_has_no_relevant_match(): void
     {
         $category = Category::create([
             'name' => 'Camera',
@@ -54,8 +78,6 @@ class SearchSuggestionsTest extends TestCase
         $response = $this->getJson(route('search.suggestions', ['q' => 'zz-not-found']));
 
         $response->assertOk();
-        $response->assertJsonCount(1, 'data');
-        $response->assertJsonPath('data.0.is_recommended', true);
-        $response->assertJsonPath('data.0.name', 'Sony FX3');
+        $response->assertJsonCount(0, 'data');
     }
 }

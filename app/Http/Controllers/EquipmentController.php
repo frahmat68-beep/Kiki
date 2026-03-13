@@ -176,18 +176,99 @@ class EquipmentController extends Controller
         $items = (clone $builder)
             ->tap($applyKeywordSearch)
             ->orderBy('name')
-            ->limit(6)
+            ->limit(4)
             ->get();
 
         if ($items->isEmpty()) {
+            $normalizedQuery = Str::of($query)
+                ->lower()
+                ->ascii()
+                ->replaceMatches('/[^a-z0-9]+/', ' ')
+                ->squish()
+                ->value();
+
             $fallbackItems = (clone $builder)
                 ->when(schema_column_exists_cached('equipments', 'status'), fn ($fallbackQuery) => $fallbackQuery->where('status', 'ready'))
-                ->orderByDesc('stock')
                 ->orderBy('name')
-                ->limit(5)
                 ->get();
 
-            $items = $fallbackItems->values();
+            $items = $fallbackItems
+                ->map(function (Equipment $equipment) use ($normalizedQuery) {
+                    $candidates = collect([
+                        (string) $equipment->name,
+                        (string) $equipment->slug,
+                        (string) ($equipment->category?->name ?? ''),
+                    ])
+                        ->filter()
+                        ->flatMap(function (string $value) {
+                            $normalized = Str::of($value)
+                                ->lower()
+                                ->ascii()
+                                ->replaceMatches('/[^a-z0-9]+/', ' ')
+                                ->squish()
+                                ->value();
+
+                            return collect([$normalized])
+                                ->merge(explode(' ', $normalized));
+                        })
+                        ->filter();
+
+                    $score = $candidates
+                        ->map(function (string $value) use ($normalizedQuery) {
+                            if ($value === '') {
+                                return null;
+                            }
+
+                            if (str_contains($value, $normalizedQuery)) {
+                                return 0;
+                            }
+
+                            similar_text($normalizedQuery, $value, $similarity);
+                            $distance = levenshtein($normalizedQuery, $value);
+
+                            return [
+                                'distance' => $distance,
+                                'similarity' => $similarity,
+                            ];
+                        })
+                        ->filter()
+                        ->sortBy(function ($item) {
+                            if (is_int($item)) {
+                                return -1000;
+                            }
+
+                            return ($item['distance'] * 10) - $item['similarity'];
+                        })
+                        ->first();
+
+                    if ($score === null) {
+                        return null;
+                    }
+
+                    if (is_int($score)) {
+                        return [
+                            'equipment' => $equipment,
+                            'rank' => $score,
+                        ];
+                    }
+
+                    $queryLength = max(mb_strlen($normalizedQuery), 1);
+                    $distanceThreshold = max(2, (int) ceil($queryLength / 3));
+
+                    if ($score['similarity'] < 55 && $score['distance'] > $distanceThreshold) {
+                        return null;
+                    }
+
+                    return [
+                        'equipment' => $equipment,
+                        'rank' => ($score['distance'] * 10) - $score['similarity'],
+                    ];
+                })
+                ->filter()
+                ->sortBy('rank')
+                ->take(4)
+                ->pluck('equipment')
+                ->values();
         }
 
         $matchingIds = $items

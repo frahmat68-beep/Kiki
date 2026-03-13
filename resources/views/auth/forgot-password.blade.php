@@ -1,14 +1,12 @@
 <x-guest-layout
     :page-title="__('ui.auth.forgot_title') . ' | Manake.Id'"
     :eyebrow="__('ui.auth.forgot_title')"
-    :heading="__('ui.auth.forgot_heading')"
-    :subheading="__('ui.auth.forgot_subheading')"
-    :aside-eyebrow="__('ui.auth.forgot_title')"
-    :aside-heading="__('ui.auth.forgot_title')"
+    :heading="__('ui.auth.forgot_title')"
+    :subheading="null"
+    :aside-eyebrow="null"
+    :aside-heading="__('ui.auth.forgot_help')"
     :aside-text="null"
-    :aside-points="[
-        __('ui.auth.forgot_help'),
-    ]"
+    :aside-points="[]"
 >
     <div class="space-y-4">
         @if (session('status'))

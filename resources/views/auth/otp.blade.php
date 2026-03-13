@@ -1,16 +1,12 @@
 <x-guest-layout
     :page-title="__('app.auth.otp_page_title')"
     :eyebrow="__('app.auth.otp_title')"
-    :heading="__('app.auth.otp_heading')"
-    :subheading="__('app.auth.otp_subheading')"
-    :aside-eyebrow="__('app.auth.otp_title')"
-    :aside-heading="__('app.auth.otp_aside_heading')"
-    :aside-text="__('app.auth.otp_aside_text')"
-    :aside-points="[
-        __('app.auth.otp_point_1'),
-        __('app.auth.otp_point_2'),
-        __('app.auth.otp_point_3'),
-    ]"
+    :heading="__('app.auth.otp_title')"
+    :subheading="null"
+    :aside-eyebrow="null"
+    :aside-heading="__('app.auth.otp_point_1')"
+    :aside-text="null"
+    :aside-points="[]"
 >
     <div class="space-y-4">
         @if (session('status'))
