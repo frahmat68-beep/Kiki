@@ -259,9 +259,16 @@ class EquipmentController extends Controller
                     }
 
                     $queryLength = max(mb_strlen($normalizedQuery), 1);
-                    $distanceThreshold = max(1, (int) ceil($queryLength / 4));
+                    $distanceThreshold = min(2, max(1, (int) ceil($queryLength / 5)));
+                    $startsWithSameLetter = $normalizedQuery !== ''
+                        && isset($value[0])
+                        && $value[0] === $normalizedQuery[0];
 
-                    if ($score['similarity'] < 72 || $score['distance'] > $distanceThreshold) {
+                    if (
+                        ! $startsWithSameLetter
+                        || $score['similarity'] < 84
+                        || $score['distance'] > $distanceThreshold
+                    ) {
                         return null;
                     }
 
@@ -281,7 +288,7 @@ class EquipmentController extends Controller
 
                 $items = $rankedFallbackItems
                     ->filter(function (array $item) use ($bestRank) {
-                        return ((float) $item['rank']) <= ($bestRank + 8);
+                        return ((float) $item['rank']) <= ($bestRank + 4);
                     })
                     ->take(4)
                     ->pluck('equipment')

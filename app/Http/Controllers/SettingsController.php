@@ -12,7 +12,10 @@ class SettingsController extends Controller
     public function edit(Request $request): View
     {
         $locale = app()->getLocale();
-        $theme = $request->attributes->get('theme_preference', 'dark');
+        $theme = $request->attributes->get(
+            'theme_preference',
+            $request->session()->get('theme', $request->cookie('theme', 'light'))
+        );
 
         if ($request->user() && schema_column_exists_cached('users', 'preferred_locale')) {
             $userLocale = $request->user()->preferred_locale;

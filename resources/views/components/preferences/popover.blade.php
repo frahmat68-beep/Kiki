@@ -9,12 +9,12 @@
 @endphp
 
 <div {{ $attributes->class(['manake-preferences-popover rounded-[1.45rem] border p-3 shadow-2xl']) }}>
-    <div class="space-y-3">
+    <div class="space-y-4">
         <div class="space-y-1">
             <p class="manake-preferences-popover__title">{{ __('ui.nav.settings') }}</p>
         </div>
 
-        <section class="space-y-2">
+        <section class="space-y-2.5">
             <p class="manake-preferences-popover__label">{{ __('ui.nav.language') }}</p>
             <div class="manake-preferences-grid manake-preferences-grid--two">
                 @foreach (['id' => __('ui.languages.id'), 'en' => __('ui.languages.en')] as $value => $label)
@@ -22,11 +22,16 @@
                         href="{{ route('lang.switch', ['locale' => $value, 'redirect' => $redirect]) }}"
                         data-locale-option="{{ $value }}"
                         data-ui-active="{{ $locale === $value ? 'true' : 'false' }}"
-                        class="manake-preferences-choice manake-preferences-choice--compact rounded-2xl border {{ $locale === $value ? 'is-active' : '' }}"
+                        class="manake-preferences-choice manake-preferences-choice--row rounded-2xl border {{ $locale === $value ? 'is-active' : '' }}"
                     >
                         <span class="manake-preferences-choice__dot" aria-hidden="true"></span>
                         <span class="manake-preferences-choice__body">
                             <span class="manake-preferences-choice__title">{{ $label }}</span>
+                        </span>
+                        <span class="manake-preferences-choice__check" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-[0.85rem] w-[0.85rem]" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.02 7.08a1 1 0 0 1-1.42.002l-3.02-3.04a1 1 0 1 1 1.42-1.407l2.31 2.327 6.31-6.363a1 1 0 0 1 1.414-.013Z" clip-rule="evenodd" />
+                            </svg>
                         </span>
                     </a>
                 @endforeach
@@ -35,9 +40,9 @@
 
         <div class="h-px bg-slate-200/90"></div>
 
-        <section class="space-y-2">
+        <section class="space-y-2.5">
             <p class="manake-preferences-popover__label">{{ __('ui.nav.theme') }}</p>
-            <div class="manake-preferences-grid manake-preferences-grid--three">
+            <div class="manake-preferences-grid manake-preferences-grid--stacked">
                 @foreach ([
                     'system' => ['label' => __('ui.settings.theme_system'), 'meta' => __('ui.settings.theme_system_meta'), 'icon' => 'monitor'],
                     'dark' => ['label' => __('ui.settings.theme_dark'), 'meta' => __('ui.settings.theme_dark_meta'), 'icon' => 'moon'],
@@ -47,7 +52,7 @@
                         href="{{ route('theme.switch', ['theme' => $value, 'redirect' => $redirect]) }}"
                         data-theme-option="{{ $value }}"
                         data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}"
-                        class="manake-preferences-choice manake-preferences-choice--compact rounded-2xl border {{ $currentTheme === $value ? 'is-active' : '' }}"
+                        class="manake-preferences-choice manake-preferences-choice--row rounded-2xl border {{ $currentTheme === $value ? 'is-active' : '' }}"
                     >
                         <span class="manake-preferences-choice__icon" aria-hidden="true">
                             @if ($themeOption['icon'] === 'monitor')
@@ -76,6 +81,12 @@
                         </span>
                         <span class="manake-preferences-choice__body">
                             <span class="manake-preferences-choice__title">{{ $themeOption['label'] }}</span>
+                            <span class="manake-preferences-choice__meta">{{ $themeOption['meta'] }}</span>
+                        </span>
+                        <span class="manake-preferences-choice__check" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-[0.85rem] w-[0.85rem]" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.02 7.08a1 1 0 0 1-1.42.002l-3.02-3.04a1 1 0 1 1 1.42-1.407l2.31 2.327 6.31-6.363a1 1 0 0 1 1.414-.013Z" clip-rule="evenodd" />
+                            </svg>
                         </span>
                     </a>
                 @endforeach

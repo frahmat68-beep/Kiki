@@ -243,7 +243,7 @@
                     >
                     <div
                         id="global-catalog-search-dropdown"
-                        class="absolute left-0 right-auto top-[calc(100%+0.35rem)] z-50 hidden w-full max-w-[28rem] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+                        class="absolute left-0 right-auto top-[calc(100%+0.45rem)] z-50 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
                     ></div>
                 </form>
 
@@ -609,27 +609,28 @@
             dropdown.classList.add('hidden');
         };
 
-        const showDropdown = () => {
-            dropdown.classList.remove('hidden');
-        };
+            const showDropdown = () => {
+                dropdown.style.width = `min(${form.getBoundingClientRect().width}px, 24rem)`;
+                dropdown.classList.remove('hidden');
+            };
 
         const createItemNode = (item) => {
             const link = document.createElement('a');
             link.href = item.detail_url || '#';
-            link.className = 'flex items-center gap-3 px-3 py-2.5 transition hover:bg-blue-50';
+            link.className = 'flex items-center gap-3 px-3 py-2 transition hover:bg-blue-50';
 
             const image = document.createElement('img');
             image.src = item.image_url || '{{ site_asset('MANAKE-FAV-M.png') }}';
             image.alt = item.name || genericItemLabel;
             image.loading = 'lazy';
-            image.className = 'h-10 w-10 rounded-xl border border-slate-200 bg-slate-50 object-cover';
+            image.className = 'h-9 w-9 rounded-xl border border-slate-200 bg-slate-50 object-cover';
             link.appendChild(image);
 
             const content = document.createElement('div');
             content.className = 'min-w-0 flex-1';
 
             const name = document.createElement('p');
-            name.className = 'truncate text-sm font-semibold text-slate-900';
+            name.className = 'truncate text-[0.92rem] font-semibold text-slate-900';
             name.textContent = item.name || genericItemLabel;
             content.appendChild(name);
 

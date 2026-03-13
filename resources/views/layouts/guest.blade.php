@@ -46,7 +46,7 @@
                                 light="manake-logo-blue.png"
                                 dark="manake-logo-white.png"
                                 :alt="$brandName"
-                                img-class="h-[2.2rem] w-auto"
+                                img-class="manake-brand-wordmark-image"
                             />
                         </a>
 
@@ -76,7 +76,7 @@
                             light="manake-logo-white.png"
                             dark="manake-logo-white.png"
                             :alt="$brandName"
-                            img-class="h-[2.6rem] w-auto"
+                            img-class="manake-brand-wordmark-image"
                         />
                         <div class="space-y-2">
                             <h2 class="text-[1.75rem] font-semibold leading-tight tracking-[-0.04em] text-white">

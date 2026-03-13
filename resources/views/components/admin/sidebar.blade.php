@@ -80,7 +80,7 @@
                     light="manake-logo-blue.png"
                     dark="manake-logo-white.png"
                     :alt="$brandName"
-                    img-class="h-[2.35rem] w-auto max-w-[13.5rem] object-contain object-left"
+                    img-class="manake-brand-wordmark-image"
                 />
             </span>
         </a>

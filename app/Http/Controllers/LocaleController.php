@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema;
 
 class LocaleController extends Controller
 {
@@ -23,21 +22,34 @@ class LocaleController extends Controller
             ])->save();
         }
 
-        $redirectTarget = $request->query('redirect');
-        $fallback = url()->previous() ?: route('home');
-        $target = $fallback;
-
-        if (is_string($redirectTarget) && trim($redirectTarget) !== '') {
-            $candidate = trim($redirectTarget);
-            $appUrl = rtrim(config('app.url') ?: $request->getSchemeAndHttpHost(), '/');
-            $sameHostAbsolute = Str::startsWith($candidate, $appUrl . '/');
-            $relativePath = Str::startsWith($candidate, '/');
-
-            if ($sameHostAbsolute || $relativePath) {
-                $target = $candidate;
-            }
-        }
+        $target = $this->resolveRedirectTarget($request, $request->query('redirect'));
 
         return redirect()->to($target)->withCookie(cookie('locale', $locale, 60 * 24 * 30));
+    }
+
+    private function resolveRedirectTarget(Request $request, mixed $redirectTarget): string
+    {
+        $fallback = url()->previous() ?: route('home');
+
+        if (! is_string($redirectTarget) || trim($redirectTarget) === '') {
+            return $fallback;
+        }
+
+        $candidate = trim($redirectTarget);
+        if (Str::startsWith($candidate, '/')) {
+            return $candidate;
+        }
+
+        $candidateParts = parse_url($candidate);
+        if (! is_array($candidateParts) || empty($candidateParts['host'])) {
+            return $fallback;
+        }
+
+        $allowedHosts = collect([
+            parse_url($request->getSchemeAndHttpHost(), PHP_URL_HOST),
+            parse_url((string) config('app.url'), PHP_URL_HOST),
+        ])->filter()->values()->all();
+
+        return in_array($candidateParts['host'], $allowedHosts, true) ? $candidate : $fallback;
     }
 }

@@ -80,7 +80,7 @@
                     light="MANAKE-FAV-M.png"
                     dark="MANAKE-FAV-M-white.png"
                     :alt="$brandName"
-                    img-class="h-[2.45rem] w-[2.45rem] object-contain"
+                    img-class="manake-brand-mark-image"
                 />
             </span>
             <span class="manake-sidebar-brand__wordmark">
@@ -88,7 +88,7 @@
                     light="manake-logo-blue.png"
                     dark="manake-logo-white.png"
                     :alt="$brandName"
-                    img-class="h-[2.35rem] w-auto max-w-[13.5rem] shrink-0 object-contain object-left"
+                    img-class="manake-brand-wordmark-image"
                 />
             </span>
         </a>
