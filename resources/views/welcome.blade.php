@@ -103,47 +103,9 @@
                             {{ __('app.landing.hero_suffix') }}
                         @endif
                     </h1>
-                        <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                        <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
                             {{ $heroSubtitle ?: __('app.landing.hero_desc') }}
                         </p>
-
-                        <div class="spotlight-grid mt-4">
-                            <article class="spotlight-metric">
-                                <strong>{{ max($productsReady->count(), 1) }}</strong>
-                                <span>{{ __('app.landing.ready_items') }}</span>
-                            </article>
-                            <article class="spotlight-metric">
-                                <strong>{{ max($catalogCategoryCount, 1) }}</strong>
-                                <span>{{ __('ui.nav.category') }}</span>
-                            </article>
-                            <article class="spotlight-metric">
-                                <strong>{{ max($guestRentalSnapshot->count(), 1) }}</strong>
-                                <span>{{ __('app.landing.snapshot_title') }}</span>
-                            </article>
-                        </div>
-
-                        <div class="surface-band mt-5 rounded-2xl p-4 sm:p-5">
-                            <div class="flex items-center justify-between gap-2">
-                                <h2 class="text-sm font-semibold text-slate-900">{{ __('app.landing.snapshot_title') }}</h2>
-                            </div>
-                            <div class="mt-3 space-y-2.5">
-                                @forelse ($guestRentalSnapshot as $rental)
-                                    <article class="rounded-xl border border-slate-100 bg-white/80 px-3 py-2.5">
-                                        <div class="flex items-start justify-between gap-2">
-                                            <p class="text-sm font-semibold text-slate-900">{{ $rental['name'] }}</p>
-                                            <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">x{{ $rental['qty'] }}</span>
-                                        </div>
-                                        <p class="mt-1 text-xs text-slate-600">
-                                            {{ __('app.landing.snapshot_rental_date') }}: {{ $formatLandingDate($rental['start_date']) }} - {{ $formatLandingDate($rental['end_date']) }}
-                                        </p>
-                                    </article>
-                                @empty
-                                    <div class="rounded-xl border border-dashed border-slate-200 bg-white/75 px-3 py-3 text-xs text-slate-500">
-                                        {{ __('app.landing.snapshot_empty') }}
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
 
                         @if ($isLoggedIn && $damageAlertOrder)
                             <a href="{{ route('account.orders.show', $damageAlertOrder) }}" class="mt-4 block rounded-2xl border-2 border-rose-300 bg-rose-50 p-4 shadow-sm transition hover:border-rose-400">

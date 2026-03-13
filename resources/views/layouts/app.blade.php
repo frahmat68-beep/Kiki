@@ -414,7 +414,6 @@
                     <div class="mt-5 inline-flex rounded-2xl border border-slate-200 bg-slate-50/90 p-1">
                         <button type="button" data-ui-chip-option :data-ui-active="authModalView === 'login' ? 'true' : 'false'" class="rounded-xl px-3 py-2 text-xs font-semibold" @click="authModalView = 'login'">{{ __('ui.nav.login') }}</button>
                         <button type="button" data-ui-chip-option :data-ui-active="authModalView === 'register' ? 'true' : 'false'" class="rounded-xl px-3 py-2 text-xs font-semibold" @click="authModalView = 'register'">{{ __('ui.nav.register') }}</button>
-                        <button type="button" data-ui-chip-option :data-ui-active="authModalView === 'forgot' ? 'true' : 'false'" class="rounded-xl px-3 py-2 text-xs font-semibold" @click="authModalView = 'forgot'">{{ __('ui.auth.forgot_title') }}</button>
                     </div>
 
                     <div class="mt-6" x-show="authModalView === 'login'" x-transition>
@@ -558,11 +557,15 @@
                     </div>
                 </div>
 
-                <div class="manake-auth-showcase relative hidden overflow-hidden p-8 text-white lg:block lg:p-10">
-                    <span class="manake-kicker manake-kicker-inverse">{{ __('ui.nav.login') }}</span>
-                    <div class="relative z-10">
-                        <h1 class="mt-6 text-3xl font-semibold leading-tight tracking-[-0.04em]">{{ __('app.auth.login_title') }}</h1>
-                        <p class="mt-4 max-w-sm text-sm leading-7 text-blue-100/82">
+                <div class="manake-auth-showcase relative hidden overflow-hidden p-8 text-white lg:flex lg:flex-col lg:justify-between lg:p-10">
+                    <div class="relative z-10 space-y-5">
+                        <x-brand.image
+                            light="manake-logo-white.png"
+                            dark="manake-logo-white.png"
+                            alt="Manake"
+                            img-class="h-[2.6rem] w-auto"
+                        />
+                        <p class="max-w-sm text-sm leading-6 text-blue-100/82">
                             {{ __('app.auth.login_benefit_1') }}
                         </p>
                     </div>

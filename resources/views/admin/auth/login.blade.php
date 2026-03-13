@@ -5,7 +5,7 @@
     :subheading="null"
     :aside-eyebrow="null"
     :aside-heading="__('ui.admin.login_intro')"
-    :aside-text="null"
+    :aside-text="__('ui.admin.login_hint')"
     :aside-points="[]"
 >
     <div class="space-y-4">
