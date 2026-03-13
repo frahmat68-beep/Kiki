@@ -40,7 +40,7 @@
         </section>
 
         <section class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
-            <article class="flex min-h-[38rem] flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex h-[38rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
                 <div>
                     <h3 class="text-base font-semibold text-slate-900">{{ __('Arsip Bulanan') }}</h3>
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-                <div class="scroll-panel mt-4 grid max-h-[36rem] gap-3 overflow-y-auto pr-1 md:grid-cols-2">
+                <div class="scroll-panel mt-4 min-h-0 flex-1 grid gap-3 overflow-y-auto pr-1 md:grid-cols-2">
                     @forelse (($monthlyRecaps ?? collect()) as $recap)
                         <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                             <div class="flex items-start justify-between gap-3">
@@ -90,13 +90,13 @@
                 </div>
             </article>
 
-            <article class="flex min-h-[38rem] flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex h-[38rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div>
                     <h3 class="text-base font-semibold text-slate-900">{{ __('Log Pesanan') }}</h3>
                     <p class="text-xs text-slate-500">{{ __('Perubahan terbaru untuk pelacakan pesanan.') }}</p>
                 </div>
 
-                <div class="scroll-panel mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
+                <div class="scroll-panel mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
                     @forelse (($orderLogs ?? collect()) as $log)
                         <article class="rounded-xl border border-slate-200 px-3 py-3">
                             <div class="flex items-start justify-between gap-3">

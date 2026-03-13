@@ -5,9 +5,8 @@
     :subheading="__('ui.admin.login_intro')"
     :aside-eyebrow="__('ui.admin.admin_login')"
     :aside-heading="__('ui.admin.panel_title')"
-    :aside-text="__('ui.admin.login_subheading')"
+    :aside-text="null"
     :aside-points="[
-        __('ui.admin.equipments'),
         __('ui.admin.orders'),
         __('ui.admin.website_settings'),
     ]"
@@ -57,8 +56,10 @@
             </button>
         </form>
 
-        <div class="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm text-slate-600">
-            {{ __('ui.admin.login_hint') }}
+        <div class="border-t border-slate-200/80 pt-4 text-sm text-slate-500">
+            <a href="{{ route('home') }}" class="font-semibold text-blue-600 hover:text-blue-700" data-skip-loader="true">
+                {{ __('app.auth.back_home') }}
+            </a>
         </div>
     </div>
 </x-guest-layout>

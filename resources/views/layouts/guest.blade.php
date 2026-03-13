@@ -41,7 +41,7 @@
         <div class="manake-auth-shell min-h-screen px-4 py-4 sm:px-6 sm:py-6">
             <div class="manake-auth-card mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] lg:grid lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                 <div class="manake-auth-panel p-5 sm:p-7 lg:p-8">
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         <a href="{{ route('home') }}" class="inline-flex items-center" data-skip-loader="true" aria-label="{{ $brandName }}">
                             <x-brand.image
                                 light="manake-logo-blue.png"
@@ -52,7 +52,7 @@
                         </a>
 
                         @if ($eyebrow || $heading || $subheading)
-                            <div class="space-y-2">
+                            <div class="space-y-1.5">
                                 @if ($eyebrow)
                                     <span class="manake-kicker">{{ $eyebrow }}</span>
                                 @endif
@@ -76,7 +76,7 @@
                         <span class="manake-kicker manake-kicker-inverse">{{ $asideEyebrow }}</span>
                     @endif
                     @if ($asideHeading)
-                        <h2 class="mt-6 text-3xl font-semibold leading-tight tracking-[-0.04em] md:text-4xl">
+                        <h2 class="mt-5 text-3xl font-semibold leading-tight tracking-[-0.04em] md:text-[2.25rem]">
                             {{ $asideHeading }}
                         </h2>
                     @endif
@@ -87,7 +87,7 @@
                     @endif
 
                     @if (! empty($asidePoints))
-                        <div class="manake-auth-matrix mt-8">
+                        <div class="manake-auth-matrix mt-7">
                             @foreach ($asidePoints as $point)
                                 <article class="manake-auth-chip">
                                     <span>{{ $brandName }}</span>

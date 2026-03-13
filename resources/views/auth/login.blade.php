@@ -5,11 +5,10 @@
     :subheading="__('app.auth.login_subheading')"
     :aside-eyebrow="__('app.auth.login_title')"
     :aside-heading="__('app.auth.login_title')"
-    :aside-text="__('app.auth.login_note')"
+    :aside-text="null"
     :aside-points="[
         __('app.auth.login_benefit_1'),
         __('app.auth.login_benefit_2'),
-        __('app.auth.login_benefit_3'),
     ]"
 >
     <div class="space-y-4">

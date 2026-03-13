@@ -179,16 +179,15 @@ class EquipmentController extends Controller
             ->limit(6)
             ->get();
 
-        if ($items->count() < 6) {
+        if ($items->isEmpty()) {
             $fallbackItems = (clone $builder)
                 ->when(schema_column_exists_cached('equipments', 'status'), fn ($fallbackQuery) => $fallbackQuery->where('status', 'ready'))
-                ->whereNotIn('id', $items->pluck('id')->all())
                 ->orderByDesc('stock')
                 ->orderBy('name')
-                ->limit(max(6 - $items->count(), 0))
+                ->limit(5)
                 ->get();
 
-            $items = $items->concat($fallbackItems)->values();
+            $items = $fallbackItems->values();
         }
 
         $matchingIds = $items

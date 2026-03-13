@@ -5,11 +5,10 @@
     :subheading="__('app.auth.register_subheading')"
     :aside-eyebrow="__('ui.nav.register')"
     :aside-heading="__('app.auth.register_title')"
-    :aside-text="__('app.auth.register_note')"
+    :aside-text="null"
     :aside-points="[
         __('app.auth.register_step_1_desc'),
         __('app.auth.register_step_2_desc'),
-        __('app.auth.login_benefit_3'),
     ]"
 >
     <div class="space-y-4">

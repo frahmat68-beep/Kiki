@@ -5,10 +5,9 @@
     :subheading="__('ui.auth.forgot_subheading')"
     :aside-eyebrow="__('ui.auth.forgot_title')"
     :aside-heading="__('ui.auth.forgot_title')"
-    :aside-text="__('ui.auth.forgot_hint')"
+    :aside-text="null"
     :aside-points="[
         __('ui.auth.forgot_help'),
-        __('ui.auth.forgot_note'),
     ]"
 >
     <div class="space-y-4">

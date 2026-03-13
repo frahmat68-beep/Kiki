@@ -618,7 +618,6 @@
         const perDaySuffix = @json(__('ui.nav.search_per_day_suffix'));
         const stockLeftTemplate = @json(__('ui.nav.search_stock_left_template'));
         const noResultsTemplate = @json(__('ui.nav.search_no_results'));
-        const browseResultsTemplate = @json(__('ui.nav.search_browse_results'));
         const minimumQueryLength = 2;
         let debounceTimer = null;
         let activeAbortController = null;
@@ -688,12 +687,6 @@
             }
 
             dropdown.appendChild(list);
-
-            const footer = document.createElement('a');
-            footer.href = `{{ route('catalog') }}?q=${encodeURIComponent(query)}`;
-            footer.className = 'block border-t border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50';
-            footer.textContent = applyTemplate(browseResultsTemplate, { query });
-            dropdown.appendChild(footer);
 
             showDropdown();
         };
