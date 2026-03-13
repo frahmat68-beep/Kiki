@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Order;
 use App\Models\OrderNotification;
+use App\Services\OrderArchiveService;
+use App\Services\OrderPaymentLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -29,8 +33,12 @@ class OrderController extends Controller
         'refund',
     ];
 
-    public function index(Request $request): View
+    public function index(Request $request, OrderArchiveService $orderArchiveService, OrderPaymentLifecycleService $paymentLifecycle): View
     {
+        $orderArchiveService->archiveCompletedOrders();
+        $paymentLifecycle->expirePendingPayments();
+        $paymentLifecycle->reconcileRecentRentalPayments();
+
         $search = $request->string('q')->trim()->value();
         $status = $request->string('status')->trim()->value();
 
@@ -55,17 +63,22 @@ class OrderController extends Controller
             'orders' => $orders,
             'search' => $search,
             'status' => $status,
+            'monthlyRecaps' => $orderArchiveService->buildMonthlyRecaps(6),
+            'orderLogs' => $this->recentOrderLogs(),
             'activePage' => 'orders',
         ]);
     }
 
-    public function show(Order $order): View
+    public function show(Order $order, OrderPaymentLifecycleService $paymentLifecycle): View
     {
+        $paymentLifecycle->expirePendingOrderIfPastCutoff($order);
+        $paymentLifecycle->reconcileRentalPaymentState($order);
         $order->load(['user.profile', 'items.equipment', 'payment']);
 
         return view('admin.orders.show', [
             'order' => $order,
             'statusPesananOptions' => self::ORDER_STATUS_OPTIONS,
+            'auditLogs' => $this->orderAuditLogs($order),
             'activePage' => 'orders',
         ]);
     }
@@ -220,6 +233,79 @@ class OrderController extends Controller
             'dibatalkan' => __('Dibatalkan'),
             'refund' => __('Refund'),
             default => strtoupper((string) $status),
+        };
+    }
+
+    private function recentOrderLogs(int $limit = 10): Collection
+    {
+        if (! schema_table_exists_cached('audit_logs')) {
+            return collect();
+        }
+
+        $logs = AuditLog::query()
+            ->with('admin:id,name')
+            ->where(function ($query) {
+                $query->where('table_name', 'orders')
+                    ->orWhere('action', 'like', 'order.%');
+            })
+            ->latest('created_at')
+            ->limit($limit)
+            ->get();
+
+        $orderNumbers = Order::query()
+            ->whereIn('id', $logs->pluck('record_id')->filter()->map(fn ($value) => (int) $value)->all())
+            ->pluck('order_number', 'id');
+
+        return $logs->map(function (AuditLog $log) use ($orderNumbers) {
+            $payload = json_decode((string) ($log->payload_json ?? ''), true);
+            if (! is_array($payload)) {
+                $payload = [];
+            }
+
+            return [
+                'created_at' => $log->created_at,
+                'admin_name' => $log->admin?->name,
+                'order_number' => $orderNumbers[(int) $log->record_id] ?? ($log->record_id ? ('ORD-' . $log->record_id) : null),
+                'summary' => $this->auditSummary($log->action, $payload),
+            ];
+        });
+    }
+
+    private function orderAuditLogs(Order $order, int $limit = 12): Collection
+    {
+        if (! schema_table_exists_cached('audit_logs')) {
+            return collect();
+        }
+
+        return AuditLog::query()
+            ->with('admin:id,name')
+            ->where('table_name', 'orders')
+            ->where('record_id', (string) $order->id)
+            ->latest('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(function (AuditLog $log) use ($order) {
+                $payload = json_decode((string) ($log->payload_json ?? ''), true);
+                if (! is_array($payload)) {
+                    $payload = [];
+                }
+
+                return [
+                    'created_at' => $log->created_at,
+                    'admin_name' => $log->admin?->name,
+                    'order_number' => $order->order_number ?? ('ORD-' . $order->id),
+                    'summary' => $this->auditSummary($log->action, $payload),
+                ];
+            });
+    }
+
+    private function auditSummary(string $action, array $payload): string
+    {
+        return match ($action) {
+            'order.auto_archive' => __('Masuk arsip bulanan otomatis.'),
+            'order.update_operational_status' => __('Status operasional diubah.'),
+            'order.update_status' => __('Status, biaya, atau catatan pesanan diperbarui.'),
+            default => __('Perubahan pesanan tercatat.'),
         };
     }
 }

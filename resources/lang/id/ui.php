@@ -163,6 +163,8 @@ return [
             'paid' => 'Lunas',
             'pending' => 'Menunggu',
             'failed' => 'Gagal',
+            'expired' => 'Kedaluwarsa',
+            'refunded' => 'Refund',
         ],
         'reschedule_available' => 'Bisa reschedule sebelum barang diambil.',
         'reschedule_locked' => 'Reschedule ditutup karena barang sudah diambil.',

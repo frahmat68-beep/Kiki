@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
+use App\Models\AuditLog;
 use App\Models\Equipment;
 use App\Models\Order;
 use App\Models\User;
@@ -114,5 +115,47 @@ class AdminRoutesTest extends TestCase
         $response->assertSee('Rp 333.000');
         $response->assertSee('Rp 300.000');
         $response->assertSee('Rp 33.000');
+    }
+
+    public function test_admin_orders_page_shows_monthly_archive_and_logs(): void
+    {
+        $admin = $this->createAdmin();
+        $user = User::factory()->create();
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'order_number' => 'MNK-ARCHIVE-001',
+            'status_pembayaran' => 'paid',
+            'status_pesanan' => 'selesai',
+            'status' => 'completed',
+            'total_amount' => 275000,
+            'rental_start_date' => now()->subDays(10)->toDateString(),
+            'rental_end_date' => now()->subDays(8)->toDateString(),
+            'paid_at' => now()->subDays(11),
+            'returned_at' => now()->subDays(7),
+        ]);
+
+        $order->items()->create([
+            'equipment_id' => Equipment::factory()->create()->id,
+            'qty' => 2,
+            'price' => 137500,
+            'subtotal' => 275000,
+        ]);
+
+        AuditLog::create([
+            'admin_id' => $admin->id,
+            'action' => 'order.update_status',
+            'table_name' => 'orders',
+            'record_id' => (string) $order->id,
+            'payload_json' => json_encode(['status_pembayaran' => 'paid']),
+            'created_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.orders.index'));
+
+        $response->assertOk();
+        $response->assertSee('Arsip Bulanan');
+        $response->assertSee('Log Pesanan');
+        $response->assertSee('MNK-ARCHIVE-001');
     }
 }

@@ -242,6 +242,36 @@ class OrderPaymentLifecycleService
         return $updated;
     }
 
+    public function reconcileRecentRentalPayments(int $limit = 120): int
+    {
+        if (! schema_table_exists_cached('orders') || ! schema_table_exists_cached('payments')) {
+            return 0;
+        }
+
+        $updatedCount = 0;
+
+        Order::query()
+            ->whereHas('payments', function ($query) {
+                $query->where('provider', Payment::PROVIDER_MIDTRANS_RENTAL)
+                    ->whereIn('status', [
+                        Order::PAYMENT_PAID,
+                        Order::PAYMENT_FAILED,
+                        Order::PAYMENT_EXPIRED,
+                        Order::PAYMENT_REFUNDED,
+                    ]);
+            })
+            ->latest('updated_at')
+            ->limit(max($limit, 1))
+            ->get()
+            ->each(function (Order $order) use (&$updatedCount) {
+                if ($this->reconcileRentalPaymentState($order)) {
+                    $updatedCount++;
+                }
+            });
+
+        return $updatedCount;
+    }
+
     private function createExpiredNotification(Order $order): void
     {
         OrderNotification::query()->create([

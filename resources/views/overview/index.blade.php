@@ -17,6 +17,8 @@
         return match ($status) {
             'paid' => ['label' => __('ui.overview.payment_labels.paid'), 'badge' => 'bg-blue-100 text-blue-700'],
             'failed' => ['label' => __('ui.overview.payment_labels.failed'), 'badge' => 'bg-rose-100 text-rose-700'],
+            'expired' => ['label' => __('ui.overview.payment_labels.expired'), 'badge' => 'bg-slate-200 text-slate-700'],
+            'refunded' => ['label' => __('ui.overview.payment_labels.refunded'), 'badge' => 'bg-violet-100 text-violet-700'],
             default => ['label' => __('ui.overview.payment_labels.pending'), 'badge' => 'bg-amber-100 text-amber-700'],
         };
     };

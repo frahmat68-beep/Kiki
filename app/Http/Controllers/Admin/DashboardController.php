@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderNotification;
 use App\Models\Payment;
+use App\Services\OrderArchiveService;
+use App\Services\OrderPaymentLifecycleService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,16 +16,17 @@ use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, OrderArchiveService $orderArchiveService, OrderPaymentLifecycleService $paymentLifecycle)
     {
         $calendarMonth = (string) $request->query('calendar_month', '');
 
-        $this->archiveCompletedOrders();
+        $orderArchiveService->archiveCompletedOrders();
+        $paymentLifecycle->expirePendingPayments();
+        $paymentLifecycle->reconcileRecentRentalPayments();
 
         if (! schema_table_exists_cached('orders')) {
             return view('admin.dashboard', [
                 'operationalOrders' => collect(),
-                'archivedOrders' => collect(),
                 'summary' => [
                     'ready_pickup' => 0,
                     'on_rent' => 0,
@@ -58,17 +61,9 @@ class DashboardController extends Controller
             ->latest('updated_at')
             ->paginate(12);
 
-        $archivedOrders = (clone $basePaidOrders)
-            ->with(['user:id,name,email'])
-            ->where('status_pesanan', Order::STATUS_COMPLETED)
-            ->latest('updated_at')
-            ->limit(6)
-            ->get();
-
         return view('admin.dashboard', [
             'summary' => $summary,
             'operationalOrders' => $operationalOrders,
-            'archivedOrders' => $archivedOrders,
             'financialSummary' => $this->buildFinancialSummary($basePaidOrders),
             'rentalCalendar' => $this->buildRentalCalendar($calendarMonth),
         ]);
@@ -164,37 +159,6 @@ class DashboardController extends Controller
             default => strtoupper((string) $status),
         };
     }
-
-    private function archiveCompletedOrders(): void
-    {
-        if (! schema_table_exists_cached('orders')) {
-            return;
-        }
-
-        Order::query()
-            ->with('damagePayment')
-            ->where('status_pembayaran', Order::PAYMENT_PAID)
-            ->whereIn('status_pesanan', [
-                Order::STATUS_RETURNED_OK,
-                Order::STATUS_RETURNED_DAMAGED,
-                Order::STATUS_RETURNED_LOST,
-                Order::STATUS_OVERDUE_DAMAGE_INVOICE,
-            ])
-            ->orderBy('id')
-            ->chunkById(100, function ($orders) {
-                foreach ($orders as $order) {
-                    if ($order->hasOutstandingDamageFee()) {
-                        continue;
-                    }
-
-                    $order->forceFill([
-                        'status_pesanan' => Order::STATUS_COMPLETED,
-                        'status' => 'completed',
-                    ])->saveQuietly();
-                }
-            });
-    }
-
     private function buildRentalCalendar(string $monthValue = ''): array
     {
         $monthDate = $this->resolveMonthDate($monthValue);

@@ -249,36 +249,12 @@
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between gap-3">
                         <div>
-                            <h3 class="text-base font-semibold text-blue-700">{{ __('Arsip Selesai') }}</h3>
-                            <p class="text-xs text-slate-500">{{ __('Pesanan yang selesai otomatis dipindahkan ke arsip.') }}</p>
+                            <h3 class="text-base font-semibold text-blue-700">{{ __('Rekap & Log Pesanan') }}</h3>
+                            <p class="text-xs text-slate-500">{{ __('Arsip bulanan dan jejak perubahan dipusatkan di menu Pesanan.') }}</p>
                         </div>
                         <a href="{{ route('admin.orders.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                            {{ __('Lihat semua') }}
+                            {{ __('Buka Pesanan') }}
                         </a>
-                    </div>
-
-                    <div class="mt-3 space-y-2.5">
-                        @forelse (($archivedOrders ?? collect()) as $archivedOrder)
-                            <article class="rounded-xl border border-slate-200 px-3 py-3">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <p class="truncate text-sm font-semibold text-slate-900">{{ $archivedOrder->order_number ?? ('ORD-' . $archivedOrder->id) }}</p>
-                                        <p class="text-xs text-slate-500">{{ $archivedOrder->user?->name ?: __('Pelanggan') }}</p>
-                                    </div>
-                                    <span class="status-chip status-chip-success">{{ __('Selesai') }}</span>
-                                </div>
-                                <div class="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
-                                    <span>{{ optional($archivedOrder->updated_at)->format('d M Y H:i') }}</span>
-                                    <a href="{{ route('admin.orders.show', $archivedOrder) }}" class="font-semibold text-blue-600 hover:text-blue-700">
-                                        {{ __('Detail') }}
-                                    </a>
-                                </div>
-                            </article>
-                        @empty
-                            <div class="rounded-xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500">
-                                {{ __('Belum ada pesanan yang masuk arsip.') }}
-                            </div>
-                        @endforelse
                     </div>
                 </section>
 

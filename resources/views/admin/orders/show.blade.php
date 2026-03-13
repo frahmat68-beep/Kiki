@@ -108,11 +108,13 @@
                     <div>
                         <label class="text-xs font-semibold text-slate-500">{{ __('Status Pembayaran') }}</label>
                         <select name="status_pembayaran" class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
-                            @foreach (['pending', 'paid', 'failed'] as $paymentStatus)
+                            @foreach (['pending', 'paid', 'failed', 'expired', 'refunded'] as $paymentStatus)
                                 @php
                                     $paymentStatusText = match ($paymentStatus) {
                                         'paid' => __('Lunas'),
                                         'failed' => __('Gagal'),
+                                        'expired' => __('Kedaluwarsa'),
+                                        'refunded' => __('Refund'),
                                         default => __('Menunggu'),
                                     };
                                 @endphp
@@ -173,6 +175,29 @@
                         {{ __('Simpan & Kirim Notifikasi') }}
                     </button>
                 </form>
+
+                <div class="border-t border-slate-200 pt-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <h4 class="text-sm font-semibold text-slate-900">{{ __('Log Pesanan') }}</h4>
+                        <span class="text-[11px] text-slate-400">{{ __('Terbaru') }}</span>
+                    </div>
+
+                    <div class="mt-3 space-y-2.5">
+                        @forelse (($auditLogs ?? collect()) as $log)
+                            <article class="rounded-xl border border-slate-200 px-3 py-3">
+                                <div class="flex items-start justify-between gap-3">
+                                    <p class="text-xs font-semibold text-slate-800">{{ $log['summary'] }}</p>
+                                    <span class="shrink-0 text-[11px] text-slate-400">{{ optional($log['created_at'])->format('d M H:i') }}</span>
+                                </div>
+                                <p class="mt-1 text-[11px] text-slate-400">{{ $log['admin_name'] ?: __('Sistem') }}</p>
+                            </article>
+                        @empty
+                            <div class="rounded-xl border border-dashed border-slate-200 px-3 py-4 text-sm text-slate-500">
+                                {{ __('Belum ada log untuk pesanan ini.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </aside>
         </section>
     </div>

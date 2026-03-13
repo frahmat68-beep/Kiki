@@ -163,6 +163,8 @@ return [
             'paid' => 'Paid',
             'pending' => 'Pending',
             'failed' => 'Failed',
+            'expired' => 'Expired',
+            'refunded' => 'Refunded',
         ],
         'reschedule_available' => 'You can reschedule before pickup.',
         'reschedule_locked' => 'Reschedule is locked after pickup.',

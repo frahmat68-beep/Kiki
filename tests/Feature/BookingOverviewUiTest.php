@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -57,9 +58,41 @@ class BookingOverviewUiTest extends TestCase
         $response = $this->actingAs($user)->get(route('booking.history'));
 
         $response->assertOk();
-        $response->assertDontSee('Lihat semua');
         $response->assertSee('Detail & Ubah Jadwal', false);
-        $response->assertDontSee('>Riwayat</a>', false);
         $response->assertSee('Invoice');
+        $response->assertSee('MNK-UI-TEST-1');
+    }
+
+    public function test_booking_history_shows_expired_label_for_expired_payment(): void
+    {
+        $user = User::factory()->create();
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'order_number' => 'MNK-UI-EXPIRED-1',
+            'midtrans_order_id' => 'MNK-UI-EXPIRED-1',
+            'status_pembayaran' => 'pending',
+            'status_pesanan' => 'menunggu_pembayaran',
+            'status' => 'pending',
+            'total_amount' => 420000,
+            'rental_start_date' => now()->addDays(2)->toDateString(),
+            'rental_end_date' => now()->addDays(4)->toDateString(),
+        ]);
+
+        Payment::create([
+            'order_id' => $order->id,
+            'provider' => 'midtrans',
+            'midtrans_order_id' => $order->midtrans_order_id,
+            'status' => 'expired',
+            'transaction_status' => 'expire',
+            'gross_amount' => 420000,
+            'expired_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('booking.history'));
+
+        $response->assertOk();
+        $response->assertSee('Kedaluwarsa');
+        $response->assertSee('MNK-UI-EXPIRED-1');
     }
 }

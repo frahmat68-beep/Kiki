@@ -15,7 +15,7 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-blue-700">{{ __('Daftar Pesanan') }}</h2>
-                    <p class="text-xs text-slate-500">{{ __('Pantau transaksi, pembayaran, dan status pesanan.') }}</p>
+                    <p class="text-xs text-slate-500">{{ __('Pantau status, arsip bulanan, dan log perubahan pesanan.') }}</p>
                 </div>
             </div>
 
@@ -32,9 +32,85 @@
                     <option value="pending" {{ ($status ?? '') === 'pending' ? 'selected' : '' }}>{{ __('Menunggu') }}</option>
                     <option value="paid" {{ ($status ?? '') === 'paid' ? 'selected' : '' }}>{{ __('Lunas') }}</option>
                     <option value="failed" {{ ($status ?? '') === 'failed' ? 'selected' : '' }}>{{ __('Gagal') }}</option>
+                    <option value="expired" {{ ($status ?? '') === 'expired' ? 'selected' : '' }}>{{ __('Kedaluwarsa') }}</option>
+                    <option value="refunded" {{ ($status ?? '') === 'refunded' ? 'selected' : '' }}>{{ __('Refund') }}</option>
                 </select>
                 <button class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">{{ __('Terapkan') }}</button>
             </form>
+        </section>
+
+        <section class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-900">{{ __('Arsip Bulanan') }}</h3>
+                        <p class="text-xs text-slate-500">{{ __('Periode dihitung dari awal sampai akhir bulan.') }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    @forelse (($monthlyRecaps ?? collect()) as $recap)
+                        <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">{{ $recap['label'] }}</p>
+                                    <p class="text-[11px] text-slate-500">{{ $recap['period_label'] }}</p>
+                                </div>
+                                <span class="status-chip status-chip-success">{{ $recap['orders_count'] }} {{ __('pesanan') }}</span>
+                            </div>
+                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-400">{{ __('Unit') }}</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ $recap['units_total'] }}</p>
+                                </div>
+                                <div class="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-400">{{ __('Total') }}</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-900">{{ __('Rp') }} {{ number_format((int) $recap['revenue_total'], 0, ',', '.') }}</p>
+                                </div>
+                            </div>
+                            @if (! empty($recap['latest_orders']))
+                                <div class="mt-3 space-y-1.5 border-t border-slate-200 pt-3">
+                                    @foreach ($recap['latest_orders'] as $archivedOrder)
+                                        <a href="{{ route('admin.orders.show', $archivedOrder) }}" class="block truncate text-xs font-semibold text-blue-600 hover:text-blue-700">
+                                            {{ $archivedOrder->order_number ?? ('ORD-' . $archivedOrder->id) }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </article>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500 md:col-span-2 xl:col-span-3">
+                            {{ __('Belum ada arsip bulanan.') }}
+                        </div>
+                    @endforelse
+                </div>
+            </article>
+
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div>
+                    <h3 class="text-base font-semibold text-slate-900">{{ __('Log Pesanan') }}</h3>
+                    <p class="text-xs text-slate-500">{{ __('Jejak perubahan terbaru untuk operasional dan status pembayaran.') }}</p>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    @forelse (($orderLogs ?? collect()) as $log)
+                        <article class="rounded-xl border border-slate-200 px-3 py-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-semibold text-slate-900">{{ $log['order_number'] ?? __('Pesanan') }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">{{ $log['summary'] }}</p>
+                                </div>
+                                <span class="shrink-0 text-[11px] text-slate-400">{{ optional($log['created_at'])->format('d M H:i') }}</span>
+                            </div>
+                            <p class="mt-2 text-[11px] text-slate-400">{{ $log['admin_name'] ?: __('Sistem') }}</p>
+                        </article>
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500">
+                            {{ __('Belum ada log pesanan.') }}
+                        </div>
+                    @endforelse
+                </div>
+            </article>
         </section>
 
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -56,11 +132,15 @@
                                 $paymentBadge = match($order->status_pembayaran) {
                                     'paid' => 'status-chip-success',
                                     'failed' => 'status-chip-danger',
+                                    'expired' => 'status-chip-muted',
+                                    'refunded' => 'status-chip-info',
                                     default => 'status-chip-warning',
                                 };
                                 $paymentStatusLabel = match($order->status_pembayaran) {
                                     'paid' => __('LUNAS'),
                                     'failed' => __('GAGAL'),
+                                    'expired' => __('KEDALUWARSA'),
+                                    'refunded' => __('REFUND'),
                                     default => __('MENUNGGU'),
                                 };
                                 $orderStatusLabel = match($order->status_pesanan) {
@@ -70,6 +150,7 @@
                                     'barang_diambil' => __('Barang Diambil'),
                                     'barang_kembali' => __('Barang Kembali'),
                                     'barang_rusak' => __('Barang Rusak'),
+                                    'expired' => __('Kedaluwarsa'),
                                     'selesai' => __('Selesai'),
                                     'dibatalkan' => __('Dibatalkan'),
                                     'refund' => __('Pengembalian Dana'),
