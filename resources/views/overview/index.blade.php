@@ -59,120 +59,128 @@
         </div>
     </div>
 
-    <div class="mt-7 grid grid-cols-1 gap-5 xl:grid-cols-[1.4fr,1fr]">
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="mt-6 grid grid-cols-1 items-start gap-5 xl:grid-cols-[1.4fr,1fr]">
+        <div class="flex min-h-[28rem] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingActiveTitle }}</h3>
             </div>
 
-            <div class="mt-4 space-y-3.5">
-                @forelse ($activeRentals as $order)
-                    @php
-                        $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
-                        $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
-                        $durationDays = 1;
-                        if ($order->rental_start_date && $order->rental_end_date && $order->rental_end_date->gte($order->rental_start_date)) {
-                            $durationDays = $order->rental_start_date->diffInDays($order->rental_end_date) + 1;
-                        }
-                        $itemUnits = (int) ($order->items?->sum('qty') ?? 0);
-                        $canReschedule = $canRescheduleOrder($order);
-                    @endphp
-                    <article class="rounded-xl border border-slate-100 p-4">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
-                                <p class="text-xs text-slate-500">
-                                    {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
-                                </p>
-                                <p class="mt-2 text-xs font-semibold text-slate-500">{{ __('ui.overview.total') }} {{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
-                                <p class="mt-1 text-xs text-slate-500">
-                                    {{ max((int) ($durationDays ?? 1), 1) }} {{ __('app.product.day_label') }} • {{ max($itemUnits, 0) }} {{ __('ui.overview.unit_label') }}
-                                </p>
-                                <p class="mt-1 text-[11px] text-slate-500">
-                                    {{ $canReschedule ? __('ui.overview.reschedule_available') : __('ui.overview.reschedule_locked') }}
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
-                                    {{ $meta['label'] }}
-                                </span>
-                                @if (($order->status_pembayaran ?? 'pending') !== 'paid')
-                                    <a href="{{ route('booking.pay', $order) }}" class="btn-primary rounded-xl px-3 py-2 text-xs font-semibold">
-                                        {{ __('ui.actions.pay') }}
-                                    </a>
-                                @endif
-                                <a href="{{ route('account.orders.show', $order) }}" class="btn-secondary rounded-xl px-3 py-2 text-xs font-semibold">
-                                    {!! strip_tags((string) __('ui.overview.detail_reschedule')) !!}
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                @empty
-                    <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-                        <p class="text-sm font-semibold text-slate-700">{{ __('ui.overview.empty_active_title') }}</p>
-                        <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.empty_active_body') }}</p>
-                        <a href="{{ route('catalog') }}" class="btn-primary mt-4 inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-semibold">
-                            {{ __('ui.overview.empty_active_cta') }}
-                        </a>
+            <div class="mt-4 flex-1">
+                @if ($activeRentals->isNotEmpty())
+                    <div class="scroll-panel max-h-[34rem] space-y-3.5 overflow-y-auto pr-1">
+                        @foreach ($activeRentals as $order)
+                            @php
+                                $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
+                                $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
+                                $durationDays = 1;
+                                if ($order->rental_start_date && $order->rental_end_date && $order->rental_end_date->gte($order->rental_start_date)) {
+                                    $durationDays = $order->rental_start_date->diffInDays($order->rental_end_date) + 1;
+                                }
+                                $itemUnits = (int) ($order->items?->sum('qty') ?? 0);
+                                $canReschedule = $canRescheduleOrder($order);
+                            @endphp
+                            <article class="rounded-xl border border-slate-100 p-4">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
+                                        </p>
+                                        <p class="mt-2 text-xs font-semibold text-slate-500">{{ __('ui.overview.total') }} {{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            {{ max((int) ($durationDays ?? 1), 1) }} {{ __('app.product.day_label') }} • {{ max($itemUnits, 0) }} {{ __('ui.overview.unit_label') }}
+                                        </p>
+                                        <p class="mt-1 text-[11px] text-slate-500">
+                                            {{ $canReschedule ? __('ui.overview.reschedule_available') : __('ui.overview.reschedule_locked') }}
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
+                                            {{ $meta['label'] }}
+                                        </span>
+                                        @if (($order->status_pembayaran ?? 'pending') !== 'paid')
+                                            <a href="{{ route('booking.pay', $order) }}" class="btn-primary rounded-xl px-3 py-2 text-xs font-semibold">
+                                                {{ __('ui.actions.pay') }}
+                                            </a>
+                                        @endif
+                                        <a href="{{ route('account.orders.show', $order) }}" class="btn-secondary rounded-xl px-3 py-2 text-xs font-semibold">
+                                            {!! strip_tags((string) __('ui.overview.detail_reschedule')) !!}
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
-                @endforelse
+                @else
+                    <div class="flex min-h-[18rem] items-center">
+                        <div class="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                            <p class="text-sm font-semibold text-slate-700">{{ __('ui.overview.empty_active_title') }}</p>
+                            <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.empty_active_body') }}</p>
+                            <a href="{{ route('catalog') }}" class="btn-primary mt-4 inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-semibold">
+                                {{ __('ui.overview.empty_active_cta') }}
+                            </a>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex min-h-[28rem] flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingRecentTitle }}</h3>
             </div>
 
-            <div class="mt-4 divide-y divide-slate-100">
-                @forelse ($recentBookings as $order)
-                    @php
-                        $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
-                        $canOpenInvoice = $canViewInvoice($order);
-                        $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
-                        $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: '');
-                        $signedInvoiceUrl = ($canOpenInvoice && $orderRouteKey !== '')
-                            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), ['order' => $orderRouteKey])
-                            : null;
-                        $signedInvoicePdfPreviewUrl = ($canOpenInvoice && $orderRouteKey !== '')
-                            ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), ['order' => $orderRouteKey, 'inline' => 1])
-                            : null;
-                    @endphp
-                    <div class="py-4">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
-                                <p class="text-xs text-slate-500">
-                                    {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
-                                </p>
+            <div class="mt-4 flex-1 overflow-hidden">
+                <div class="scroll-panel max-h-[34rem] divide-y divide-slate-100 overflow-y-auto pr-1">
+                    @forelse ($recentBookings as $order)
+                        @php
+                            $meta = $paymentMeta($order->status_pembayaran ?? 'pending');
+                            $canOpenInvoice = $canViewInvoice($order);
+                            $orderNumber = $order->order_number ?? ('ORD-' . $order->id);
+                            $orderRouteKey = (string) ($order->order_number ?: $order->midtrans_order_id ?: '');
+                            $signedInvoiceUrl = ($canOpenInvoice && $orderRouteKey !== '')
+                                ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt', now()->addMinutes(30), ['order' => $orderRouteKey])
+                                : null;
+                            $signedInvoicePdfPreviewUrl = ($canOpenInvoice && $orderRouteKey !== '')
+                                ? \Illuminate\Support\Facades\URL::temporarySignedRoute('account.orders.receipt.pdf', now()->addMinutes(30), ['order' => $orderRouteKey, 'inline' => 1])
+                                : null;
+                        @endphp
+                        <div class="py-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
+                                    <p class="text-xs text-slate-500">
+                                        {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
+                                    </p>
+                                </div>
+                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
+                                    {{ $meta['label'] }}
+                                </span>
                             </div>
-                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
-                                {{ $meta['label'] }}
-                            </span>
+                            <div class="mt-3 flex items-center justify-between">
+                                <p class="text-xs font-semibold text-slate-700">{{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
+                                @if ($canOpenInvoice && $signedInvoiceUrl)
+                                    <button
+                                        type="button"
+                                        data-open-invoice-modal
+                                        data-invoice-url="{{ $signedInvoiceUrl }}"
+                                        data-invoice-preview-url="{{ $signedInvoicePdfPreviewUrl }}"
+                                        data-order-number="{{ $orderNumber }}"
+                                        class="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                                    >
+                                        {{ __('ui.invoice.title') }}
+                                    </button>
+                                @else
+                                    <span class="text-xs font-semibold text-slate-400">{{ __('ui.invoice.title') }}</span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="mt-3 flex items-center justify-between">
-                            <p class="text-xs font-semibold text-slate-700">{{ $formatIdr($order->grand_total ?? $order->total_amount) }}</p>
-                            @if ($canOpenInvoice && $signedInvoiceUrl)
-                                <button
-                                    type="button"
-                                    data-open-invoice-modal
-                                    data-invoice-url="{{ $signedInvoiceUrl }}"
-                                    data-invoice-preview-url="{{ $signedInvoicePdfPreviewUrl }}"
-                                    data-order-number="{{ $orderNumber }}"
-                                    class="text-xs font-semibold text-blue-600 hover:text-blue-700"
-                                >
-                                    {{ __('ui.invoice.title') }}
-                                </button>
-                            @else
-                                <span class="text-xs font-semibold text-slate-400">{{ __('ui.invoice.title') }}</span>
-                            @endif
+                    @empty
+                        <div class="py-6 text-center">
+                            <p class="text-sm text-slate-500">{{ __('ui.overview.empty_recent_body') }}</p>
                         </div>
-                    </div>
-                @empty
-                    <div class="py-6 text-center">
-                        <p class="text-sm text-slate-500">{{ __('ui.overview.empty_recent_body') }}</p>
-                    </div>
-                @endforelse
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>

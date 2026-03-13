@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class OrderArchiveService
 {
@@ -67,6 +68,7 @@ class OrderArchiveService
         $rangeEnd = now()->copy()->endOfMonth();
 
         $completedOrders = Order::query()
+            ->with('user:id,name')
             ->withSum('items as units_total', 'qty')
             ->where('status_pembayaran', Order::PAYMENT_PAID)
             ->where('status_pesanan', Order::STATUS_COMPLETED)
@@ -85,6 +87,9 @@ class OrderArchiveService
             ->sortKeysDesc()
             ->map(function (Collection $orders, string $monthKey) {
                 $anchor = Carbon::createFromFormat('Y-m', $monthKey)->startOfMonth();
+                $sortedOrders = $orders
+                    ->sortByDesc(fn (Order $order) => $this->resolveArchiveDate($order)->timestamp)
+                    ->values();
 
                 return [
                     'month_key' => $monthKey,
@@ -93,10 +98,24 @@ class OrderArchiveService
                     'orders_count' => $orders->count(),
                     'units_total' => (int) $orders->sum(fn (Order $order) => (int) ($order->units_total ?? 0)),
                     'revenue_total' => (int) $orders->sum(fn (Order $order) => (int) $order->grand_total),
-                    'latest_orders' => $orders
-                        ->sortByDesc(fn (Order $order) => $this->resolveArchiveDate($order)->timestamp)
-                        ->take(3)
-                        ->values(),
+                    'latest_orders' => $sortedOrders
+                        ->take(8)
+                        ->values()
+                        ->map(function (Order $order, int $index) {
+                            $customerName = trim((string) ($order->user?->name ?? 'Pelanggan'));
+                            $customerLabel = Str::of($customerName)
+                                ->squish()
+                                ->limit(28, '')
+                                ->value();
+
+                            return [
+                                'id' => $order->id,
+                                'archive_label' => 'P' . ($index + 1) . '-' . $customerLabel,
+                                'customer_name' => $customerName,
+                                'order_number' => $order->order_number ?? ('ORD-' . $order->id),
+                                'archive_date' => $this->resolveArchiveDate($order)->copy(),
+                            ];
+                        }),
                 ];
             })
             ->values();

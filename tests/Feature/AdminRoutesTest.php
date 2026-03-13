@@ -59,7 +59,7 @@ class AdminRoutesTest extends TestCase
     public function test_admin_order_and_user_detail_pages_are_accessible(): void
     {
         $admin = $this->createAdmin();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Fikri Rachmat']);
         $equipment = Equipment::factory()->create();
 
         $order = Order::create([

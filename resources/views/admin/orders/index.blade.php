@@ -40,15 +40,15 @@
         </section>
 
         <section class="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
-            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex min-h-[38rem] flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between gap-3">
-                    <div>
-                        <h3 class="text-base font-semibold text-slate-900">{{ __('Arsip Bulanan') }}</h3>
-                        <p class="text-xs text-slate-500">{{ __('Periode dihitung dari awal sampai akhir bulan.') }}</p>
-                    </div>
+                <div>
+                    <h3 class="text-base font-semibold text-slate-900">{{ __('Arsip Bulanan') }}</h3>
+                    <p class="text-xs text-slate-500">{{ __('Periode awal bulan sampai akhir bulan.') }}</p>
                 </div>
+            </div>
 
-                <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <div class="scroll-panel mt-4 grid max-h-[36rem] gap-3 overflow-y-auto pr-1 md:grid-cols-2">
                     @forelse (($monthlyRecaps ?? collect()) as $recap)
                         <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                             <div class="flex items-start justify-between gap-3">
@@ -69,30 +69,34 @@
                                 </div>
                             </div>
                             @if (! empty($recap['latest_orders']))
-                                <div class="mt-3 space-y-1.5 border-t border-slate-200 pt-3">
+                                <div class="scroll-panel mt-3 max-h-[10rem] space-y-2 overflow-y-auto border-t border-slate-200 pt-3 pr-1">
                                     @foreach ($recap['latest_orders'] as $archivedOrder)
-                                        <a href="{{ route('admin.orders.show', $archivedOrder) }}" class="block truncate text-xs font-semibold text-blue-600 hover:text-blue-700">
-                                            {{ $archivedOrder->order_number ?? ('ORD-' . $archivedOrder->id) }}
+                                        <a href="{{ route('admin.orders.show', $archivedOrder['id']) }}" class="block rounded-xl border border-slate-200 bg-white px-3 py-2 transition hover:border-blue-200">
+                                            <p class="truncate text-xs font-semibold text-blue-600 hover:text-blue-700">
+                                                {{ $archivedOrder['archive_label'] }}
+                                            </p>
+                                            <p class="mt-1 truncate text-[11px] text-slate-600">{{ $archivedOrder['customer_name'] }}</p>
+                                            <p class="mt-1 truncate text-[11px] text-slate-500">{{ $archivedOrder['order_number'] }}</p>
                                         </a>
                                     @endforeach
                                 </div>
                             @endif
                         </article>
                     @empty
-                        <div class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500 md:col-span-2 xl:col-span-3">
+                        <div class="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500 md:col-span-2">
                             {{ __('Belum ada arsip bulanan.') }}
                         </div>
                     @endforelse
                 </div>
             </article>
 
-            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article class="flex min-h-[38rem] flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div>
                     <h3 class="text-base font-semibold text-slate-900">{{ __('Log Pesanan') }}</h3>
-                    <p class="text-xs text-slate-500">{{ __('Jejak perubahan terbaru untuk operasional dan status pembayaran.') }}</p>
+                    <p class="text-xs text-slate-500">{{ __('Perubahan terbaru untuk pelacakan pesanan.') }}</p>
                 </div>
 
-                <div class="mt-4 space-y-3">
+                <div class="scroll-panel mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
                     @forelse (($orderLogs ?? collect()) as $log)
                         <article class="rounded-xl border border-slate-200 px-3 py-3">
                             <div class="flex items-start justify-between gap-3">
@@ -114,9 +118,9 @@
         </section>
 
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="overflow-x-auto">
+            <div class="scroll-panel max-h-[42rem] overflow-auto">
                 <table class="min-w-[860px] w-full text-sm">
-                    <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                    <thead class="sticky top-0 z-10 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-5 py-3">{{ __('Pesanan') }}</th>
                             <th class="px-5 py-3">{{ __('Pengguna') }}</th>

@@ -225,7 +225,7 @@
                     method="GET"
                     action="{{ route('catalog') }}"
                     data-search-suggest-url="{{ route('search.suggestions') }}"
-                    class="command-surface relative order-3 w-full rounded-2xl sm:order-2 sm:flex-1 sm:max-w-2xl"
+                    class="command-surface command-surface--search relative order-3 w-full rounded-2xl sm:order-2 sm:flex-1 sm:max-w-2xl"
                 >
                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -674,7 +674,7 @@
             lastItems = items;
 
             const list = document.createElement('div');
-            list.className = 'max-h-[22rem] overflow-y-auto';
+            list.className = 'scroll-panel max-h-[22rem] overflow-y-auto';
 
             if (!items.length) {
                 const emptyState = document.createElement('p');

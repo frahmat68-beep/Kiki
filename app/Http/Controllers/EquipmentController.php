@@ -152,30 +152,55 @@ class EquipmentController extends Controller
         }
 
         $builder = Equipment::query()
-            ->with('category')
-            ->orderBy('name');
+            ->with('category');
         $hasDescriptionColumn = schema_column_exists_cached('equipments', 'description');
 
         if (schema_table_exists_cached('order_items') && schema_table_exists_cached('orders')) {
             $builder->withSum('activeOrderItems as reserved_units', 'qty');
         }
 
-        $items = $builder
-            ->where(function ($searchBuilder) use ($query, $hasDescriptionColumn) {
-                $searchBuilder->where('name', 'like', '%' . $query . '%')
+        $applyKeywordSearch = function ($searchBuilder) use ($query, $hasDescriptionColumn) {
+            $searchBuilder->where(function ($nestedBuilder) use ($query, $hasDescriptionColumn) {
+                $nestedBuilder->where('name', 'like', '%' . $query . '%')
                     ->orWhere('slug', 'like', '%' . $query . '%')
                     ->orWhereHas('category', function ($categoryBuilder) use ($query) {
                         $categoryBuilder->where('name', 'like', '%' . $query . '%');
                     });
 
                 if ($hasDescriptionColumn) {
-                    $searchBuilder->orWhere('description', 'like', '%' . $query . '%');
+                    $nestedBuilder->orWhere('description', 'like', '%' . $query . '%');
                 }
-            })
-            ->limit(8)
+            });
+        };
+
+        $items = (clone $builder)
+            ->tap($applyKeywordSearch)
+            ->orderBy('name')
+            ->limit(6)
             ->get();
 
-        $data = $items->map(function (Equipment $equipment) {
+        if ($items->count() < 6) {
+            $fallbackItems = (clone $builder)
+                ->when(schema_column_exists_cached('equipments', 'status'), fn ($fallbackQuery) => $fallbackQuery->where('status', 'ready'))
+                ->whereNotIn('id', $items->pluck('id')->all())
+                ->orderByDesc('stock')
+                ->orderBy('name')
+                ->limit(max(6 - $items->count(), 0))
+                ->get();
+
+            $items = $items->concat($fallbackItems)->values();
+        }
+
+        $matchingIds = $items
+            ->filter(function (Equipment $equipment) use ($query) {
+                return str_contains(Str::lower((string) $equipment->name), Str::lower($query))
+                    || str_contains(Str::lower((string) $equipment->slug), Str::lower($query))
+                    || str_contains(Str::lower((string) ($equipment->category?->name ?? '')), Str::lower($query));
+            })
+            ->pluck('id')
+            ->all();
+
+        $data = $items->map(function (Equipment $equipment) use ($matchingIds) {
             $imagePath = (string) ($equipment->image_path ?? $equipment->image ?? '');
             $imageUrl = site_media_url($imagePath) ?: site_asset('MANAKE-FAV-M.png');
 
@@ -191,6 +216,7 @@ class EquipmentController extends Controller
                     ->limit(88)
                     ->value(),
                 'detail_url' => route('product.show', $equipment->slug),
+                'is_recommended' => ! in_array($equipment->id, $matchingIds, true),
             ];
         })->values();
 
