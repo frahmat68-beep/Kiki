@@ -22,7 +22,7 @@
                         href="{{ route('lang.switch', ['locale' => $value, 'redirect' => $redirect]) }}"
                         data-locale-option="{{ $value }}"
                         data-ui-active="{{ $locale === $value ? 'true' : 'false' }}"
-                        class="manake-preferences-choice manake-preferences-choice--row rounded-2xl border {{ $locale === $value ? 'is-active' : '' }}"
+                        class="manake-preferences-choice manake-preferences-choice--locale manake-preferences-choice--row rounded-2xl border {{ $locale === $value ? 'is-active' : '' }}"
                     >
                         <span class="manake-preferences-choice__dot" aria-hidden="true"></span>
                         <span class="manake-preferences-choice__body">
@@ -52,7 +52,7 @@
                         href="{{ route('theme.switch', ['theme' => $value, 'redirect' => $redirect]) }}"
                         data-theme-option="{{ $value }}"
                         data-ui-active="{{ $currentTheme === $value ? 'true' : 'false' }}"
-                        class="manake-preferences-choice manake-preferences-choice--row rounded-2xl border {{ $currentTheme === $value ? 'is-active' : '' }}"
+                        class="manake-preferences-choice manake-preferences-choice--theme manake-preferences-choice--row rounded-2xl border {{ $currentTheme === $value ? 'is-active' : '' }}"
                     >
                         <span class="manake-preferences-choice__icon" aria-hidden="true">
                             @if ($themeOption['icon'] === 'monitor')

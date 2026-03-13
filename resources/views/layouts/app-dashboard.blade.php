@@ -55,17 +55,27 @@
         [x-cloak] { display: none !important; }
         body {
             font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
-            color: var(--manake-body-color) !important;
+            color: var(--manake-body-color-resolved, var(--text)) !important;
             font-weight: var(--manake-body-weight);
             font-style: var(--manake-body-style);
             font-size: calc(1rem * var(--manake-body-scale));
         }
         :root {
-            --manake-heading-h1: {{ $headingColor }};
-            --manake-heading-h2: {{ $subheadingColor }};
-            --manake-heading-h3: {{ $subheadingColor }};
-            --manake-heading-h4: {{ $headingColor }};
-            --manake-body-color: {{ $bodyColor }};
+            --manake-heading-h1-light: {{ $headingColor }};
+            --manake-heading-h2-light: {{ $subheadingColor }};
+            --manake-heading-h3-light: {{ $subheadingColor }};
+            --manake-heading-h4-light: {{ $headingColor }};
+            --manake-body-color-light: {{ $bodyColor }};
+            --manake-heading-h1-dark: color-mix(in oklab, {{ $headingColor }} 72%, white 28%);
+            --manake-heading-h2-dark: color-mix(in oklab, {{ $subheadingColor }} 70%, white 30%);
+            --manake-heading-h3-dark: color-mix(in oklab, {{ $subheadingColor }} 70%, white 30%);
+            --manake-heading-h4-dark: color-mix(in oklab, {{ $headingColor }} 74%, white 26%);
+            --manake-body-color-dark: color-mix(in oklab, var(--text) 90%, white 10%);
+            --manake-heading-h1-resolved: var(--manake-heading-h1-light);
+            --manake-heading-h2-resolved: var(--manake-heading-h2-light);
+            --manake-heading-h3-resolved: var(--manake-heading-h3-light);
+            --manake-heading-h4-resolved: var(--manake-heading-h4-light);
+            --manake-body-color-resolved: var(--manake-body-color-light);
             --manake-heading-weight: {{ $headingWeight }};
             --manake-body-weight: {{ $bodyWeight }};
             --manake-heading-style: {{ $headingStyle }};
@@ -73,34 +83,41 @@
             --manake-heading-scale: {{ $headingScaleMap[$headingScaleKey] ?? '1' }};
             --manake-body-scale: {{ $bodyScaleMap[$bodyScaleKey] ?? '1' }};
         }
+        html[data-theme-resolved='dark'] {
+            --manake-heading-h1-resolved: var(--manake-heading-h1-dark);
+            --manake-heading-h2-resolved: var(--manake-heading-h2-dark);
+            --manake-heading-h3-resolved: var(--manake-heading-h3-dark);
+            --manake-heading-h4-resolved: var(--manake-heading-h4-dark);
+            --manake-body-color-resolved: var(--manake-body-color-dark);
+        }
         header :is(h1, h2, h3) {
-            color: var(--manake-heading-h1) !important;
+            color: var(--manake-heading-h1-resolved) !important;
             letter-spacing: -0.012em;
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
         }
         main h1 {
-            color: var(--manake-heading-h1) !important;
+            color: var(--manake-heading-h1-resolved) !important;
             letter-spacing: -0.015em;
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
             font-size: calc(2rem * var(--manake-heading-scale)) !important;
         }
         main h2 {
-            color: var(--manake-heading-h2) !important;
+            color: var(--manake-heading-h2-resolved) !important;
             letter-spacing: -0.012em;
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
             font-size: calc(1.5rem * var(--manake-heading-scale)) !important;
         }
         main h3 {
-            color: var(--manake-heading-h3) !important;
+            color: var(--manake-heading-h3-resolved) !important;
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
             font-size: calc(1.125rem * var(--manake-heading-scale)) !important;
         }
         main :is(h4, h5, h6) {
-            color: var(--manake-heading-h4) !important;
+            color: var(--manake-heading-h4-resolved) !important;
             font-style: var(--manake-heading-style) !important;
             font-weight: var(--manake-heading-weight) !important;
         }

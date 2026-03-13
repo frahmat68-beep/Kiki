@@ -15,11 +15,11 @@
 
     $paymentMeta = function ($status) {
         return match ($status) {
-            'paid' => ['label' => __('ui.overview.payment_labels.paid'), 'badge' => 'bg-blue-100 text-blue-700'],
-            'failed' => ['label' => __('ui.overview.payment_labels.failed'), 'badge' => 'bg-rose-100 text-rose-700'],
-            'expired' => ['label' => __('ui.overview.payment_labels.expired'), 'badge' => 'bg-slate-200 text-slate-700'],
-            'refunded' => ['label' => __('ui.overview.payment_labels.refunded'), 'badge' => 'bg-violet-100 text-violet-700'],
-            default => ['label' => __('ui.overview.payment_labels.pending'), 'badge' => 'bg-amber-100 text-amber-700'],
+            'paid' => ['label' => __('ui.overview.payment_labels.paid'), 'badge' => 'status-chip status-chip-info'],
+            'failed' => ['label' => __('ui.overview.payment_labels.failed'), 'badge' => 'status-chip status-chip-danger'],
+            'expired' => ['label' => __('ui.overview.payment_labels.expired'), 'badge' => 'status-chip status-chip-muted'],
+            'refunded' => ['label' => __('ui.overview.payment_labels.refunded'), 'badge' => 'status-chip status-chip-muted'],
+            default => ['label' => __('ui.overview.payment_labels.pending'), 'badge' => 'status-chip status-chip-warning'],
         };
     };
 @endphp
@@ -42,22 +42,22 @@
     @endif
 
     <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="card rounded-2xl p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.total_booking') }}</p>
             <p class="mt-2 text-2xl font-semibold text-slate-900">{{ $stats['total_booking'] ?? 0 }}</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="card rounded-2xl p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.active_rental') }}</p>
             <p class="mt-2 text-2xl font-semibold text-blue-600">{{ $stats['active_rental'] ?? 0 }}</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="card rounded-2xl p-5 shadow-sm">
             <p class="text-xs text-slate-500">{{ __('ui.overview.stats.completed') }}</p>
             <p class="mt-2 text-2xl font-semibold text-blue-600">{{ $stats['completed'] ?? 0 }}</p>
         </div>
     </div>
 
     <div class="mt-6 grid grid-cols-1 items-start gap-5 xl:grid-cols-[1.4fr,1fr]">
-        <div class="flex h-[30rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="card flex h-[30rem] flex-col overflow-hidden rounded-2xl p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingActiveTitle }}</h3>
             </div>
@@ -76,7 +76,7 @@
                                 $itemUnits = (int) ($order->items?->sum('qty') ?? 0);
                                 $canReschedule = $canRescheduleOrder($order);
                             @endphp
-                            <article class="rounded-xl border border-slate-100 p-4">
+                            <article class="rounded-xl border p-4">
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p class="break-all text-sm font-semibold text-blue-700">{{ $orderNumber }}</p>
@@ -92,7 +92,7 @@
                                         </p>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
+                                        <span class="{{ $meta['badge'] }}">
                                             {{ $meta['label'] }}
                                         </span>
                                         @if (($order->status_pembayaran ?? 'pending') !== 'paid')
@@ -110,7 +110,7 @@
                     </div>
                 @else
                     <div class="flex h-full items-center">
-                        <div class="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                        <div class="w-full rounded-xl border border-dashed border-slate-200/80 bg-slate-50/70 p-6 text-center">
                             <p class="text-sm font-semibold text-slate-700">{{ __('ui.overview.empty_active_title') }}</p>
                             <p class="mt-2 text-xs text-slate-500">{{ __('ui.overview.empty_active_body') }}</p>
                             <a href="{{ route('catalog') }}" class="btn-primary mt-4 inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-semibold">
@@ -122,7 +122,7 @@
             </div>
         </div>
 
-        <div class="flex h-[30rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="card flex h-[30rem] flex-col overflow-hidden rounded-2xl p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-blue-700">{{ $bookingRecentTitle }}</h3>
             </div>
@@ -150,7 +150,7 @@
                                         {{ optional($order->rental_start_date)->format('d M Y') }} - {{ optional($order->rental_end_date)->format('d M Y') }}
                                     </p>
                                 </div>
-                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $meta['badge'] }}">
+                                <span class="{{ $meta['badge'] }}">
                                     {{ $meta['label'] }}
                                 </span>
                             </div>
