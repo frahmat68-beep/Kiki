@@ -15,46 +15,12 @@ use Illuminate\View\View;
 
 class AvailabilityBoardController extends Controller
 {
-    public function index(Request $request, AvailabilityService $availability): View| \Illuminate\Http\JsonResponse
+    public function index(Request $request, AvailabilityService $availability)
     {
         try {
-            $windowStartDate = now()->startOfDay();
-            $windowEndDate = now()->addMonths(3);
-            $monthDate = now()->startOfMonth();
-            $monthStart = $monthDate->copy();
-            $monthEnd = $monthDate->copy()->endOfMonth();
-            $calendarStart = $monthStart->copy()->startOfWeek();
-            $calendarEnd = $monthEnd->copy()->endOfWeek();
-            $selectedDate = now()->startOfDay();
-            $search = '';
-
-            return view('availability.board', [
-                'search' => '',
-                'monthDate' => $monthDate,
-                'monthStart' => $monthStart,
-                'monthEnd' => $monthEnd,
-                'calendarStart' => $calendarStart,
-                'calendarEnd' => $calendarEnd,
-                'selectedDate' => $selectedDate,
-                'windowStartDate' => $windowStartDate,
-                'windowEndDate' => $windowEndDate,
-                'dateKeys' => [],
-                'calendarDays' => collect(),
-                'equipmentRows' => collect(),
-                'selectedBusyRows' => collect(),
-                'selectedFreeRows' => collect(),
-                'monthlySchedules' => collect(),
-                'dailySchedulesByDate' => [],
-                'summary' => [
-                    'total_equipments' => 0,
-                    'busy_equipments' => 0,
-                    'available_equipments' => 0,
-                    'reserved_units' => 0,
-                ],
-            ]);
+            return "OK - Controller reached";
         } catch (\Throwable $exception) {
-            report($exception);
-            return $this->fallbackView($search ?? '', now()->startOfMonth(), now()->startOfMonth(), now()->endOfMonth(), now()->startOfWeek(), now()->endOfWeek(), now(), now(), now()->addMonths(3));
+            return "ERROR - Controller failed: " . $exception->getMessage();
         }
     }
 
