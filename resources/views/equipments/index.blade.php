@@ -78,10 +78,10 @@
 
     <div
         x-data="catalogIdleHamburger({
-            enabled: @js($idleHamburgerEnabled),
-            delay: @js($idleHamburgerDelayMs),
-            step: @js($idleHamburgerStepMs),
-            total: @js($categories->count()),
+            enabled: {{ $idleHamburgerEnabled ? 'true' : 'false' }},
+            delay: {{ (int) $idleHamburgerDelayMs }},
+            step: {{ (int) $idleHamburgerStepMs }},
+            total: {{ (int) $categories->count() }},
         })"
         x-init="init()"
         @mouseenter="markPointerEnter"
@@ -215,7 +215,7 @@
                                         return days > 0 ? days * {{ (int) $item->price_per_day }} * this.quickQty : 0;
                                     },
                                     formatIdr(value) {
-                                        return new Intl.NumberFormat(@js($intlLocale)).format(value);
+                                        return new Intl.NumberFormat('{{ $intlLocale }}').format(value);
                                     }
                                 }"
                                 @click="if (!$event.target.closest('button, a')) window.location.assign('{{ route('product.show', $item->slug) }}')"
