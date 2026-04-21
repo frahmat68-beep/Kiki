@@ -74,9 +74,9 @@ class AvailabilityBoardController extends Controller
             $equipmentIds = $equipments->pluck('id')->all();
 
             $allReservations = [];
-            if (!empty($equipmentIds)) {
-                $allReservations = $availability->getBatchDailyReservedUnits($equipments, $calendarStart, $calendarEnd);
-            }
+            // if (!empty($equipmentIds)) {
+            //    $allReservations = $availability->getBatchDailyReservedUnits($equipments, $calendarStart, $calendarEnd);
+            // }
 
             $selectedDateKey = $selectedDate->toDateString();
             $equipmentRows = collect();
