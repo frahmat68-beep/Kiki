@@ -29,6 +29,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'otp_code',
         'otp_expires_at',
         'is_otp_verified',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
     ];
 
     protected $hidden = [

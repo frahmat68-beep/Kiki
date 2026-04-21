@@ -57,4 +57,10 @@ return [
         'model' => env('NVIDIA_MODEL', 'meta/llama-3.1-8b-instruct'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL'),
+    ],
+
 ];
