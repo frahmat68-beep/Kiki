@@ -4,7 +4,6 @@ namespace App\Services\Ai;
 
 use App\Models\Category;
 use App\Models\Equipment;
-use App\Services\AvailabilityService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -96,16 +95,28 @@ class NvidiaAiService
         $tagline = site_setting('brand.tagline', 'Rental Alat Produksi Profesional');
         $owner = "Kiki Rachmat";
         
-        // Fetch Categories
-        $categories = Category::all(['name', 'description'])->map(fn($c) => "- {$c->name}: {$c->description}")->implode("\n");
+        // Fetch Categories with safety
+        $categories = schema_table_exists_cached('categories') 
+            ? Category::all(['name', 'description'])->map(fn($c) => "- {$c->name}: {$c->description}")->implode("\n")
+            : "Data kategori sedang tidak tersedia.";
         
-        // Fetch Ready Equipments with more detail
-        $equipments = Equipment::with('category:id,name')
-            ->where('status', 'ready')
-            ->get(['name', 'price_per_day', 'description', 'stock', 'category_id', 'slug'])
-            ->map(function($e) {
-                return "- {$e->name} [Slug: {$e->slug}] ({$e->category?->name}): Rp" . number_format($e->price_per_day, 0, ',', '.') . "/hari. Stok: {$e->stock}. Deskripsi: {$e->description}";
-            })->implode("\n");
+        if (empty($categories)) {
+            $categories = "Belum ada kategori yang terdaftar.";
+        }
+        
+        // Fetch Ready Equipments with more detail and safety
+        $equipments = schema_table_exists_cached('equipments')
+            ? Equipment::with('category:id,name')
+                ->where('status', 'ready')
+                ->get(['name', 'price_per_day', 'description', 'stock', 'category_id', 'slug'])
+                ->map(function($e) {
+                    return "- {$e->name} [Slug: {$e->slug}] ({$e->category?->name}): Rp" . number_format($e->price_per_day, 0, ',', '.') . "/hari. Stok: {$e->stock}. Deskripsi: {$e->description}";
+                })->implode("\n")
+            : "Data alat sedang tidak tersedia.";
+
+        if (empty($equipments)) {
+            $equipments = "Semua alat sedang tidak tersedia atau dalam penyewaan.";
+        }
 
         return "Kamu adalah 'Manake Guide', asisten AI cerdas untuk platform '{$siteName}' ({$tagline}).
 Platform ini adalah hasil karya Skripsi dari {$owner}.

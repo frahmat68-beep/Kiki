@@ -19,10 +19,10 @@ class SecurityHeaders
 
         $csp = "default-src 'self'; ";
         $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://cdn.jsdelivr.net https://unpkg.com https://accounts.google.com; ";
-        $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; ";
+        $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; ";
         $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
         $csp .= "img-src 'self' data: https:; ";
-        $csp .= "connect-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com; ";
+        $csp .= "connect-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com https://cdn.jsdelivr.net https://unpkg.com; ";
         $csp .= "frame-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com https://accounts.google.com; ";
 
         $response->headers->set('Content-Security-Policy', $csp);

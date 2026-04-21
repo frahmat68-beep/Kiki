@@ -7,9 +7,10 @@ use App\Models\Admin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Throwable;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -70,18 +71,28 @@ class AuthenticatedSessionController extends Controller
         }
 
         if (in_array($role, ['admin', 'super_admin'], true)) {
-            if (schema_table_exists_cached('admins')) {
-                $admin = Admin::updateOrCreate(
-                    ['email' => $user->email],
-                    [
-                        'name' => $user->name ?: __('Admin'),
-                        'password' => $user->password,
-                        'role' => $role,
-                        'email_verified_at' => $user->email_verified_at ?: now(),
-                    ]
-                );
+            try {
+                if (schema_table_exists_cached('admins')) {
+                    $admin = Admin::updateOrCreate(
+                        ['email' => $user->email],
+                        [
+                            'name' => $user->name ?: __('Admin'),
+                            'password' => $user->password,
+                            'role' => $role,
+                            'email_verified_at' => $user->email_verified_at ?: now(),
+                        ]
+                    );
 
-                Auth::guard('admin')->login($admin);
+                    Auth::guard('admin')->login($admin);
+                }
+            } catch (Throwable $e) {
+                Log::error('Admin Sync Failure in Login: ' . $e->getMessage(), [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // We logic fallback: don't crash, let them in as user or show specific error
+                // For production security audit, we decide to allow the login to continue but without admin guard if sync fails
             }
 
             return redirect()->intended(route('admin.dashboard'));
