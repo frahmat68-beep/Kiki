@@ -22,8 +22,8 @@ class SecurityHeaders
         $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; ";
         $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
         $csp .= "img-src 'self' data: https:; ";
-        $csp .= "connect-src 'self' https://*.midtrans.com https://cdn.jsdelivr.net https://unpkg.com; ";
-        $csp .= "frame-src 'self' https://*.midtrans.com https://accounts.google.com; ";
+        $csp .= "connect-src 'self' https://*.midtrans.com https://cdn.jsdelivr.net https://unpkg.com https://integrate.api.nvidia.com; ";
+        $csp .= "frame-src 'self' https://*.midtrans.com https://accounts.google.com https://www.google.com; ";
 
         $response->headers->set('Content-Security-Policy', $csp);
 

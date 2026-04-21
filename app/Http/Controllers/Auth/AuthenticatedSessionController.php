@@ -92,8 +92,6 @@ class AuthenticatedSessionController extends Controller
                     'email' => $user->email,
                     'trace' => $e->getTraceAsString()
                 ]);
-                // We logic fallback: don't crash, let them in as user or show specific error
-                // For production security audit, we decide to allow the login to continue but without admin guard if sync fails
             }
 
             return redirect()->intended(route('admin.dashboard'));

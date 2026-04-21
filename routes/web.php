@@ -28,12 +28,12 @@ use App\Http\Controllers\Admin\EquipmentController as AdminEquipmentController;
 use App\Http\Controllers\Admin\ContentController as AdminContentController;
 use App\Http\Controllers\Admin\CopywritingController as AdminCopywritingController;
 use App\Http\Controllers\Admin\WebsiteSettingsController as AdminWebsiteSettingsController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
 | PUBLIC PAGES (NO AUTH)
 |--------------------------------------------------------------------------
-|
 */
 
 Route::get('/assets/public/{path}', [AssetController::class, 'public'])
@@ -89,7 +89,6 @@ Route::middleware('auth.feature')->group(function () {
 |--------------------------------------------------------------------------
 | USER PAGES (AUTH)
 |--------------------------------------------------------------------------
-|
 */
 
 Route::middleware(['auth', 'otp'])->group(function () {
@@ -133,7 +132,6 @@ Route::middleware(['auth', 'otp'])->group(function () {
 |--------------------------------------------------------------------------
 | CHECKOUT (AUTH + PROFILE COMPLETED)
 |--------------------------------------------------------------------------
-|
 */
 
 Route::middleware(['auth', 'otp', 'ensure.profile.completed'])->group(function () {
@@ -145,7 +143,6 @@ Route::middleware(['auth', 'otp', 'ensure.profile.completed'])->group(function (
 |--------------------------------------------------------------------------
 | ADMIN ROUTES
 |--------------------------------------------------------------------------
-|
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
