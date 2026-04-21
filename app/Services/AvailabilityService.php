@@ -99,7 +99,7 @@ class AvailabilityService
         $equipmentIds = $equipments->pluck('id')->all();
 
         $items = OrderItem::query()
-            ->with(['order:id,user_id,order_number,midtrans_order_id,status_pesanan,status_pembayaran,rental_start_date,rental_end_date,created_at'])
+            ->with(['order'])
             ->whereIn('equipment_id', $equipmentIds)
             ->whereHas('order', function ($query) use ($windowStart, $windowEnd, $holdCutoff, $ignoreOrderId) {
                 $query
@@ -378,7 +378,7 @@ class AvailabilityService
         $holdCutoff = now()->subMinutes(self::HOLD_WINDOW_MINUTES);
 
         return OrderItem::query()
-            ->with(['order:id,user_id,order_number,midtrans_order_id,status_pesanan,status_pembayaran,rental_start_date,rental_end_date,created_at'])
+            ->with(['order'])
             ->where('equipment_id', $equipmentId)
             ->whereHas('order', function ($query) use ($windowStart, $windowEnd, $holdCutoff, $ignoreOrderId) {
                 $query

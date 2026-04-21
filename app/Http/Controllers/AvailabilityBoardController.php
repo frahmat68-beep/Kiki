@@ -59,7 +59,7 @@ class AvailabilityBoardController extends Controller
             }
 
             $equipmentQuery = Equipment::query()
-                ->with('category')
+                ->with(['category'])
                 ->orderBy('name');
 
             if ($search !== '') {
@@ -302,10 +302,7 @@ class AvailabilityBoardController extends Controller
         }
 
         return OrderItem::query()
-            ->with([
-                'equipment:id,name',
-                'order:id,order_number,status_pesanan,rental_start_date,rental_end_date',
-            ])
+            ->with(['equipment', 'order'])
             ->whereIn('equipment_id', $equipmentIds->all())
             ->whereHas('order', function ($query) use ($calendarStart, $calendarEnd) {
                 $query
@@ -315,7 +312,7 @@ class AvailabilityBoardController extends Controller
             })
             ->latest('id')
             ->limit(180)
-            ->get(['id', 'order_id', 'equipment_id', 'qty', 'rental_start_date', 'rental_end_date'])
+            ->get()
             ->map(function (OrderItem $item) {
                 $startDate = $item->rental_start_date ?: $item->order?->rental_start_date;
                 $endDate = $item->rental_end_date ?: $item->order?->rental_end_date;
@@ -481,7 +478,7 @@ class AvailabilityBoardController extends Controller
             'ready' => 'Ready',
             'maintenance' => 'Maintenance',
             'unavailable' => 'Unavailable',
-            default => strtoupper($status),
+            default => Str::of($status)->replace('_', ' ')->title()->value(),
         };
     }
 
@@ -507,7 +504,7 @@ class AvailabilityBoardController extends Controller
             'selesai' => 'Selesai',
             'dibatalkan' => 'Dibatalkan',
             'barang_rusak' => 'Klaim Kerusakan',
-            default => str($status)->replace('_', ' ')->title()->value(),
+            default => Str::of($status)->replace('_', ' ')->title()->value(),
         };
     }
 
@@ -553,7 +550,7 @@ class AvailabilityBoardController extends Controller
             'buffer_before' => 'Buffer Sebelum',
             'buffer_after' => 'Buffer Sesudah',
             'maintenance' => 'Maintenance',
-            default => str($type)->replace('_', ' ')->title()->value(),
+            default => Str::of($type)->replace('_', ' ')->title()->value(),
         };
     }
 }
