@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\WebsiteSettingsController as AdminWebsiteSettings
 |--------------------------------------------------------------------------
 | PUBLIC PAGES (NO AUTH)
 |--------------------------------------------------------------------------
+|
 */
 
 Route::get('/assets/public/{path}', [AssetController::class, 'public'])
@@ -44,9 +45,10 @@ Route::get('/assets/media/{path}', [AssetController::class, 'media'])
 
 Route::get('/', [CategoryController::class, 'home'])->name('home');
 Route::get('/logout', function (Request $request) {
-    return redirect()
-        ->route('home')
-        ->with('error', __('ui.auth.session_expired_logout'));
+    Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/');
 });
 
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('lang.switch');
@@ -87,6 +89,7 @@ Route::middleware('auth.feature')->group(function () {
 |--------------------------------------------------------------------------
 | USER PAGES (AUTH)
 |--------------------------------------------------------------------------
+|
 */
 
 Route::middleware(['auth', 'otp'])->group(function () {
@@ -130,6 +133,7 @@ Route::middleware(['auth', 'otp'])->group(function () {
 |--------------------------------------------------------------------------
 | CHECKOUT (AUTH + PROFILE COMPLETED)
 |--------------------------------------------------------------------------
+|
 */
 
 Route::middleware(['auth', 'otp', 'ensure.profile.completed'])->group(function () {
@@ -141,6 +145,7 @@ Route::middleware(['auth', 'otp', 'ensure.profile.completed'])->group(function (
 |--------------------------------------------------------------------------
 | ADMIN ROUTES
 |--------------------------------------------------------------------------
+|
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {

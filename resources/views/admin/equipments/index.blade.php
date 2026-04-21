@@ -27,8 +27,8 @@
         <section class="card rounded-2xl shadow-sm p-6">
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-blue-700">{{ __('Daftar Alat') }}</h2>
-                    <p class="text-xs text-slate-500">{{ __('Kelola nama alat, harga, stok, dan status sewa.') }}</p>
+                    <h2 class="text-xl font-bold text-blue-700">{{ __('Daftar Alat & Inventaris') }}</h2>
+                    <p class="text-sm text-slate-500">{{ __('Kelola spesifikasi, harga sewa, dan pantau ketersediaan unit secara real-time.') }}</p>
                 </div>
                 <div class="flex w-full gap-2 sm:w-auto">
                     <a
@@ -66,10 +66,10 @@
                 </div>
             </form>
 
-            <div class="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{{ __('Filter Status') }}</p>
-                    <div class="mt-2 flex flex-wrap gap-2">
+            <div class="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div class="flex flex-wrap items-center gap-4">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('Status') }}</p>
+                    <div class="flex flex-wrap gap-2">
                         @foreach ($statusFilters as $filter)
                             @php
                                 $isActiveStatus = $status === $filter['value'];
@@ -80,7 +80,7 @@
                                     'status' => $filter['value'],
                                     'category' => $activeCategorySlug,
                                 ], fn ($value) => $value !== '')) }}"
-                                class="rounded-full border px-3 py-1.5 text-xs font-semibold transition {{ $isActiveStatus ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-600' }}"
+                                class="rounded-xl border px-3 py-1.5 text-xs font-semibold transition {{ $isActiveStatus ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-blue-600' }}"
                             >
                                 {{ $filter['label'] }}
                             </a>
@@ -88,17 +88,17 @@
                     </div>
                 </div>
 
-                <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{{ __('Filter Kategori') }}</p>
-                    <div class="mt-2 flex flex-wrap gap-2">
+                <div class="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-100">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('Kategori') }}</p>
+                    <div class="flex flex-wrap gap-2">
                         <a
                             href="{{ route('admin.equipments.index', array_filter([
                                 'q' => $search,
                                 'status' => $status,
                             ], fn ($value) => $value !== '')) }}"
-                            class="rounded-full border px-3 py-1.5 text-xs font-semibold transition {{ $activeCategorySlug === '' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-600' }}"
+                            class="rounded-xl border px-3 py-1.5 text-xs font-semibold transition {{ $activeCategorySlug === '' ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-blue-600' }}"
                         >
-                            {{ __('Semua Kategori') }}
+                            {{ __('Semua') }}
                         </a>
                         @foreach ($categories as $category)
                             <a
@@ -107,7 +107,7 @@
                                     'status' => $status,
                                     'category' => $category->slug,
                                 ], fn ($value) => $value !== '')) }}"
-                                class="rounded-full border px-3 py-1.5 text-xs font-semibold transition {{ $activeCategorySlug === $category->slug ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-600' }}"
+                                class="rounded-xl border px-3 py-1.5 text-xs font-semibold transition {{ $activeCategorySlug === $category->slug ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-blue-600' }}"
                             >
                                 {{ $category->name }}
                             </a>

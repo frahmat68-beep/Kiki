@@ -14,8 +14,8 @@
         <section class="card rounded-2xl shadow-sm p-6">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-blue-700">{{ __('Daftar Kategori') }}</h2>
-                    <p class="text-xs text-slate-500">{{ __('Kelola kategori dan slug untuk katalog.') }}</p>
+                    <h2 class="text-xl font-bold text-blue-700">{{ __('Daftar Kategori Katalog') }}</h2>
+                    <p class="text-sm text-slate-500">{{ __('Kelola pengelompokan alat dan optimasi slug untuk struktur katalog.') }}</p>
                 </div>
                 <a
                     href="{{ route('admin.categories.create') }}"

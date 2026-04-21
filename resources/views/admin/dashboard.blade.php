@@ -41,22 +41,22 @@
             </div>
         @endif
 
-        <section class="grid grid-cols-2 gap-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,1.2fr)]">
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Siap Diambil') }}</p>
-                <p class="mt-2 text-3xl font-semibold text-blue-600">{{ (int) ($summary['ready_pickup'] ?? 0) }}</p>
+        <section class="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,1.2fr)]">
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{{ __('Siap Diambil') }}</p>
+                <p class="mt-2 text-3xl font-extrabold text-blue-600">{{ (int) ($summary['ready_pickup'] ?? 0) }}</p>
             </article>
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Sedang Disewa') }}</p>
-                <p class="mt-2 text-3xl font-semibold text-amber-600">{{ (int) ($summary['on_rent'] ?? 0) }}</p>
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{{ __('Sedang Disewa') }}</p>
+                <p class="mt-2 text-3xl font-extrabold text-amber-500">{{ (int) ($summary['on_rent'] ?? 0) }}</p>
             </article>
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Sudah Kembali') }}</p>
-                <p class="mt-2 text-3xl font-semibold text-emerald-600">{{ (int) ($summary['returned'] ?? 0) }}</p>
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{{ __('Sudah Kembali') }}</p>
+                <p class="mt-2 text-3xl font-extrabold text-emerald-600">{{ (int) ($summary['returned'] ?? 0) }}</p>
             </article>
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Kasus Rusak') }}</p>
-                <p class="mt-2 text-3xl font-semibold text-rose-600">{{ (int) ($summary['damaged'] ?? 0) }}</p>
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+                <p class="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{{ __('Kasus Rusak') }}</p>
+                <p class="mt-2 text-3xl font-extrabold text-rose-600">{{ (int) ($summary['damaged'] ?? 0) }}</p>
             </article>
             <article class="col-span-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-1">
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('Prioritas Hari Ini') }}</p>
@@ -103,8 +103,8 @@
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
                     <div>
-                        <h2 class="text-lg font-semibold text-blue-700">{{ __('Pesanan Perlu Tindakan') }}</h2>
-                        <p class="text-xs text-slate-500">{{ __('Fokus ke aksi inti: konfirmasi diambil, dikembalikan, atau rusak.') }}</p>
+                        <h2 class="text-lg font-bold text-blue-700">{{ __('Pesanan Perlu Tindakan') }}</h2>
+                        <p class="text-xs text-slate-500">{{ __('Daftar pesanan aktif yang membutuhkan konfirmasi operasional.') }}</p>
                     </div>
                     <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">
                         {{ __('Kelola di halaman Pesanan →') }}

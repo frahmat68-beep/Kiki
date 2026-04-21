@@ -29,6 +29,19 @@ class CartController extends Controller
                 ->unique()
                 ->values();
 
+            $cartEquipments = Equipment::query()
+                ->whereIn('id', $cartEquipmentIds)
+                ->get()
+                ->keyBy('id');
+
+            $cartItems = collect($cartItems)->map(function (array $item) use ($cartEquipments) {
+                $equipmentId = (int) ($item['equipment_id'] ?? $item['product_id'] ?? 0);
+                $equipment = $cartEquipments->get($equipmentId);
+                $item['stock'] = $equipment ? (int) $equipment->stock : 99;
+
+                return $item;
+            })->all();
+
             $suggestionQuery = Equipment::query()
                 ->with('category')
                 ->where('stock', '>', 0)

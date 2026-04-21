@@ -3,11 +3,11 @@
         $isNameLocked = (bool) ($nameLocked ?? false);
     @endphp
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-xl font-bold text-blue-700">
             {{ __('Informasi Profil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-slate-500">
             {{ __('Perbarui informasi profil dan alamat email akun Anda.') }}
         </p>
     </header>
@@ -72,7 +72,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm font-semibold text-emerald-600"
                 >{{ __('Tersimpan.') }}</p>
             @endif
         </div>

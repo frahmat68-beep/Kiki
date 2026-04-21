@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-xl font-bold text-blue-700">
             {{ __('Ubah Kata Sandi') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-slate-500">
             {{ __('Gunakan kata sandi yang panjang dan unik agar akun tetap aman.') }}
         </p>
     </header>
@@ -61,7 +61,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm font-semibold text-emerald-600"
                 >{{ __('Tersimpan.') }}</p>
             @endif
         </div>
