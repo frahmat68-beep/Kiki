@@ -186,7 +186,7 @@ class AvailabilityBoardController extends Controller
                 $reservedUnits = (int) data_get($calendarTotals, $dateKey . '.reserved_units', 0);
                 $bookingEquipments = (int) data_get($calendarTotals, $dateKey . '.booking_equipments', 0);
                 $bufferEquipments = (int) data_get($calendarTotals, $dateKey . '.buffer_equipments', 0);
-                $isSelectable = $date->betweenIncluded($windowStartDate, $windowEndDate);
+                $isSelectable = $date->gte($windowStartDate) && $date->lte($windowEndDate);
 
                 $tone = 'calm';
                 if ($bookingEquipments > 0) {
@@ -524,18 +524,26 @@ class AvailabilityBoardController extends Controller
         }
     }
 
-    private function resolveEquipmentImageUrl(Equipment $equipment): string
+    private function resolveEquipmentImageUrl(Equipment $equipment): ?string
     {
-        $imagePath = (string) ($equipment->image_path ?? $equipment->image ?? '');
-
-        if ($imagePath !== '') {
-            $resolvedImageUrl = site_media_url($imagePath);
-            if ($resolvedImageUrl) {
-                return $resolvedImageUrl;
-            }
+        $path = (string) ($equipment->main_image_url ?? $equipment->image_url ?? $equipment->image_path ?? $equipment->image ?? '');
+        
+        if ($path === '') {
+            return null;
         }
 
-        return site_asset('MANAKE-FAV-M.png');
+        if (str_starts_with($path, 'http')) {
+            return $path;
+        }
+
+        try {
+            $resolved = site_media_url($path);
+            if ($resolved) {
+                return $resolved;
+            }
+        } catch (\Throwable $e) {}
+
+        return asset('storage/' . ltrim($path, '/'));
     }
 
     private function resolveSourceLabel(string $type): string

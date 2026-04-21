@@ -130,7 +130,7 @@ class AvailabilityService
             $orderNumber = (string) ($order?->order_number ?: $order?->midtrans_order_id ?: ('ORD-' . $order?->id));
 
             for ($cursor = $bookingStart->copy(); $cursor->lte($bookingEnd); $cursor->addDay()) {
-                $this->appendDailyReservation($results[$eId], $cursor, $start, $end, $qty, [
+                $this->appendDailyReason($results[$eId], $cursor, $start, $end, $qty, [
                     'type' => 'booking',
                     'order_number' => $orderNumber,
                 ]);
@@ -138,13 +138,13 @@ class AvailabilityService
 
             for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
                 $bufferBeforeDate = $bookingStart->copy()->subDays($offset);
-                $this->appendDailyReservation($results[$eId], $bufferBeforeDate, $start, $end, $qty, [
+                $this->appendDailyReason($results[$eId], $bufferBeforeDate, $start, $end, $qty, [
                     'type' => 'buffer_before',
                     'order_number' => $orderNumber,
                 ]);
 
                 $bufferAfterDate = $bookingEnd->copy()->addDays($offset);
-                $this->appendDailyReservation($results[$eId], $bufferAfterDate, $start, $end, $qty, [
+                $this->appendDailyReason($results[$eId], $bufferAfterDate, $start, $end, $qty, [
                     'type' => 'buffer_after',
                     'order_number' => $orderNumber,
                 ]);
@@ -168,7 +168,7 @@ class AvailabilityService
 
                 $stock = (int) ($stockMap[$eId] ?? 1);
                 for ($cursor = $maintenanceStart->copy(); $cursor->lte($maintenanceEnd); $cursor->addDay()) {
-                    $this->appendDailyReservation($results[$eId], $cursor, $start, $end, max($stock, 1), [
+                    $this->appendDailyReason($results[$eId], $cursor, $start, $end, max($stock, 1), [
                         'type' => 'maintenance',
                         'reason' => $window->reason,
                     ]);
@@ -209,7 +209,7 @@ class AvailabilityService
             $orderNumber = (string) ($order?->order_number ?: $order?->midtrans_order_id ?: ('ORD-' . $order?->id));
 
             for ($cursor = $bookingStart->copy(); $cursor->lte($bookingEnd); $cursor->addDay()) {
-                $this->appendDailyReservation($daily, $cursor, $start, $end, $qty, [
+                $this->appendDailyReason($daily, $cursor, $start, $end, $qty, [
                     'type' => 'booking',
                     'order_number' => $orderNumber,
                 ]);
@@ -217,13 +217,13 @@ class AvailabilityService
 
             for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
                 $bufferBeforeDate = $bookingStart->copy()->subDays($offset);
-                $this->appendDailyReservation($daily, $bufferBeforeDate, $start, $end, $qty, [
+                $this->appendDailyReason($daily, $bufferBeforeDate, $start, $end, $qty, [
                     'type' => 'buffer_before',
                     'order_number' => $orderNumber,
                 ]);
 
                 $bufferAfterDate = $bookingEnd->copy()->addDays($offset);
-                $this->appendDailyReservation($daily, $bufferAfterDate, $start, $end, $qty, [
+                $this->appendDailyReason($daily, $bufferAfterDate, $start, $end, $qty, [
                     'type' => 'buffer_after',
                     'order_number' => $orderNumber,
                 ]);
@@ -245,7 +245,7 @@ class AvailabilityService
                 }
 
                 for ($cursor = $maintenanceStart->copy(); $cursor->lte($maintenanceEnd); $cursor->addDay()) {
-                    $this->appendDailyReservation($daily, $cursor, $start, $end, max((int) $equipment->stock, 1), [
+                    $this->appendDailyReason($daily, $cursor, $start, $end, max((int) $equipment->stock, 1), [
                         'type' => 'maintenance',
                         'reason' => $window->reason,
                     ]);
@@ -301,7 +301,7 @@ class AvailabilityService
 
             for ($offset = 1; $offset <= self::BUFFER_DAYS; $offset++) {
                 $bufferBeforeDate = $bookingStart->copy()->subDays($offset);
-                if ($bufferBeforeDate->betweenIncluded($start, $end)) {
+                if ($bufferBeforeDate->gte($start) && $bufferBeforeDate->lte($end)) {
                     $entries->push([
                         'type' => 'buffer_before',
                         'order_number' => $orderNumber,
@@ -315,7 +315,7 @@ class AvailabilityService
                 }
 
                 $bufferAfterDate = $bookingEnd->copy()->addDays($offset);
-                if ($bufferAfterDate->betweenIncluded($start, $end)) {
+                if ($bufferAfterDate->gte($start) && $bufferAfterDate->lte($end)) {
                     $entries->push([
                         'type' => 'buffer_after',
                         'order_number' => $orderNumber,
@@ -395,7 +395,7 @@ class AvailabilityService
             ->get();
     }
 
-    private function appendDailyReservation(
+    private function appendDailyReason(
         array &$daily,
         Carbon $cursor,
         Carbon $windowStart,
@@ -403,7 +403,7 @@ class AvailabilityService
         int $qty,
         array $source
     ): void {
-        if (! $cursor->betweenIncluded($windowStart, $windowEnd)) {
+        if (! ($cursor->gte($windowStart) && $cursor->lte($windowEnd))) {
             return;
         }
 
