@@ -17,9 +17,9 @@ class NvidiaAiService
 
     public function __construct()
     {
-        $this->primaryKey = config('services.nvidia.api_key');
-        $this->secondaryKey = config('services.nvidia.api_key_secondary');
-        $this->model = config('services.nvidia.model', 'meta/llama-3.1-8b-instruct');
+        $this->primaryKey = (string) config('services.nvidia.api_key');
+        $this->secondaryKey = (string) config('services.nvidia.api_key_secondary');
+        $this->model = (string) config('services.nvidia.model', 'meta/llama-3.1-8b-instruct');
     }
 
     /**
@@ -27,43 +27,49 @@ class NvidiaAiService
      */
     public function chat(array $messages)
     {
-        if (!collect($messages)->contains('role', 'system')) {
-            array_unshift($messages, [
-                'role' => 'system',
-                'content' => $this->buildSystemPrompt(),
-            ]);
-        }
-
-        // Check if API keys are configured
-        if (!$this->primaryKey) {
-            Log::error('Nvidia AI Primary API Key is not configured.');
-            return "Maaf, sistem AI sedang dalam pemeliharaan (API Key belum dikonfigurasi). Silakan coba lagi nanti.";
-        }
-
-        // Try primary key first
-        $response = $this->sendRequest($this->primaryKey, $messages);
-
-        // If primary fails (rate limit or auth error), try secondary key
-        if ($response->failed() && ($response->status() === 429 || $response->status() === 401)) {
-            Log::warning('Nvidia Primary API Key failed, trying secondary key.', [
-                'status' => $response->status(),
-            ]);
-            
-            if ($this->secondaryKey) {
-                $response = $this->sendRequest($this->secondaryKey, $messages);
+        try {
+            if (!collect($messages)->contains('role', 'system')) {
+                array_unshift($messages, [
+                    'role' => 'system',
+                    'content' => $this->buildSystemPrompt(),
+                ]);
             }
+
+            // Check if API keys are configured
+            if (!$this->primaryKey) {
+                Log::error('Nvidia AI Primary API Key is not configured.');
+                return "Maaf, sistem AI sedang dalam pemeliharaan (API Key belum dikonfigurasi). Silakan coba lagi nanti.";
+            }
+
+            // Try primary key first
+            $response = $this->sendRequest($this->primaryKey, $messages);
+
+            // If primary fails (rate limit or auth error), try secondary key
+            if ($response->failed() && ($response->status() === 429 || $response->status() === 401)) {
+                Log::warning('Nvidia Primary API Key failed, trying secondary key.', [
+                    'status' => $response->status(),
+                ]);
+                
+                if ($this->secondaryKey) {
+                    $response = $this->sendRequest($this->secondaryKey, $messages);
+                }
+            }
+
+            if ($response->successful()) {
+                $content = $response->json('choices.0.message.content');
+                return $content ?: "Maaf, saya tidak mendapatkan respon yang valid dari AI.";
+            }
+
+            Log::error('Nvidia AI API Error (All keys failed)', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return "Maaf, saat ini saya sedang mengalami gangguan koneksi ke mesin AI. Silakan coba lagi nanti.";
+        } catch (Throwable $e) {
+            Log::critical('NvidiaAiService::chat failure: ' . $e->getMessage(), ['exception' => $e]);
+            return "Maaf, terjadi kesalahan internal pada sistem asisten digital.";
         }
-
-        if ($response->successful()) {
-            return $response->json('choices.0.message.content');
-        }
-
-        Log::error('Nvidia AI API Error (All keys failed)', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        return "Maaf, saat ini saya sedang mengalami gangguan koneksi. Silakan coba lagi nanti.";
     }
 
     /**
@@ -73,7 +79,7 @@ class NvidiaAiService
     {
         try {
             return Http::withToken($key)
-                ->timeout(9)
+                ->timeout(12)
                 ->post("{$this->baseUrl}/chat/completions", [
                     'model' => $this->model,
                     'messages' => $messages,
