@@ -60,7 +60,6 @@ Konfigurasi yang disarankan saat import repo ke Vercel:
 - Framework Preset: `Other`
 - Root Directory: `.`
 - Build Command: `npm run build`
-- Output Directory: `public/build`
 - Node.js Version: gunakan default project Vercel atau `22.x`
 - Install Command:
   - `npm install`
@@ -113,6 +112,7 @@ ADMIN_DB_EDIT_ENABLED=false
 Catatan runtime Vercel untuk project ini:
 
 - `SESSION_DRIVER`, `CACHE_STORE`, dan `QUEUE_CONNECTION` akan otomatis dibuat aman untuk Vercel melalui config aplikasi.
+- Untuk Laravel PHP runtime di Vercel, jangan isi `Output Directory`. Biarkan route ditangani oleh `api/index.php` lewat `vercel.json`.
 - Queue async jangka panjang tidak cocok dijalankan di Vercel serverless tanpa layanan worker terpisah.
 - File upload lokal di `storage/app/public` tidak persisten antar deployment. Jika admin akan sering upload aset produksi, pindahkan media ke object storage eksternal.
 - Upload media admin sekarang bisa diarahkan ke disk lain dengan `SITE_MEDIA_DISK` seperti `s3`, sehingga Vercel tidak bergantung pada filesystem lokal untuk logo, hero, dan gambar equipment.
