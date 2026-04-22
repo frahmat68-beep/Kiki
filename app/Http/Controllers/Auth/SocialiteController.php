@@ -22,6 +22,14 @@ class SocialiteController extends Controller
             abort(404);
         }
 
+        if (! $this->googleOauthIsConfigured()) {
+            return redirect()
+                ->route('login')
+                ->withErrors([
+                    'email' => 'Login Google belum aktif karena konfigurasi OAuth production belum lengkap.',
+                ]);
+        }
+
         return Socialite::driver($provider)->redirect();
     }
 
@@ -35,6 +43,14 @@ class SocialiteController extends Controller
         }
 
         try {
+            if (! $this->googleOauthIsConfigured()) {
+                return redirect()
+                    ->route('login')
+                    ->withErrors([
+                        'email' => 'Login Google belum aktif karena konfigurasi OAuth production belum lengkap.',
+                    ]);
+            }
+
             $socialUser = Socialite::driver($provider)->user();
             
             $user = User::where('google_id', $socialUser->getId())
@@ -72,5 +88,12 @@ class SocialiteController extends Controller
                 'email' => 'Gagal login menggunakan Google: ' . $e->getMessage(),
             ]);
         }
+    }
+
+    private function googleOauthIsConfigured(): bool
+    {
+        return trim((string) config('services.google.client_id', '')) !== ''
+            && trim((string) config('services.google.client_secret', '')) !== ''
+            && trim((string) config('services.google.redirect', '')) !== '';
     }
 }

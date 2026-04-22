@@ -43,6 +43,15 @@ class PageSmokeTest extends TestCase
         }
     }
 
+    public function test_home_page_renders_rental_snapshot_inside_hero_surface(): void
+    {
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Rental Snapshot Saat Ini');
+        $response->assertSee('Lihat board');
+    }
+
     public function test_login_page_uses_relative_logo_assets(): void
     {
         $response = $this->get(route('login'));
